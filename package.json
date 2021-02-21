@@ -1,0 +1,22 @@
+{
+  "private": true,
+  "name": "medley",
+  "version": "0.0.1",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build:mve": "npx lerna run build:mve --stream",
+    "test:mve": "npx lerna run test:mve --stream"
+  },
+  "devDependencies": {
+    "lerna": "3.18.4"
+  },  
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "roots": ["<rootDir>/packages/medley-mve/src"]
+  },
+  "workspaces": [
+    "packages/**"
+  ]
+}

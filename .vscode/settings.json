@@ -1,0 +1,15 @@
+{
+    "lit-html.tags": [
+        "html",
+        "raw",
+        "xml"
+    ],
+    "deno.enable": false,
+    "jest.debugCodeLens.showWhenTestStateIn": [
+        "pass",
+        "fail",
+        "unknown"
+    ],
+    "jest.pathToJest": "./node_modules/.bin/jest",
+    "explorer.autoReveal": false
+}

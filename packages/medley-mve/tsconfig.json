@@ -1,0 +1,22 @@
+{
+  "exclude": ["node_modules", "dist"],
+  "extends": "../../tsconfig.json",  
+  "compilerOptions": {
+    "outDir": "dist",
+    "lib": ["ES2020"],
+    "module": "CommonJS",
+    "target": "ES2020",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "importHelpers": true,
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "declaration": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "stripInternal": true,
+    "pretty": true,
+    "strictNullChecks": true
+  },
+  "include": ["src"],
+}
