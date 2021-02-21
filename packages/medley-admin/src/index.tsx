@@ -1,8 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import pkg from "systemjs"
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+
+const { System } = pkg;
 
 ReactDOM.render(
   <React.StrictMode>

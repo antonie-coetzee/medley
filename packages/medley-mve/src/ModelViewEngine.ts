@@ -1,4 +1,4 @@
-import { Loader, ViewEngine } from "./core";
+import { Loader, ViewEngine } from "./Core";
 import { ModelGraphRepository } from "./Models";
 import { TypeMapRepository } from "./Types";
 
