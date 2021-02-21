@@ -6,11 +6,6 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "module": "./dist/index.js",
-  "workspaces": {
-    "packages": [
-      "packages/**"
-    ]
-  },
   "scripts": {
     "build:mve": "tsc",
     "test:mve": "jest"
@@ -27,7 +22,7 @@
   },
   "devDependencies": {
     "@types/jest": "26.0.3",
-    "jest": "26.1.0",
+    "jest": "26.6.0",
     "ts-jest": "26.5.1",
     "typescript": "3.9.6"
   }
