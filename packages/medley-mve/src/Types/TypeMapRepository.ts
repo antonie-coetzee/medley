@@ -15,7 +15,7 @@ export class TypeMapRepository {
     this.parentDirectory = url.substring(0, url.lastIndexOf("/") + 1);
     var module = await this.loader.import(url);
     const tmap: TypeMap = module.default;
-    return this.loadTypeMap(tmap)
+    return this.loadTypeMap(tmap);
   }
 
   public async loadTypeMap(typeMap: TypeMap): Promise<void> {
@@ -67,16 +67,15 @@ export class TypeMapRepository {
       return url;
     }
   }
-  
+
   private async resolveTypeMap(
     partialTypeMap: TypeMap,
     resolvedTypeMap: TypeMap
   ): Promise<void> {
-    partialTypeMap.types.forEach(async (type) => {
+    for await (const type of partialTypeMap.types) {
       if (typeof type === "string") {
         const typeUrl = this.formatUrl(type);
-        if (typeUrl === undefined)
-          throw new Error(`type url is undefined`);
+        if (typeUrl === undefined) throw new Error(`type url is undefined`);
         const typeLoaded = await this.loadType(typeUrl);
         resolvedTypeMap.types.push(typeLoaded);
         this.indexType(typeLoaded);
@@ -84,17 +83,19 @@ export class TypeMapRepository {
         this.indexType(type);
         resolvedTypeMap.types.push(type);
       }
-    });
-    partialTypeMap.groups?.forEach(async (group) => {
-      const resolvedGroup: TypeMap = {
-        name: group.name,
-        iconUrl: group.iconUrl,
-        types: [],
-        groups: [],
-      };
-      resolvedTypeMap.groups?.push(resolvedGroup);
-      await this.resolveTypeMap(group, resolvedGroup);
-    });
+    }
+    if (partialTypeMap.groups !== undefined) {
+      for await (const group of partialTypeMap.groups) {
+        const resolvedGroup: TypeMap = {
+          name: group.name,
+          iconUrl: group.iconUrl,
+          types: [],
+          groups: [],
+        };
+        resolvedTypeMap.groups?.push(resolvedGroup);
+        await this.resolveTypeMap(group, resolvedGroup);
+      }
+    }
   }
 
   private indexType(type: Type) {
