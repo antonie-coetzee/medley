@@ -1,15 +1,18 @@
-import React, { useEffect } from 'react';
-import logo from './logo.svg';
-import './App.css';
-import {ModelViewEngine} from "@medley/medley-mve";
+import React, { useEffect } from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import { ModelViewEngine } from "@medley/medley-mve";
 
 function App() {
-  useEffect(()=>{
+  useEffect(() => {
     const doTest = async () => {
       const mve = new ModelViewEngine();
       mve.setBasePath("/assets/");
       await mve.load("models.json");
-      const res = await mve.renderModel("e0754165-d127-48be-92c5-85fc25dbca19",[]);
+      const res = await mve.renderModel(
+        "e0754165-d127-48be-92c5-85fc25dbca19",
+        []
+      );
       console.log(res);
     };
     doTest();
