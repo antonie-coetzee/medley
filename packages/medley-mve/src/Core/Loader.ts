@@ -1,19 +1,20 @@
-const fs = require('fs').promises;
+const fs = require("fs").promises;
 
 declare global {
   interface Window {
-      System:any;
+    System: any;
   }
 }
 
 export class Loader {
   private context: any;
 
-  private static systemJs:any;
-  public static setSystemJs(systemjsConstructor:any){
-    if(Loader.systemJs){
+  private static systemJs: any;
+  public static setSystemJs(systemjsConstructor: any) {
+    if (Loader.systemJs) {
       return;
     }
+    let jsonContentType = /^application\/json(;|$)/;
     const systemJSPrototype = systemjsConstructor.prototype;
     // add json module support to nodejs, already supported in the browser
     const fetch = systemJSPrototype.fetch;
@@ -36,7 +37,11 @@ export class Loader {
               },
             },
             async text() {
-              return 'System.register([],function(e){return{execute:function(){e("default",' + json + ')}}})'
+              return (
+                'System.register([],function(e){return{execute:function(){e("default",' +
+                json +
+                ")}}})"
+              );
             },
             async json() {
               return JSON.parse(json);
@@ -48,25 +53,59 @@ export class Loader {
           else return { status: 500, statusText: e.toString() };
         }
       } else {
-        return fetch(url, options);
+        return fetch(url, options).then(function (res: any) {
+          if (!res.ok) return res;
+          var contentType = res.headers.get("content-type");
+          if (jsonContentType.test(contentType)) {
+            return res.json().then(function (json: any) {
+              return {
+                ok: true,
+                status: 200,
+                headers: {
+                  get: (headerName: string) => {
+                    if (headerName === "content-type") {
+                      return "application/javascript";
+                    } else {
+                      throw Error(
+                        `NodeJS fetch emulation doesn't support ${headerName} header`
+                      );
+                    }
+                  },
+                },
+                async text() {
+                  return (
+                    'System.register([],function(e){return{execute:function(){e("default",' +
+                    JSON.stringify(json) +
+                    ")}}})"
+                  );
+                },
+                async json() {
+                  return JSON.parse(json);
+                },
+              };
+            });
+          } else {
+            return res;
+          }
+        });
       }
     };
     Loader.systemJs = systemjsConstructor;
   }
 
-  private static loadSystemJs(){
-    let isNode = (typeof exports === 'object') ? true: false;
-    if(isNode === true){
+  private static loadSystemJs() {
+    let isNode = typeof exports === "object" ? true : false;
+    if (isNode === true) {
       const { System } = require("systemjs"); // nodejs export
       Loader.setSystemJs(System.constructor);
-    }else{
+    } else {
       require("systemjs/dist/system.js"); // global variable in browser
       Loader.setSystemJs(window.System.constructor);
     }
   }
 
   constructor() {
-    if(Loader.systemJs === undefined){
+    if (Loader.systemJs === undefined) {
       Loader.loadSystemJs();
     }
     this.context = this.newContext();

@@ -3,6 +3,10 @@
     {
       "name": "@medley/medley-mve",
       "path": "./packages/medley-mve"
+    },
+    {
+      "name": "@medley/medley-admin",
+      "path": "./packages/medley-admin"
     }
   ]
 }

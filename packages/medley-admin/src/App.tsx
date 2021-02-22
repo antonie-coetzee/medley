@@ -15,8 +15,6 @@ function App() {
     doTest();
   });
 
-
-
   return (
     <div className="App">
       <header className="App-header">
