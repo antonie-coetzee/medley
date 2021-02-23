@@ -9,7 +9,7 @@
     "moduleResolution": "Node",
     "esModuleInterop": true,
     "importHelpers": true,
-    "inlineSourceMap": true,
+    "sourceMap": true,
     "noImplicitAny": true,
     "declaration": true,
     "noFallthroughCasesInSwitch": true,
