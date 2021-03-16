@@ -36,13 +36,13 @@ export class TypeMapRepository {
     if (type === undefined)
       throw new Error(`type with typeId: ${typeId} not found`);
 
-    const typeModuleUrl = this.formatUrl(type.moduleUrl);
+    const typeModuleUrl = this.formatUrl(type.viewFunction.URL.toString());
     if (typeModuleUrl === undefined)
       throw new Error("typeModuleUrl is undefined");
 
     const typeModule = await this.loader.import(typeModuleUrl);
-    if (type.export) {
-      return typeModule[type.export];
+    if (type.viewFunction.name) {
+      return typeModule[type.viewFunction.name];
     } else {
       return typeModule.default;
     }

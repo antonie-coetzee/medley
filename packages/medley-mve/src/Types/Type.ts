@@ -1,16 +1,18 @@
+export interface ModuleExport {
+  URL: URL;
+  name?: string;
+}
+
 export interface TypeVersion {
-    number: string;
-    id: string;
-    moduleUrl: string;
-    export?: string;
-    editUrl?: string;
-    schemaUrl?: string;
-    migrationUrl?: string;
-    dependenciesUrl?: string;
-  }
+  number: string;
+  id: string;
+  viewFunction: ModuleExport;
+  editUrl?: URL;
+  schemaUrl?: URL;
+}
 
 export interface Type {
-    name: string;
-    iconUrl?: string;
-    versions: TypeVersion[];
+  name: string;
+  iconUrl?: URL;
+  versions: TypeVersion[];
 }
