@@ -1,89 +1,24 @@
 import React, { useEffect } from "react";
-import FlexLayout, { TabNode } from "flexlayout-react";
+import { Provider } from "mobx-react";
 
 import "./App.css"
-import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
-import { AppBar, Button, IconButton, Toolbar, Typography, Icon } from "@material-ui/core";
-import FileSystemNavigator from "./components/Content/Panels/TypeTree/TypeTree";
 
-const json = {
-	global: {},
-	borders: [		 {
-		"type":"border",
-		 "location": "left",
-		"children": [
-			{
-				"type": "tab",
-				"enableClose":false,
-				"name": "Types",
-				"component": "typeTree",
-			}
-		]
-	}
-],
-	layout:{
-		"type": "row",
-		"weight": 100,
-		"children": [
-			{
-				"type": "tabset",
-				"weight": 50,
-				"selected": 0,
-				"children": [
-					{
-						"type": "tab",
-						"name": "FX",
-						"component":"grid",
-					}
-				]
-			},
-			{
-				"type": "tabset",
-				"weight": 50,
-				"selected": 0,
-				"children": [
-					{
-						"type": "tab",
-						"name": "FI",
-						"component":"grid",
-					}
-				]
-			}
-		]
-	}
-};
+import { Stores } from "./stores/Stores";
+import { PanelContainer } from "./components/panels/PanelContainer";
+import { Header } from "./components/header/Header";
 
-const factory = (node:TabNode) => {
-  var component = node.getComponent();
-  if (component === "grid") {
-      //return <button>{node.getName()}</button>;
-	  return <Button variant="contained" color="primary">
-      {node.getName()}
-    </Button>
-  }
-  if (component === "typeTree"){
-	  return FileSystemNavigator();
-  }
-}
+const stores = new Stores();
 
 function App() {
   return   <div id="app" >
-	<div id="header">
-		<AppBar position="static">
-		<Toolbar>
-			<IconButton edge="start" color="inherit" aria-label="menu">
-				<ArrowDownwardIcon fontSize="inherit" />
-			</IconButton>
-			<Typography variant="h6">
-			News
-			</Typography>
-			<Button color="inherit">Login</Button>
-		</Toolbar>
-		</AppBar>
-	</div>
-	<div id="contents">
-		<FlexLayout.Layout model={FlexLayout.Model.fromJson(json)} factory={factory}/>
-	</div>  
+	<Provider {...stores}>
+		<div id="header">
+			<Header/>
+		</div>
+		<div id="contents">
+			<PanelContainer/>
+		</div>  
+	</Provider>
 </div>
 }
 
