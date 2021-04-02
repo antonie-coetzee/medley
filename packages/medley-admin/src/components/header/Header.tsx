@@ -1,4 +1,5 @@
 import React, { useRef } from "react";
+import { useStores } from "../../stores/Stores";
 
 import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
@@ -10,6 +11,7 @@ import {
   Theme,
   Toolbar,
 } from "@material-ui/core";
+
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -30,54 +32,63 @@ const useStyles = makeStyles((theme: Theme) =>
 type HeaderProps = {};
 
 export const HeaderComponent: React.FC<HeaderProps> = () => {
+  const { modelGraphStore } = useStores();
   const classes = useStyles();
-  let uploadRef: React.RefObject<HTMLInputElement> = React.createRef();
-  let downloadRef: React.RefObject<HTMLInputElement> = React.createRef();
+  const LoadConfig = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e == null || e.target.files == null || e.target.files[0] == null)
+      return;
+    e.preventDefault();
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const text = e?.target?.result as string;
+      if(text == null)
+        return;      
+      modelGraphStore.setModelGraph(JSON.parse(text));
+    };
+
+    reader.readAsText(e.target.files[0]);
+  };
   return (
     <React.Fragment>
       <AppBar position="static">
         <Toolbar>
           <div className={classes.root}>
             <input
-              accept="image/*"
+              accept="*.json"
               className={classes.input}
               id="upload-config"
               type="file"
-              ref={uploadRef}
+              onChange={LoadConfig}
             />
             <label htmlFor="upload-config">
               <Button
                 variant="contained"
                 color="default"
                 className={classes.button}
+                component="span"
                 startIcon={<CloudUploadIcon />}
-                onClick={(e) => {
-                  uploadRef.current?.click();
-                }}
+                
               >
                 Upload
               </Button>
             </label>
             <input
-              accept="image/*"
+              accept="*.json"
               className={classes.input}
               id="download-config"
               type="file"
-              ref={downloadRef}
             />
             <label htmlFor="download-config">
               <Button
                 variant="contained"
                 color="default"
                 className={classes.button}
+                component="span"
                 startIcon={<CloudDownloadIcon />}
-                onClick={(e) => {
-                    downloadRef.current?.click();
-                }}
               >
                 Download
               </Button>
-            </label>            
+            </label>
           </div>
         </Toolbar>
       </AppBar>

@@ -16,3 +16,10 @@ export interface Type {
   iconUrl?: URL;
   versions: TypeVersion[];
 }
+
+export interface TypeTree {
+  name: string;
+  iconUrl?: URL;
+  types: (string | Type)[];
+  groups?: TypeTree[];
+}

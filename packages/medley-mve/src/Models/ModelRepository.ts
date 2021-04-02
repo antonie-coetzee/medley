@@ -1,23 +1,19 @@
 import { Loader } from "../Core";
-import { TypeMap } from "../Types";
-import { TypedModel } from "./Model";
-import { ModelGraph } from "./ModelGraph";
+import { TypeTree } from "../Types";
+import { ModelsByTypeId, TypedModel } from "./Model";
 
-
-export class ModelGraphRepository {
-  public typeMap: string | TypeMap;
+export class ModelRepository {
   private modelMap: Map<string, TypedModel>;
 
   constructor() {
     this.getModelById = this.getModelById.bind(this);
   }
 
-  public async load(modelGraph: ModelGraph): Promise<void> {
-    this.typeMap = modelGraph.typeMap;
+  public async load(models: ModelsByTypeId[]): Promise<void> {
     this.modelMap = new Map();
-    modelGraph.modelsByType.forEach((modulesWithTypeId) => {
-      const typeId = modulesWithTypeId.typeId;
-      modulesWithTypeId.models.forEach(model => {
+    models.forEach((modelsWithTypeId) => {
+      const typeId = modelsWithTypeId.typeId;
+      modelsWithTypeId.models.forEach(model => {
         const typedModel = (model as TypedModel);
         typedModel.typeId = typeId;
         this.modelMap.set(model.id, typedModel);

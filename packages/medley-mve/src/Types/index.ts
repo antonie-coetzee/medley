@@ -1,8 +1,3 @@
 export * from "./Type";
-export * from "./TypeMap";
-export * from "./TypeMapRepository";
-
-
-
-
-
+export * from "./TypeTree";
+export * from "./TypeRepository";

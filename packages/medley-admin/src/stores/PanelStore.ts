@@ -6,12 +6,13 @@ const tempConfig = {
 	borders: [		 {
 		"type":"border",
 		 "location": "left",
+		 "selected": 0,
 		"children": [
 			{
 				"type": "tab",
 				"enableClose":false,
 				"name": "Types",
-				"component": TYPE_TREE,
+				"component": TYPE_TREE,			
 			}
 		]
 	}
