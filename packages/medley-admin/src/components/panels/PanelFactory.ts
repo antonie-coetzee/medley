@@ -1,19 +1,17 @@
 import { TabNode } from "flexlayout-react";
-import { MODEL_LIST, TYPE_TREE } from "../../stores/PanelStore";
+import { MODEL_LIST, TYPE_TREE } from "../../stores/LayoutStore";
 
 import BasicTable from "./ModelList/ModelList";
-import {FileSystemNavigator} from "./TypeTree/TypeTree";
+import { TypeExplorer } from "./TypeExplorer/TypeExplorer";
 
-export const panelFactory = (node:TabNode) => {
-    var component = node.getComponent();
-    switch (component) {
-        case MODEL_LIST:
-            return BasicTable();
-        case TYPE_TREE:
-            const navigator = FileSystemNavigator;
-            return navigator();            
-        default:
-            break;
-    }
-}
-
+export const panelFactory = (node: TabNode) => {
+  var component = node.getComponent();
+  switch (component) {
+    case MODEL_LIST:
+      return BasicTable();
+    case TYPE_TREE:
+      return TypeExplorer();
+    default:
+      break;
+  }
+};

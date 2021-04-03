@@ -4,11 +4,11 @@ import { Type, TypeTree, TypeVersion } from "./Type";
 
 export class TypeRepository {
   private repoUrl: Url;
-  private typeMap: Map<string, TypeVersion>;
+  private typeVersionMap: Map<string, { type: Type; version: TypeVersion }>;
   private resolvedTypeTree: TypeTree;
 
   constructor(private loader: Loader) {
-    this.getViewFunctionFromTypeId = this.getViewFunctionFromTypeId.bind(this);
+    this.getViewFunctionFromTypeVersionId = this.getViewFunctionFromTypeVersionId.bind(this);
   }
 
   public async loadFromUrl(url: Url): Promise<void> {
@@ -25,24 +25,32 @@ export class TypeRepository {
       types: [],
       groups: [],
     };
-    this.typeMap = new Map();
+    this.typeVersionMap = new Map();
     await this.resolveTypeTree(typeTree, this.resolvedTypeTree);
   }
 
-  public async getViewFunctionFromTypeId(
-    typeId: string
-  ): Promise<ViewFunction> {
-    const type = this.typeMap.get(typeId);
-    if (type === undefined)
-      throw new Error(`type with typeId: ${typeId} not found`);
+  public versionToType(versionId: string): Type | undefined {
+    const { type } = this.typeVersionMap.get(versionId) || {};
+    return type;
+  }
 
-    const typeModuleUrl = new Url(type.viewFunction.URL.toString(), this.repoUrl);
+  public async getViewFunctionFromTypeVersionId(
+    typeVersionId: string
+  ): Promise<ViewFunction> {
+    const { type, version } = this.typeVersionMap.get(typeVersionId) || {};
+    if (type === undefined || version === undefined)
+      throw new Error(`type with version id: ${typeVersionId} not found`);
+
+    const typeModuleUrl = new Url(
+      version.viewFunction.URL.toString(),
+      this.repoUrl
+    );
     if (typeModuleUrl === undefined)
       throw new Error("typeModuleUrl is undefined");
 
     const typeModule = await this.loader.import(typeModuleUrl);
-    if (type.viewFunction.name) {
-      return typeModule[type.viewFunction.name];
+    if (version.viewFunction.name) {
+      return typeModule[version.viewFunction.name];
     } else {
       return typeModule.default;
     }
@@ -84,7 +92,7 @@ export class TypeRepository {
 
   private indexType(type: Type) {
     type.versions.forEach((version) => {
-      this.typeMap.set(version.id, version);
+      this.typeVersionMap.set(version.id, { type, version });
     });
   }
 

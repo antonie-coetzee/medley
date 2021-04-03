@@ -1,26 +1,22 @@
 import React from "react";
-import FlexLayout from "flexlayout-react";
+import FlexLayout, { Layout } from "flexlayout-react";
 import { panelFactory } from "./PanelFactory";
-import { observer} from "mobx-react";
-import { PanelStore } from "../../stores/PanelStore";
+import { observer } from "mobx-react";
+import { LayoutStore } from "../../stores/LayoutStore";
 import { useStores } from "../../stores/Stores";
 
-type PanelContainerProps = {
-  panelStore: PanelStore;
-};
-
-export const PanelContainerComponent: React.FC<PanelContainerProps> = ({
-  panelStore,
-}) => {
+export const PanelContainerComponent = () => {
+  const { layoutStore } = useStores();
+  
   return (
     <FlexLayout.Layout
-      model={FlexLayout.Model.fromJson(panelStore.config)}
+      model={FlexLayout.Model.fromJson(layoutStore.config)}
       factory={panelFactory}
+      ref={(ref) => layoutStore.setLayout(ref)}
     />
   );
 };
 
 export const PanelContainer = observer(() => {
-  const { panelStore } = useStores();
-  return <PanelContainerComponent  panelStore={panelStore} />;
+  return <PanelContainerComponent />;
 });

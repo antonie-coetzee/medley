@@ -6,12 +6,12 @@ import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import {
   AppBar,
   Button,
+  ButtonGroup,
   createStyles,
   makeStyles,
   Theme,
   Toolbar,
 } from "@material-ui/core";
-
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme: Theme) =>
 type HeaderProps = {};
 
 export const HeaderComponent: React.FC<HeaderProps> = () => {
-  const { modelGraphStore } = useStores();
+  const { compositionStore } = useStores();
   const classes = useStyles();
   const LoadConfig = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e == null || e.target.files == null || e.target.files[0] == null)
@@ -40,10 +40,9 @@ export const HeaderComponent: React.FC<HeaderProps> = () => {
     e.preventDefault();
     const reader = new FileReader();
     reader.onload = async (e) => {
-      const text = e?.target?.result as string;     
-      if(text == null)
-        return;      
-      //modelGraphStore.setModelGraph(JSON.parse(text));
+      const text = e?.target?.result as string;
+      if (text == null) return;
+      await compositionStore.load(JSON.parse(text));
     };
 
     reader.readAsText(e.target.files[0]);
@@ -53,6 +52,7 @@ export const HeaderComponent: React.FC<HeaderProps> = () => {
       <AppBar position="static">
         <Toolbar>
           <div className={classes.root}>
+            <label htmlFor="upload-config">
             <input
               accept="*.json"
               className={classes.input}
@@ -60,14 +60,12 @@ export const HeaderComponent: React.FC<HeaderProps> = () => {
               type="file"
               onChange={LoadConfig}
             />
-            <label htmlFor="upload-config">
               <Button
                 variant="contained"
                 color="default"
                 className={classes.button}
                 component="span"
                 startIcon={<CloudUploadIcon />}
-                
               >
                 Upload
               </Button>

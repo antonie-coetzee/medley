@@ -1,8 +1,8 @@
 import Url from "url-parse";
 import { Composition } from "./Composition";
 import { Loader, ViewFunction } from "./Core";
-import { ModelRepository, TypedModel } from "./Models";
-import { TypeRepository, TypeTree } from "./Types";
+import { ModelRepository, ModelsOfType, TypedModel } from "./Models";
+import { Type, TypeRepository, TypeTree } from "./Types";
 
 export class CompositionRepository {
   private loader: Loader;
@@ -41,10 +41,18 @@ export class CompositionRepository {
   }
 
   public getViewFunctionFromTypeId(typeId: string): Promise<ViewFunction> {
-    return this.typeRepo.getViewFunctionFromTypeId(typeId);
+    return this.typeRepo.getViewFunctionFromTypeVersionId(typeId);
   }
 
   public getTypeTree(): TypeTree {
     return this.typeRepo.typeTree;
+  }
+
+  public typeVersionToType(versionId: string): Type | undefined {
+    return this.typeRepo.versionToType(versionId);
+  }
+
+  public getModelsByTypeVersionId(typeVersionId:string): ModelsOfType | undefined {
+    return this.modelRepo.getModelsByTypeId(typeVersionId);
   }
 }

@@ -29,6 +29,11 @@ export class ModelRepository {
     return Promise.resolve(model);
   }
 
+  public getModelsByTypeId(typeId:string): ModelsOfType | undefined {
+    return this.modelsByTypeId.get(typeId);
+  }
+
+
   public async upsertModel(model: TypedModel): Promise<void> {
     this.modelsById.set(model.id, model);
   }
