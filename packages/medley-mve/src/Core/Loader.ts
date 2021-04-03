@@ -1,3 +1,4 @@
+import Url from "url-parse";
 const fs = require("fs").promises;
 
 declare global {
@@ -19,9 +20,9 @@ export class Loader {
     // add json module support to nodejs, already supported in the browser
     const fetch = systemJSPrototype.fetch;
     systemJSPrototype.fetch = async function (url: string, options: any) {
-      if (url.startsWith("file://") && url.endsWith(".json")) {
+      if (url.startsWith("file:") && url.endsWith(".json")) {
         try {
-          const json = await fs.readFile(url.replace("file://", ""), "utf8");
+          const json = await fs.readFile(new URL(url), "utf8");
           return {
             ok: true,
             status: 200,
@@ -120,7 +121,7 @@ export class Loader {
     this.context = this.newContext();
   }
 
-  public async import(url: string): Promise<any> {
-    return await this.context.import(url);
+  public async import(url: Url): Promise<any> {
+    return await this.context.import(url.toString());
   }
 }

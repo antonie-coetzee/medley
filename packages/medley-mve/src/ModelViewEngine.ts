@@ -2,13 +2,14 @@ import { CompositionRepository } from "./CompositionRepository";
 import { ViewEngine } from "./Core";
 
 export class ModelViewEngine {
-  private compositionRepo: CompositionRepository
   private viewEngine: ViewEngine;
 
   constructor(compositionRepo: CompositionRepository) {
+    const getModelById = compositionRepo.getModelById.bind(compositionRepo);
+    const getViewFunctionFromTypeId = compositionRepo.getViewFunctionFromTypeId.bind(compositionRepo);
     this.viewEngine = new ViewEngine(
-      this.compositionRepo.getModelById,
-      this.compositionRepo.getViewFunctionFromTypeId
+      getModelById,
+      getViewFunctionFromTypeId
     );
   }
   

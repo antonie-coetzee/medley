@@ -1,8 +1,9 @@
+import Url from "url-parse";
 import { Loader, ViewFunction } from "../Core";
 import { Type, TypeTree, TypeVersion } from "./Type";
 
 export class TypeRepository {
-  private repoUrl: URL;
+  private repoUrl: Url;
   private typeMap: Map<string, TypeVersion>;
   private resolvedTypeTree: TypeTree;
 
@@ -10,9 +11,9 @@ export class TypeRepository {
     this.getViewFunctionFromTypeId = this.getViewFunctionFromTypeId.bind(this);
   }
 
-  public async loadFromUrl(url: URL): Promise<void> {
+  public async loadFromUrl(url: Url): Promise<void> {
     this.repoUrl = url;
-    var module = await this.loader.import(url.toString());
+    var module = await this.loader.import(url);
     const typeTree: TypeTree = module.default;
     return this.load(typeTree);
   }
@@ -35,11 +36,11 @@ export class TypeRepository {
     if (type === undefined)
       throw new Error(`type with typeId: ${typeId} not found`);
 
-    const typeModuleUrl = new URL(type.viewFunction.URL.toString(), this.repoUrl);
+    const typeModuleUrl = new Url(type.viewFunction.URL.toString(), this.repoUrl);
     if (typeModuleUrl === undefined)
       throw new Error("typeModuleUrl is undefined");
 
-    const typeModule = await this.loader.import(typeModuleUrl.toString());
+    const typeModule = await this.loader.import(typeModuleUrl);
     if (type.viewFunction.name) {
       return typeModule[type.viewFunction.name];
     } else {
@@ -47,7 +48,7 @@ export class TypeRepository {
     }
   }
 
-  public get typeGraph(): TypeTree {
+  public get typeTree(): TypeTree {
     return this.resolvedTypeTree;
   }
 
@@ -57,7 +58,7 @@ export class TypeRepository {
   ): Promise<void> {
     for await (const type of partialTypeMap.types) {
       if (typeof type === "string") {
-        const typeUrl = new URL(type, this.repoUrl);
+        const typeUrl = new Url(type, this.repoUrl);
         if (typeUrl === undefined) throw new Error(`type url is undefined`);
         const typeLoaded = await this.loadType(typeUrl.toString());
         resolvedTypeMap.types.push(typeLoaded);
@@ -88,7 +89,7 @@ export class TypeRepository {
   }
 
   private async loadType(typeUrl: string): Promise<Type> {
-    const typeModule = await this.loader.import(typeUrl);
+    const typeModule = await this.loader.import(new Url(typeUrl));
     const type: Type = typeModule.default;
     return type;
   }

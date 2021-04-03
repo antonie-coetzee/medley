@@ -40,10 +40,10 @@ export const HeaderComponent: React.FC<HeaderProps> = () => {
     e.preventDefault();
     const reader = new FileReader();
     reader.onload = async (e) => {
-      const text = e?.target?.result as string;
+      const text = e?.target?.result as string;     
       if(text == null)
         return;      
-      modelGraphStore.setModelGraph(JSON.parse(text));
+      //modelGraphStore.setModelGraph(JSON.parse(text));
     };
 
     reader.readAsText(e.target.files[0]);

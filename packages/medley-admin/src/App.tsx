@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Provider } from "mobx-react";
 
-import "./App.css"
+import "./App.css";
 
 import { Stores } from "./stores/Stores";
 import { PanelContainer } from "./components/panels/PanelContainer";
@@ -17,7 +17,7 @@ function App() {
 		</div>
 		<div id="contents">
 			<PanelContainer/>
-		</div>  
+		</div>
 	</Provider>
 </div>
 }
