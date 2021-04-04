@@ -12,7 +12,6 @@ export interface CompositionRepositoryOptions {
 
 export class CompositionRepository {
   private loader: Loader;
-  private composition: Composition;
   public modelRepo: ModelRepository;
   public typeRepo: TypeRepository;
 
@@ -30,7 +29,6 @@ export class CompositionRepository {
       await this.typeRepo.load(composition.types);
     }
     await this.modelRepo.load(composition.modelsByType);
-    this.composition = composition;
   }
 
   public async loadFromUrl(url: string) {
@@ -38,5 +36,14 @@ export class CompositionRepository {
     var module = await this.loader.import(compoUrl);
     const composition: Composition = module.default;
     await this.load(composition, compoUrl);
+  }
+
+  public get composition(): Composition {
+    return {
+      types: this.typeRepo.typesUrl
+        ? this.typeRepo.typesUrl.toString()
+        : this.typeRepo.typeTree,
+      modelsByType: Array.from(this.modelRepo.modelsByTypeId.values()),
+    };
   }
 }
