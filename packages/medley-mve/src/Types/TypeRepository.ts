@@ -10,7 +10,7 @@ export interface TypeRepositoryOptions {
 
 export class TypeRepository {
   private loader:Loader;
-  private typesUrl: Url;
+  public typesUrl: Url;
   private typeVersionMap: Map<string, { type: Type; version: TypeVersion }>;
   private onResolvedTypeTreeUpdate: (typeTree: TypeTree) => void;
   private onTypeTreeUpdate: (typeTree: TypeTree) => void;
