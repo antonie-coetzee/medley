@@ -1,10 +1,12 @@
+import { ModelStore } from "./ModelStore";
+import { TypeStore } from "./TypeStore";
 import { Composition, CompositionRepository } from "@medley/medley-mve";
-import { action, makeAutoObservable, runInAction } from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
 
 export class CompositionStore {
   public repository: CompositionRepository | null = null;
 
-  constructor() {
+  constructor(typeStore:TypeStore, modelStore:ModelStore) {
     makeAutoObservable(this, { repository: true});
   }
 

@@ -49,7 +49,7 @@ export const HeaderComponent: React.FC<HeaderProps> = () => {
   };
   return (
     <React.Fragment>
-      <AppBar position="static">
+      <AppBar position="static" color={"transparent"} elevation={3}>
         <Toolbar>
           <div className={classes.root}>
             <label htmlFor="upload-config">

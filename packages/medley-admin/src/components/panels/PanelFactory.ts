@@ -8,7 +8,7 @@ export const panelFactory = (node: TabNode) => {
   var component = node.getComponent();
   switch (component) {
     case MODEL_LIST:
-      return BasicTable();
+      return BasicTable(node);
     case TYPE_TREE:
       return TypeExplorer();
     default:

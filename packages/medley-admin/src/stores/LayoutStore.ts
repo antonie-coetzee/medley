@@ -50,7 +50,8 @@ export class LayoutStore {
 
 		this.layout.addTabToActiveTabSet({
 			component: MODEL_LIST,
-			name: `${type.name} - ${typeVersion.number}`
+			name: `${type.name} - ${typeVersion.number}`,
+      config: {typeVersionId: typeVersion.id}
 		})
 	}
 }

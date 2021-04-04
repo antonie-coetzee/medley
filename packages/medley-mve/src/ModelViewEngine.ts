@@ -5,11 +5,11 @@ export class ModelViewEngine {
   private viewEngine: ViewEngine;
 
   constructor(compositionRepo: CompositionRepository) {
-    const getModelById = compositionRepo.getModelById.bind(compositionRepo);
-    const getViewFunctionFromTypeId = compositionRepo.getViewFunctionFromTypeId.bind(compositionRepo);
+    const getModel = compositionRepo.modelRepo.getModelById
+    const getViewFunction = compositionRepo.typeRepo.getViewFunction;
     this.viewEngine = new ViewEngine(
-      getModelById,
-      getViewFunctionFromTypeId
+      getModel,
+      getViewFunction
     );
   }
   

@@ -15,8 +15,8 @@ export class ViewEngine {
   }
 
   constructor(
-    private getModelById: (modelId: string) => Promise<Typed>,
-    private getViewFunctionByTypeId: (typeId: string) => Promise<ViewFunction>
+    private getModel: (modelId: string) => Promise<Typed>,
+    private getViewFunction: (typeId: string) => Promise<ViewFunction>
   ) {
     this.setContext = this.setContext.bind(this);
     this.renderModel = this.renderModel.bind(this);
@@ -25,8 +25,8 @@ export class ViewEngine {
   public async renderModel<T>(modelId: string, ...args: any[]): Promise<T> {
     if (!modelId) throw new Error("modelId is null or empty");
 
-    const model = await this.getModelById(modelId);
-    const viewFunction = await this.getViewFunctionByTypeId(model.typeId);
+    const model = await this.getModel(modelId);
+    const viewFunction = await this.getViewFunction(model.typeId);
     
     let oldContext = this.context;
 
