@@ -19,7 +19,10 @@ const useStyles = makeStyles({
 
 let nodeId = 0;
 
-const clickHandlerFactory = (layoutStore: LayoutStore, typeVersion: TypeVersion):React.MouseEventHandler<HTMLLIElement> => {
+const clickHandlerFactory = (
+  layoutStore: LayoutStore,
+  typeVersion: TypeVersion
+): React.MouseEventHandler<HTMLLIElement> => {
   return (e) => {
     e.preventDefault();
     layoutStore.addModelList(typeVersion);
@@ -36,7 +39,9 @@ const generateTypeVersions = (stores: Stores, parent: string, type: Type) => {
             nodeId={typeId}
             key={typeId}
             label={typeVersion.number}
-            onMouseDown={(e)=>{e.preventDefault()}}
+            onMouseDown={(e) => {
+              e.preventDefault();
+            }}
             onDoubleClick={clickHandlerFactory(stores.layoutStore, typeVersion)}
           />
         );
@@ -48,7 +53,7 @@ const generateTypeVersions = (stores: Stores, parent: string, type: Type) => {
 const generateTypes = (
   stores: Stores,
   parent: string,
-  types: (string | Type)[]
+  types: (URL | Type)[]
 ) => {
   if (types == null || types.length == 0) return;
 
@@ -60,7 +65,14 @@ const generateTypes = (
           const type = typeEl as Type;
           const typeId = parent + "." + type.name;
           return (
-            <TreeItem nodeId={typeId} key={typeId} label={type.name} onMouseDown={(e)=>{e.preventDefault()}}>
+            <TreeItem
+              nodeId={typeId}
+              key={typeId}
+              label={type.name}
+              onMouseDown={(e) => {
+                e.preventDefault();
+              }}
+            >
               {type.versions && generateTypeVersions(stores, typeId, type)}
             </TreeItem>
           );
@@ -80,9 +92,10 @@ const generateGroup = (
       <Fragment>
         {generateTypes(stores, groupKey, typeTree.types)}
         {typeTree.groups &&
-          typeTree.groups.map((group) =>
-            generateGroup(stores, groupKey, group)
-          )}
+          typeTree.groups.map((groupEl) => {
+            const groupTypeTree = groupEl as TypeTree;
+            generateGroup(stores, groupKey, groupTypeTree);
+          })}
       </Fragment>
     );
   } else {
@@ -91,9 +104,10 @@ const generateGroup = (
       <TreeItem nodeId={groupKey} key={groupKey} label={typeTree.name}>
         {generateTypes(stores, groupKey, typeTree.types)}
         {typeTree.groups &&
-          typeTree.groups.map((group) =>
-            generateGroup(stores, groupKey, group)
-          )}
+          typeTree.groups.map((groupEl) => {
+            const groupTypeTree = groupEl as TypeTree;
+            generateGroup(stores, groupKey, groupTypeTree);
+          })}
       </TreeItem>
     );
   }
@@ -106,9 +120,7 @@ const generateTree = (
   if (typeTree == undefined || typeTree == null) {
     return;
   }
-  return (
-    <Fragment>{generateGroup(stores, null, typeTree)}</Fragment>
-  );
+  return <Fragment>{generateGroup(stores, null, typeTree)}</Fragment>;
 };
 
 export function TypeExplorer() {
@@ -121,10 +133,7 @@ export function TypeExplorer() {
           defaultCollapseIcon={<ExpandMoreIcon />}
           defaultExpandIcon={<ChevronRightIcon />}
         >
-          {generateTree(
-            stores,
-            stores.compositionStore.repository?.getTypeTree()
-          )}
+          {generateTree(stores, stores.typeStore.typeTree)}
         </TreeView>
       )}
     </Observer>

@@ -1,33 +1,36 @@
-import Url from "url-parse";
 import { Loader, ViewFunction } from "../Core";
 import { Type, TypeTree, TypeVersion } from "./Type";
 
 export interface TypeRepositoryOptions {
   onResolvedTypeTreeUpdate?: (typeTree: TypeTree) => void;
   onTypeTreeUpdate?: (typeTree: TypeTree) => void;
-  onTypesUrlUpdate?: (typesUrl: Url) => void;
+  onTypesUrlUpdate?: (typesUrl: URL) => void;
 }
 
 export class TypeRepository {
-  private loader:Loader;
-  public typesUrl: Url;
+  private loader: Loader;
   private typeVersionMap: Map<string, { type: Type; version: TypeVersion }>;
-  private onResolvedTypeTreeUpdate: (typeTree: TypeTree) => void;
-  private onTypeTreeUpdate: (typeTree: TypeTree) => void;
-  private onTypesUrlUpdate: (typesUrl: Url) => void;
+  private onResolvedTypeTreeUpdate: (typeTree: TypeTree) => void = () => {};
+  private onTypeTreeUpdate: (typeTree: TypeTree) => void = () => {};
+  private onTypesUrlUpdate: (typesUrl: URL) => void = () => {};
 
+  public typesUrl: URL;
   public resolvedTypeTree: TypeTree;
   public typeTree: TypeTree;
 
-  constructor(loader: Loader, options?:TypeRepositoryOptions) {
+  constructor(loader: Loader, options?: TypeRepositoryOptions) {
     this.loader = loader;
-    this.onResolvedTypeTreeUpdate = options?.onResolvedTypeTreeUpdate || (()=>{});
-    this.onTypeTreeUpdate = options?.onTypeTreeUpdate || (()=>{});
-    this.onTypesUrlUpdate = options?.onTypesUrlUpdate || (()=>{});
     this.getViewFunction = this.getViewFunction.bind(this);
   }
 
-  public async loadFromUrl(url: Url): Promise<void> {
+  public updateOptions(options?: TypeRepositoryOptions) {
+    this.onResolvedTypeTreeUpdate =
+      options?.onResolvedTypeTreeUpdate || this.onResolvedTypeTreeUpdate;
+    this.onTypeTreeUpdate = options?.onTypeTreeUpdate || this.onTypeTreeUpdate;
+    this.onTypesUrlUpdate = options?.onTypesUrlUpdate || this.onTypesUrlUpdate;
+  }
+
+  public async loadFromUrl(url: URL): Promise<void> {
     this.typesUrl = url;
     this.onTypesUrlUpdate(this.typesUrl);
     var module = await this.loader.import(url);
@@ -59,7 +62,7 @@ export class TypeRepository {
     if (type === undefined || version === undefined)
       throw new Error(`type with version id: ${typeVersionId} not found`);
 
-    const typeModuleUrl = new Url(
+    const typeModuleUrl = new URL(
       version.viewFunction.url.toString(),
       this.typesUrl
     );
@@ -80,7 +83,7 @@ export class TypeRepository {
   ): Promise<void> {
     for await (const type of partialTypeTree.types) {
       if ((type as Type).name === undefined) {
-        const typeUrl = new Url(type.toString(), this.typesUrl);
+        const typeUrl = new URL(type.toString(), this.typesUrl);
         const typeLoaded = await this.loadType(typeUrl);
         resolvedTypeTree.types.push(typeLoaded);
         this.indexType(typeLoaded);
@@ -92,10 +95,10 @@ export class TypeRepository {
     if (partialTypeTree.groups !== undefined) {
       for await (const group of partialTypeTree.groups) {
         let groupTypeTree: TypeTree;
-        if((group as TypeTree).name === undefined){
-          const groupUrl = new Url(group.toString(), this.typesUrl);
-          groupTypeTree = await this.loadGroup(groupUrl)
-        }else{
+        if ((group as TypeTree).name === undefined) {
+          const groupUrl = new URL(group.toString(), this.typesUrl);
+          groupTypeTree = await this.loadGroup(groupUrl);
+        } else {
           groupTypeTree = group as TypeTree;
         }
         const resolvedGroup: TypeTree = {
@@ -116,13 +119,13 @@ export class TypeRepository {
     });
   }
 
-  public async loadGroup(url: Url): Promise<TypeTree> {
+  public async loadGroup(url: URL): Promise<TypeTree> {
     var module = await this.loader.import(url);
     const typeTree: TypeTree = module.default;
     return typeTree;
   }
 
-  private async loadType(url: Url): Promise<Type> {
+  private async loadType(url: URL): Promise<Type> {
     const typeModule = await this.loader.import(url);
     const type: Type = typeModule.default;
     return type;

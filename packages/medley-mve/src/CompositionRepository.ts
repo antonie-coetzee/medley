@@ -1,4 +1,3 @@
-import Url from "url-parse";
 import { Composition } from "./Composition";
 import { Loader, ViewFunction } from "./Core";
 import { ModelRepository, ModelsOfType, TypedModel } from "./Models";
@@ -6,46 +5,45 @@ import { Type, TypeRepository, TypeTree } from "./Types";
 
 export interface CompositionRepositoryOptions {
   loader?: Loader;
-  modelRepo?: ModelRepository;
-  typeRepo?: TypeRepository;
+  modelRepository?: ModelRepository;
+  typeRepository?: TypeRepository;
 }
 
 export class CompositionRepository {
   private loader: Loader;
-  public modelRepo: ModelRepository;
-  public typeRepo: TypeRepository;
+  public modelRepository: ModelRepository;
+  public typeRepository: TypeRepository;
 
   constructor(options?: CompositionRepositoryOptions) {
     this.loader = options?.loader || new Loader();
-    this.modelRepo = options?.modelRepo || new ModelRepository();
-    this.typeRepo = options?.typeRepo || new TypeRepository(this.loader);
+    this.modelRepository = options?.modelRepository || new ModelRepository();
+    this.typeRepository = options?.typeRepository || new TypeRepository(this.loader);
   }
 
-  public async load(composition: Composition, url?: Url) {
+  public async load(composition: Composition, url?: URL) {
     this.loader.reset();
     if ((composition.types as TypeTree).name === undefined) {
-      await this.typeRepo.loadFromUrl(
-        new Url(composition.types.toString(), url)
+      await this.typeRepository.loadFromUrl(
+        new URL(composition.types.toString(), url)
       );
     } else {
-      await this.typeRepo.load(composition.types as TypeTree);
+      await this.typeRepository.load(composition.types as TypeTree);
     }
-    await this.modelRepo.load(composition.modelsByType);
+    await this.modelRepository.load(composition.modelsByType);
   }
 
-  public async loadFromUrl(url: string) {
-    const compoUrl = new Url(url);
-    var module = await this.loader.import(compoUrl);
+  public async loadFromUrl(url: URL) {
+    var module = await this.loader.import(url);
     const composition: Composition = module.default;
-    await this.load(composition, compoUrl);
+    await this.load(composition, url);
   }
 
   public get composition(): Composition {
     return {
-      types: this.typeRepo.typesUrl
-        ? new URL(this.typeRepo.typesUrl.toString())
-        : this.typeRepo.typeTree,
-      modelsByType: Array.from(this.modelRepo.modelsByTypeId.values()),
+      types: this.typeRepository.typesUrl
+        ? new URL(this.typeRepository.typesUrl.toString())
+        : this.typeRepository.typeTree,
+      modelsByType: Array.from(this.modelRepository.modelsByTypeId.values()),
     };
   }
 }

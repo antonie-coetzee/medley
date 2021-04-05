@@ -5,8 +5,8 @@ export class ModelViewEngine {
   private viewEngine: ViewEngine;
 
   constructor(compositionRepo: CompositionRepository) {
-    const getModel = compositionRepo.modelRepo.getModelById
-    const getViewFunction = compositionRepo.typeRepo.getViewFunction;
+    const getModel = compositionRepo.modelRepository.getModelById
+    const getViewFunction = compositionRepo.typeRepository.getViewFunction;
     this.viewEngine = new ViewEngine(
       getModel,
       getViewFunction

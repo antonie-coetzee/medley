@@ -1,0 +1,12 @@
+0 silly argv {
+0 silly argv   _: [ 'run' ],
+0 silly argv   stream: true,
+0 silly argv   lernaVersion: '3.18.4',
+0 silly argv   '$0': 'node_modules\\lerna\\cli.js',
+0 silly argv   script: 'build:mve'
+0 silly argv }
+1 notice cli v3.18.4
+2 verbose rootPath C:\Dev\medley
+3 error JSONError: Unexpected token } in JSON at position 418 while parsing near '...stemjs": "6.8.3",  },  "devDependencie...' in packages\medley-mve\package.json
+3 error     at module.exports (C:\Dev\medley\node_modules\parse-json\index.js:26:19)
+3 error     at parse (C:\Dev\medley\node_modules\load-json-file\index.js:15:9)

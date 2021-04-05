@@ -1,7 +1,6 @@
 import { TypeVersion } from "@medley/medley-mve";
 import { Layout } from "flexlayout-react";
-import React from "react";
-import { CompositionStore } from "./CompositionStore";
+import { TypeStore } from "./TypeStore";
 
 export const MODEL_LIST = "modelList";
 export const TYPE_TREE = "typeTree";
@@ -31,21 +30,24 @@ const tempConfig = {
 };
 
 export class LayoutStore {
-	private layout: Layout | null = null;
+	private layout: Layout | undefined;
   public config: any = {};
 
-  constructor(private compositionStore: CompositionStore) {
+  constructor(private typeStore:TypeStore) {
     this.config = tempConfig;
   }
 
 	public setLayout(layout:Layout | null){
+    if(layout === null){
+      return;
+    }
 		this.layout = layout;
 	}
 
 	public addModelList(typeVersion: TypeVersion){
 		if(this.layout == null) return;
     
-    const type = this.compositionStore.repository?.typeVersionToType(typeVersion.id);
+    const type = this.typeStore.typeVersionToType(typeVersion.id);
     if(type == undefined) return;
 
 		this.layout.addTabToActiveTabSet({

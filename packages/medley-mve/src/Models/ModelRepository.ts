@@ -11,13 +11,17 @@ export class ModelRepository {
   public modelsByTypeId: Map<string, ModelsOfType>;
   private modelsOfTypeLoadHook: (modelsofType: ModelsOfType) => ModelsOfType;
 
-  constructor(options?: ModelRepositoryOptions) {
+  constructor() {
     this.getModelById = this.getModelById.bind(this);
-
     this.modelsById = new Map();
-    this.typedModelLoadHook = options?.typedModelLoadHook || ((tm) => tm);
     this.modelsByTypeId = new Map();
-    this.modelsOfTypeLoadHook = options?.modelsOfTypeLoadHook || ((mot) => mot);
+    this.typedModelLoadHook = ((tm) => tm);
+    this.modelsOfTypeLoadHook = ((mot) => mot);
+  }
+
+  public updateOptions(options?:ModelRepositoryOptions){
+    this.typedModelLoadHook = options?.typedModelLoadHook || this.typedModelLoadHook;
+    this.modelsOfTypeLoadHook = options?.modelsOfTypeLoadHook || this.modelsOfTypeLoadHook;
   }
 
   public async load(modelsByType: ModelsOfType[]): Promise<void> {

@@ -97,7 +97,6 @@ export class Loader {
   private static loadLibs() {
     let isNode = typeof exports === "object" ? true : false;
     if (isNode === true) {
-      require('url');
       const { System } = require("systemjs"); // nodejs export
       Loader.setSystemJs(System.constructor);
     } else {
@@ -122,7 +121,7 @@ export class Loader {
     this.context = this.newContext();
   }
 
-  public async import(url: Url): Promise<any> {
+  public async import(url: URL): Promise<any> {
     return await this.context.import(url.toString());
   }
 }

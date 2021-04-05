@@ -27,8 +27,8 @@ export default function BasicTable(node: TabNode) {
   const borderClasses = borderStyle();
 
   const typeVersionId = node.getConfig()?.typeVersionId as string;
-  const {compositionStore} = useStores();
-  const typedModels = compositionStore.repository?.getModelsByTypeVersionId(typeVersionId);
+  const {modelStore} = useStores();
+  const typedModels = modelStore.getModelsByTypeVersionId(typeVersionId);
 
   return (
     <TableContainer className={borderClasses.table}>
