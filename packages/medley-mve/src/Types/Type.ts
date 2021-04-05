@@ -1,5 +1,5 @@
 export interface ModuleExport {
-  URL: URL;
+  url: URL;
   name?: string;
 }
 
@@ -20,6 +20,6 @@ export interface Type {
 export interface TypeTree {
   name: string;
   iconUrl?: URL;
-  types: (string | Type)[];
-  groups?: TypeTree[];
+  types: (URL | Type)[];
+  groups?: (URL | TypeTree)[];
 }

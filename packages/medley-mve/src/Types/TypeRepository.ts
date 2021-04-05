@@ -60,7 +60,7 @@ export class TypeRepository {
       throw new Error(`type with version id: ${typeVersionId} not found`);
 
     const typeModuleUrl = new Url(
-      version.viewFunction.URL.toString(),
+      version.viewFunction.url.toString(),
       this.typesUrl
     );
     if (typeModuleUrl === undefined)
@@ -79,27 +79,33 @@ export class TypeRepository {
     resolvedTypeTree: TypeTree
   ): Promise<void> {
     for await (const type of partialTypeTree.types) {
-      if (typeof type === "string") {
-        const typeUrl = new Url(type, this.typesUrl);
-        if (typeUrl === undefined) throw new Error(`type url is undefined`);
-        const typeLoaded = await this.loadType(typeUrl.toString());
+      if ((type as Type).name === undefined) {
+        const typeUrl = new Url(type.toString(), this.typesUrl);
+        const typeLoaded = await this.loadType(typeUrl);
         resolvedTypeTree.types.push(typeLoaded);
         this.indexType(typeLoaded);
       } else {
-        this.indexType(type);
+        this.indexType(type as Type);
         resolvedTypeTree.types.push(type);
       }
     }
     if (partialTypeTree.groups !== undefined) {
       for await (const group of partialTypeTree.groups) {
+        let groupTypeTree: TypeTree;
+        if((group as TypeTree).name === undefined){
+          const groupUrl = new Url(group.toString(), this.typesUrl);
+          groupTypeTree = await this.loadGroup(groupUrl)
+        }else{
+          groupTypeTree = group as TypeTree;
+        }
         const resolvedGroup: TypeTree = {
-          name: group.name,
-          iconUrl: group.iconUrl,
+          name: groupTypeTree.name,
+          iconUrl: groupTypeTree.iconUrl,
           types: [],
           groups: [],
         };
         resolvedTypeTree.groups?.push(resolvedGroup);
-        await this.resolveTypeTree(group, resolvedGroup);
+        await this.resolveTypeTree(groupTypeTree, resolvedGroup);
       }
     }
   }
@@ -110,8 +116,14 @@ export class TypeRepository {
     });
   }
 
-  private async loadType(typeUrl: string): Promise<Type> {
-    const typeModule = await this.loader.import(new Url(typeUrl));
+  public async loadGroup(url: Url): Promise<TypeTree> {
+    var module = await this.loader.import(url);
+    const typeTree: TypeTree = module.default;
+    return typeTree;
+  }
+
+  private async loadType(url: Url): Promise<Type> {
+    const typeModule = await this.loader.import(url);
     const type: Type = typeModule.default;
     return type;
   }

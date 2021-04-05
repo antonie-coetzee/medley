@@ -94,9 +94,10 @@ export class Loader {
     Loader.systemJs = systemjsConstructor;
   }
 
-  private static loadSystemJs() {
+  private static loadLibs() {
     let isNode = typeof exports === "object" ? true : false;
     if (isNode === true) {
+      require('url');
       const { System } = require("systemjs"); // nodejs export
       Loader.setSystemJs(System.constructor);
     } else {
@@ -107,7 +108,7 @@ export class Loader {
 
   constructor() {
     if (Loader.systemJs === undefined) {
-      Loader.loadSystemJs();
+      Loader.loadLibs();
     }
     this.context = this.newContext();
   }

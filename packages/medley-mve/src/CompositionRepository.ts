@@ -23,10 +23,12 @@ export class CompositionRepository {
 
   public async load(composition: Composition, url?: Url) {
     this.loader.reset();
-    if (typeof composition.types === "string") {
-      await this.typeRepo.loadFromUrl(new Url(composition.types, url));
+    if ((composition.types as TypeTree).name === undefined) {
+      await this.typeRepo.loadFromUrl(
+        new Url(composition.types.toString(), url)
+      );
     } else {
-      await this.typeRepo.load(composition.types);
+      await this.typeRepo.load(composition.types as TypeTree);
     }
     await this.modelRepo.load(composition.modelsByType);
   }
@@ -41,7 +43,7 @@ export class CompositionRepository {
   public get composition(): Composition {
     return {
       types: this.typeRepo.typesUrl
-        ? this.typeRepo.typesUrl.toString()
+        ? new URL(this.typeRepo.typesUrl.toString())
         : this.typeRepo.typeTree,
       modelsByType: Array.from(this.modelRepo.modelsByTypeId.values()),
     };
