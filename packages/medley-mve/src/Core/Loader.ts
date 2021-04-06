@@ -1,4 +1,3 @@
-import Url from "url-parse";
 const fs = require("fs").promises;
 
 declare global {
