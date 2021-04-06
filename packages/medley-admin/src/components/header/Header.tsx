@@ -1,13 +1,16 @@
 import React, { useRef } from "react";
 import { useStores } from "../../stores/Stores";
 
+import notes from "./notes.svg";
 import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import {
   AppBar,
+  Avatar,
   Button,
   ButtonGroup,
   createStyles,
+  Icon,
   makeStyles,
   Theme,
   Toolbar,
@@ -16,15 +19,10 @@ import {
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
+      display: "flex",
       "& > *": {
         margin: theme.spacing(1),
       },
-    },
-    input: {
-      display: "none",
-    },
-    button: {
-      margin: theme.spacing(1),
     },
   })
 );
@@ -50,44 +48,30 @@ export const HeaderComponent: React.FC<HeaderProps> = () => {
   return (
     <React.Fragment>
       <AppBar position="static" color={"transparent"} elevation={3}>
-        <Toolbar>
-          <div className={classes.root}>
-            <label htmlFor="upload-config">
-            <input
-              accept="*.json"
-              className={classes.input}
-              id="upload-config"
-              type="file"
-              onChange={LoadConfig}
-            />
-              <Button
-                variant="contained"
-                color="default"
-                className={classes.button}
-                component="span"
-                startIcon={<CloudUploadIcon />}
-              >
-                Upload
-              </Button>
-            </label>
-            <input
-              accept="*.json"
-              className={classes.input}
-              id="download-config"
-              type="file"
-            />
-            <label htmlFor="download-config">
-              <Button
-                variant="contained"
-                color="default"
-                className={classes.button}
-                component="span"
-                startIcon={<CloudDownloadIcon />}
-              >
-                Download
-              </Button>
-            </label>
-          </div>
+        <Toolbar variant="dense" className={classes.root}>
+          <Icon>
+            <img src={notes} height={24} width={24} />
+          </Icon>
+          <ButtonGroup color="default" aria-label="outlined button group">
+            <Button
+              size="small"
+              color="default"
+              component="label"
+              startIcon={<CloudUploadIcon />}
+            >
+              <input accept="*.json" hidden type="file" onChange={LoadConfig} />
+              Upload
+            </Button>
+            <Button
+              size="small"
+              color="default"
+              component="label"
+              startIcon={<CloudDownloadIcon />}
+            >
+              Download
+              <input accept="*.json" hidden type="file" />
+            </Button>
+          </ButtonGroup>
         </Toolbar>
       </AppBar>
     </React.Fragment>

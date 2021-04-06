@@ -9,11 +9,11 @@ export const PanelContainerComponent = () => {
   const { layoutStore } = useStores();
   
   return (
-    <FlexLayout.Layout
-      model={FlexLayout.Model.fromJson(layoutStore.config)}
-      factory={panelFactory}
-      ref={(ref) => layoutStore.setLayout(ref)}
-    />
+      <FlexLayout.Layout
+        model={FlexLayout.Model.fromJson(layoutStore.config)}
+        factory={panelFactory}
+        ref={(ref) => layoutStore.setLayout(ref)}
+      />      
   );
 };
 
