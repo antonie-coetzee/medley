@@ -1,6 +1,7 @@
-System.register([], (_export) => ({
-    execute() {
-      _export('default', function(cntx){return "ModuleTwo response"});
-      _export('notDefault', function(cntx){return "ModuleTwo response from non default export"});
-    }
-  }));
+export default async (cntx) => {
+  return "ModuleTwo response"
+}
+
+export const notDefault = async (cntx) => {
+  return "ModuleTwo response from non default export"
+}

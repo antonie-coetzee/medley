@@ -1,5 +1,5 @@
-import { Loader, ViewFunction } from "../Core";
-import { Type, TypeTree, TypeVersion } from "./Type";
+import { Loader, ViewFunction } from "../Core/index.js";
+import { Type, TypeTree, TypeVersion } from "./Type.js";
 
 export interface TypeRepositoryOptions {
   onResolvedTypeTreeUpdate?: (typeTree: TypeTree) => void;

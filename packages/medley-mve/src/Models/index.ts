@@ -1,2 +1,2 @@
-export * from "./Model"
-export * from "./ModelRepository"
+export * from "./Model.js"
+export * from "./ModelRepository.js"

@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { ModelsOfType, TypedModel } from "./Model";
+import { ModelsOfType, TypedModel } from "./Model.js";
 
 export interface ModelRepositoryOptions {
   typedModelLoadHook?: (typedModel: TypedModel) => TypedModel;

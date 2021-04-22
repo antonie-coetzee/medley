@@ -1,5 +1,4 @@
-import { Loader } from "./Loader";
-import { Typed } from "./Typed";
+import { Typed } from "./Typed.js";
 
 export type ViewFunction = (cntx:any, ...args:any[])=>Promise<any>;
 

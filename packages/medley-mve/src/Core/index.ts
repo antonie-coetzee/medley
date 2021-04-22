@@ -1,3 +1,3 @@
-export * from "./Loader"
-export * from "./ViewEngine"
-export * from "./Typed"
+export * from "./Loader.js"
+export * from "./ViewEngine.js"
+export * from "./Typed.js"

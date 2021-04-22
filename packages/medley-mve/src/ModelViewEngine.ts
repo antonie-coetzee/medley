@@ -1,5 +1,5 @@
-import { CompositionRepository } from "./CompositionRepository";
-import { ViewEngine } from "./Core";
+import { CompositionRepository } from "./CompositionRepository.js";
+import { ViewEngine } from "./Core/index.js";
 
 export class ModelViewEngine {
   private viewEngine: ViewEngine;

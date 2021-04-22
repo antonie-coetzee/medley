@@ -1,7 +1,7 @@
-import { Composition } from "./Composition";
-import { Loader, ViewFunction } from "./Core";
-import { ModelRepository, ModelsOfType, TypedModel } from "./Models";
-import { Type, TypeRepository, TypeTree } from "./Types";
+import { Composition } from "./Composition.js";
+import { Loader, ViewFunction } from "./Core/index.js";
+import { ModelRepository, ModelsOfType, TypedModel } from "./Models/index.js";
+import { Type, TypeRepository, TypeTree } from "./Types/index.js";
 
 export interface CompositionRepositoryOptions {
   loader?: Loader;
@@ -22,7 +22,6 @@ export class CompositionRepository {
   }
 
   public async load(composition: Composition, url?: URL) {
-    this.loader.reset();
     if ((composition.types as TypeTree).name === undefined) {
       await this.typeRepository.loadFromUrl(
         new URL(composition.types.toString(), url)
