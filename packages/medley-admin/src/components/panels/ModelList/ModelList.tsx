@@ -11,6 +11,8 @@ import { TabNode } from "flexlayout-react";
 import { useStores } from "../../../stores/Stores";
 import { AppBar, Button, Toolbar } from "@material-ui/core";
 import { AddCircleOutline } from "@material-ui/icons";
+import { NewModelDialog } from "./NewModelDialog";
+import { Observer } from "mobx-react";
 
 const borderStyle = makeStyles({
   table: {
@@ -24,7 +26,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function BasicTable(node: TabNode) {
+export function ModelListComponent(node: TabNode) {
   const classes = useStyles();
   const borderClasses = borderStyle();
 
@@ -32,11 +34,17 @@ export default function BasicTable(node: TabNode) {
   const { modelStore } = useStores();
   const typedModels = modelStore.getModelsByTypeVersionId(typeVersionId);
 
+  const createModel = async (name: string) => {
+    if (name) {
+      await modelStore.upsertModel({ name: name, typeId: typeVersionId });
+    }
+  };
+
   return (
     <Fragment>
       <AppBar position="static" color="transparent">
         <Toolbar variant="dense">
-          <Button color="default" size="small" variant="outlined" startIcon={<AddCircleOutline />}>New</Button>
+          {NewModelDialog((name) => createModel(name))}
         </Toolbar>
       </AppBar>
       <TableContainer className={borderClasses.table}>
@@ -61,5 +69,14 @@ export default function BasicTable(node: TabNode) {
         </Table>
       </TableContainer>
     </Fragment>
+  );
+}
+
+export function ModelList(node: TabNode) {
+  const stores = useStores();
+  return (
+    <Observer>
+      {() => ModelListComponent(node)}
+    </Observer>
   );
 }

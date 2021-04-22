@@ -17,7 +17,8 @@ export class CompositionRepository {
   constructor(options?: CompositionRepositoryOptions) {
     this.loader = options?.loader || new Loader();
     this.modelRepository = options?.modelRepository || new ModelRepository();
-    this.typeRepository = options?.typeRepository || new TypeRepository(this.loader);
+    this.typeRepository =
+      options?.typeRepository || new TypeRepository(this.loader);
   }
 
   public async load(composition: Composition, url?: URL) {
@@ -39,11 +40,18 @@ export class CompositionRepository {
   }
 
   public get composition(): Composition {
+    const mot = Array.from(this.modelRepository.modelsByTypeId.values());
+    const mbt = mot.map((val) => {
+      val.models = val.models.map((m) => {     
+        return {...m, typeId:undefined}
+      });
+      return val;
+    });
     return {
       types: this.typeRepository.typesUrl
         ? new URL(this.typeRepository.typesUrl.toString())
         : this.typeRepository.typeTree,
-      modelsByType: Array.from(this.modelRepository.modelsByTypeId.values()),
+      modelsByType: mbt,
     };
   }
 }

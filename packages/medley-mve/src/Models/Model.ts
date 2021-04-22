@@ -7,7 +7,7 @@ export interface ModelsOfType {
 
 export interface Model {
   id: string;
-  name: string;
+  name?: string;
   references?: string[];
   value?: any;
 }

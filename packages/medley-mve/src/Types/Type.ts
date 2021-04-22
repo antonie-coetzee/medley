@@ -8,7 +8,14 @@ export interface TypeVersion {
   id: string;
   viewFunction: ModuleExport;
   editUrl?: URL;
-  schemaUrl?: URL;
+  schema?: {
+    input?: URL;
+    output?: URL;
+  };
+  migration?: {
+    up: ModuleExport;
+    down: ModuleExport;
+  };
 }
 
 export interface Type {

@@ -15,6 +15,7 @@ import {
   Theme,
   Toolbar,
 } from "@material-ui/core";
+import { Composition } from "@medley/medley-mve";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -24,8 +25,24 @@ const useStyles = makeStyles((theme: Theme) =>
         margin: theme.spacing(1),
       },
     },
+    header: {
+      borderBottom: "solid",
+      borderBottomColor: "#f7f7f7",
+      borderBottomWidth: "8px"
+    }
   })
 );
+
+const downloadComposition = (composition: Composition | undefined, name:string) => {
+  if(composition === undefined)
+    return;
+  const a = document.createElement('a');
+  const type = name.split(".").pop();
+  const compoJson = JSON.stringify(composition,null, 2);
+  a.href = URL.createObjectURL( new Blob([compoJson], { type:`text/${type === "txt" ? "plain" : type}` }) );
+  a.download = name;
+  a.click();
+}
 
 type HeaderProps = {};
 
@@ -45,9 +62,10 @@ export const HeaderComponent: React.FC<HeaderProps> = () => {
 
     reader.readAsText(e.target.files[0]);
   };
+
   return (
     <React.Fragment>
-      <AppBar position="static" color={"transparent"} elevation={3}>
+      <AppBar position="static" color={"transparent"} elevation={0} className={classes.header}>
         <Toolbar variant="dense" className={classes.root}>
           <Icon>
             <img src={notes} height={24} width={24} />
@@ -65,11 +83,10 @@ export const HeaderComponent: React.FC<HeaderProps> = () => {
             <Button
               size="small"
               color="default"
-              component="label"
               startIcon={<CloudDownloadIcon />}
+              onClick={()=>{downloadComposition(compositionStore.getComposition(), "composition.json")}}             
             >
               Download
-              <input accept="*.json" hidden type="file" />
             </Button>
           </ButtonGroup>
         </Toolbar>

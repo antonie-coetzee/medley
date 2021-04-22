@@ -23,9 +23,6 @@ const tempConfig = {
     },
   ],
   layout: {
-    type: "row",
-    weight: 100,
-    children: [],
   },
 };
 

@@ -11,7 +11,7 @@ import { makeAutoObservable, runInAction } from "mobx";
 export class CompositionStore {
   private repository: CompositionRepository | undefined;
 
-  constructor(      
+  constructor(
     private loader: Loader,
     private typeRepo: TypeRepository,
     private modelRepo: ModelRepository
@@ -32,5 +32,9 @@ export class CompositionStore {
     // }catch(e){
     //   console.log(e);
     // }
+  }
+
+  public getComposition(): Composition | undefined {
+    return this.repository?.composition;
   }
 }

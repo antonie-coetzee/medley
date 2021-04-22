@@ -1,9 +1,16 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@material-ui/core";
-import React, { Fragment } from "react";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  TextField,
+} from "@material-ui/core";
+import { AddCircleOutline } from "@material-ui/icons";
+import React, { Fragment, useRef } from "react";
 
-export interface NewModelDialogProps { }
-
-export const NewModelDialog: React.FC<NewModelDialogProps> = () => {
+export const NewModelDialog = (doCreate: (name: string) => void) => {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -11,33 +18,63 @@ export const NewModelDialog: React.FC<NewModelDialogProps> = () => {
   };
 
   const handleClose = () => {
-
+    setOpen(false);
   };
 
-  return <Fragment>
-    <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-      New
-    </Button>
-    <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-      <DialogTitle id="form-dialog-title">New Model Name</DialogTitle>
-      <DialogContent>
-        <TextField
-          autoFocus
-          margin="dense"
-          id="name"
-          label="Name"
-          type="text"
-          fullWidth
-        />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} color="primary">
-          Cancel
+  const nameRef = useRef<HTMLInputElement>();
+  const handleCreate = () => {
+    if (nameRef.current) {
+      doCreate(nameRef.current.value);
+    }
+    setOpen(false);
+  };
+
+  const onKeyDown = (e:React.KeyboardEvent<HTMLInputElement>)=>{
+    if(e.key === "Enter"){
+      e.preventDefault();
+      handleCreate();
+    }
+  }
+
+  return (
+    <Fragment>
+      <Button
+        type="button"
+        color="default"
+        size="small"
+        variant="outlined"
+        startIcon={<AddCircleOutline />}
+        onClick={handleClickOpen}
+      >
+        New
+      </Button>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="NewModel-dialog-title"
+      >
+        <DialogTitle id="NewModel-dialog-title">New Model</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="Name"
+            type="text"
+            fullWidth
+            inputRef={nameRef}
+            onKeyDown={onKeyDown}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
           </Button>
-        <Button onClick={handleClose} color="primary">
-          Subscribe
+          <Button onClick={handleCreate} color="primary">
+            Create
           </Button>
-      </DialogActions>
-    </Dialog>
-  </Fragment>
-}
+        </DialogActions>
+      </Dialog>
+    </Fragment>
+  );
+};
