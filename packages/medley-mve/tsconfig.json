@@ -3,9 +3,9 @@
   "extends": "../../tsconfig.json",  
   "compilerOptions": {
     "outDir": "dist",
-    "lib": ["esnext", "DOM"],
-    "module": "esnext",
-    "target": "ES6",
+    "lib": ["ES2020", "DOM"],
+    "module": "ES2020",
+    "target": "ES2020",
     "moduleResolution": "Node",
     "esModuleInterop": true,
     "importHelpers": true,
@@ -14,7 +14,6 @@
     "declaration": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
-    "stripInternal": true,
     "pretty": true,
     "strictNullChecks": true
   },

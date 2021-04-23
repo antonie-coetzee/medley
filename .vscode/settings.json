@@ -4,12 +4,10 @@
         "raw",
         "xml"
     ],
-    "deno.enable": false,
-    "jest.debugCodeLens.showWhenTestStateIn": [
-        "pass",
-        "fail",
-        "unknown"
-    ],
-    "jest.pathToJest": "./node_modules/.bin/jest",
-    "explorer.autoReveal": false
+    "explorer.autoReveal": false,
+    "debug.javascript.terminalOptions": {
+        "skipFiles": [
+          "<node_internals>/**"
+        ]
+      },
 }
