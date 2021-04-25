@@ -1,3 +1,3 @@
 export interface Typed {
-    typeId: string;
+  typeId: string;
 }

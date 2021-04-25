@@ -8,8 +8,8 @@ export interface TypeRepositoryOptions {
 }
 
 export class TypeRepository {
-
-  private typeVersionMap: Map<string, { type: Type; version: TypeVersion }> = new Map();;
+  private typeVersionMap: Map<string, { type: Type; version: TypeVersion }> =
+    new Map();
   private onResolvedTypeTreeUpdate: (typeTree: TypeTree) => void = () => {};
   private onTypeTreeUpdate: (typeTree: TypeTree) => void = () => {};
   private onTypesUrlUpdate: (typesUrl: URL) => void = () => {};
@@ -23,8 +23,8 @@ export class TypeRepository {
   }
 
   public updateOptions(options?: TypeRepositoryOptions) {
-    this.onResolvedTypeTreeUpdate =
-      options?.onResolvedTypeTreeUpdate || this.onResolvedTypeTreeUpdate;
+    this.onResolvedTypeTreeUpdate = options?.onResolvedTypeTreeUpdate ||
+      this.onResolvedTypeTreeUpdate;
     this.onTypeTreeUpdate = options?.onTypeTreeUpdate || this.onTypeTreeUpdate;
     this.onTypesUrlUpdate = options?.onTypesUrlUpdate || this.onTypesUrlUpdate;
   }
@@ -58,15 +58,17 @@ export class TypeRepository {
 
   public async getViewFunction(typeVersionId: string): Promise<ViewFunction> {
     const { type, version } = this.typeVersionMap.get(typeVersionId) || {};
-    if (type === undefined || version === undefined)
+    if (type === undefined || version === undefined) {
       throw new Error(`type with version id: ${typeVersionId} not found`);
+    }
 
     const typeModuleUrl = new URL(
       version.viewFunction.url.toString(),
-      this.typesUrl
+      this.typesUrl,
     );
-    if (typeModuleUrl === undefined)
+    if (typeModuleUrl === undefined) {
       throw new Error("typeModuleUrl is undefined");
+    }
 
     const typeModule = await import(typeModuleUrl.toString());
     if (version.viewFunction.name) {
@@ -78,7 +80,7 @@ export class TypeRepository {
 
   private async resolveTypeTree(
     partialTypeTree: TypeTree,
-    resolvedTypeTree: TypeTree
+    resolvedTypeTree: TypeTree,
   ): Promise<void> {
     for await (const type of partialTypeTree.types) {
       if ((type as Type).name === undefined) {

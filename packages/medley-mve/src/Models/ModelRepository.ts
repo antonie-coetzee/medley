@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "https://deno.land/std@0.95.0/uuid/mod.ts";
+import { uuidv4 } from "../../deps.ts";
 import { ModelsOfType, TypedModel } from "./Model.ts";
 
 export interface ModelRepositoryOptions {
@@ -21,10 +21,10 @@ export class ModelRepository {
   }
 
   public updateOptions(options?: ModelRepositoryOptions) {
-    this.typedModelLoadHook =
-      options?.typedModelLoadHook || this.typedModelLoadHook;
-    this.modelsOfTypeLoadHook =
-      options?.modelsOfTypeLoadHook || this.modelsOfTypeLoadHook;
+    this.typedModelLoadHook = options?.typedModelLoadHook ||
+      this.typedModelLoadHook;
+    this.modelsOfTypeLoadHook = options?.modelsOfTypeLoadHook ||
+      this.modelsOfTypeLoadHook;
   }
 
   public async load(modelsByType: ModelsOfType[]): Promise<void> {

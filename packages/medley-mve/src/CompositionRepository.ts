@@ -14,14 +14,13 @@ export class CompositionRepository {
 
   constructor(options?: CompositionRepositoryOptions) {
     this.modelRepository = options?.modelRepository || new ModelRepository();
-    this.typeRepository =
-      options?.typeRepository || new TypeRepository();
+    this.typeRepository = options?.typeRepository || new TypeRepository();
   }
 
   public async load(composition: Composition, url?: URL) {
     if ((composition.types as TypeTree).name === undefined) {
       await this.typeRepository.loadFromUrl(
-        new URL(composition.types.toString(), url)
+        new URL(composition.types.toString(), url),
       );
     } else {
       await this.typeRepository.load(composition.types as TypeTree);
@@ -38,8 +37,8 @@ export class CompositionRepository {
   public get composition(): Composition {
     const mot = Array.from(this.modelRepository.modelsByTypeId.values());
     const mbt = mot.map((val) => {
-      val.models = val.models.map((m) => {     
-        return {...m, typeId:undefined}
+      val.models = val.models.map((m) => {
+        return { ...m, typeId: undefined };
       });
       return val;
     });
