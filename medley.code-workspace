@@ -3,10 +3,11 @@
     {
       "name": "@medley/medley-mve",
       "path": "./packages/medley-mve"
-    },
-    {
-      "name": "@medley/medley-admin",
-      "path": "./packages/medley-admin"
     }
-  ]
+  ],
+  "settings": {
+    "deno.enable": true,
+    "deno.lint": false,
+    "deno.unstable": false
+  }
 }

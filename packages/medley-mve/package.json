@@ -8,7 +8,9 @@
   "module": "./dist/index.js",
   "scripts": {
     "build:mve": "tsc",
-    "test:mve": "mocha"
+    "test:mve": "mocha",
+    "deno:run": "deno run --allow-read ./src/Tests/denoTest.ts",
+    "deno:bundle": "deno bundle ./src/Tests/denoTest.ts denoTest.js"
   },
   "mocha": {
     "spec": "dist/**/*.test.js"

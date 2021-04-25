@@ -1,5 +1,5 @@
-import { Loader, ViewFunction } from "../Core/index.js";
-import { Type, TypeTree, TypeVersion } from "./Type.js";
+import { ViewFunction } from "../Core/index.ts";
+import { Type, TypeTree, TypeVersion } from "./Type.ts";
 
 export interface TypeRepositoryOptions {
   onResolvedTypeTreeUpdate?: (typeTree: TypeTree) => void;
@@ -8,18 +8,17 @@ export interface TypeRepositoryOptions {
 }
 
 export class TypeRepository {
-  private loader: Loader;
-  private typeVersionMap: Map<string, { type: Type; version: TypeVersion }>;
+
+  private typeVersionMap: Map<string, { type: Type; version: TypeVersion }> = new Map();;
   private onResolvedTypeTreeUpdate: (typeTree: TypeTree) => void = () => {};
   private onTypeTreeUpdate: (typeTree: TypeTree) => void = () => {};
   private onTypesUrlUpdate: (typesUrl: URL) => void = () => {};
 
-  public typesUrl: URL;
-  public resolvedTypeTree: TypeTree;
-  public typeTree: TypeTree;
+  public typesUrl: URL | undefined;
+  public resolvedTypeTree: TypeTree | undefined;
+  public typeTree: TypeTree | undefined;
 
-  constructor(loader: Loader, options?: TypeRepositoryOptions) {
-    this.loader = loader;
+  constructor(options?: TypeRepositoryOptions) {
     this.getViewFunction = this.getViewFunction.bind(this);
   }
 
@@ -33,7 +32,7 @@ export class TypeRepository {
   public async loadFromUrl(url: URL): Promise<void> {
     this.typesUrl = url;
     this.onTypesUrlUpdate(this.typesUrl);
-    var module = await this.loader.import(url);
+    var module = await import(url.toString());
     const typeTree: TypeTree = module.default;
     return this.load(typeTree);
   }
@@ -69,7 +68,7 @@ export class TypeRepository {
     if (typeModuleUrl === undefined)
       throw new Error("typeModuleUrl is undefined");
 
-    const typeModule = await this.loader.import(typeModuleUrl);
+    const typeModule = await import(typeModuleUrl.toString());
     if (version.viewFunction.name) {
       return typeModule[version.viewFunction.name];
     } else {
@@ -120,13 +119,13 @@ export class TypeRepository {
   }
 
   public async loadGroup(url: URL): Promise<TypeTree> {
-    var module = await this.loader.import(url);
+    var module = await import(url.toString());
     const typeTree: TypeTree = module.default;
     return typeTree;
   }
 
   private async loadType(url: URL): Promise<Type> {
-    const typeModule = await this.loader.import(url);
+    const typeModule = await import(url.toString());
     const type: Type = typeModule.default;
     return type;
   }

@@ -1,4 +1,4 @@
-{
+export default {
   "name": "typeMapOne",
   "types": [
     {
@@ -13,7 +13,7 @@
         }
       ]
     },
-    "typeTwo.json"
+    "typeTwo.js"
   ],
-  "groups":["groups.json"]
+  "groups":["groups.js"]
 }

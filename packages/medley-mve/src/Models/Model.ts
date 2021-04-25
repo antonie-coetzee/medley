@@ -1,4 +1,4 @@
-import { Typed } from "../Core/index.js";
+import { Typed } from "../Core/index.ts";
 
 export interface ModelsOfType {
   typeId: string;

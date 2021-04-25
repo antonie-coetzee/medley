@@ -10,4 +10,6 @@
           "<node_internals>/**"
         ]
       },
+      "deno.lint": false,
+      "deno.unstable": false,
 }

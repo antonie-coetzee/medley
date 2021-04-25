@@ -1,24 +1,21 @@
-import { Composition } from "./Composition.js";
-import { Loader, ViewFunction } from "./Core/index.js";
-import { ModelRepository, ModelsOfType, TypedModel } from "./Models/index.js";
-import { Type, TypeRepository, TypeTree } from "./Types/index.js";
+import { Composition } from "./Composition.ts";
+import { ViewFunction } from "./Core/index.ts";
+import { ModelRepository, ModelsOfType, TypedModel } from "./Models/index.ts";
+import { Type, TypeRepository, TypeTree } from "./Types/index.ts";
 
 export interface CompositionRepositoryOptions {
-  loader?: Loader;
   modelRepository?: ModelRepository;
   typeRepository?: TypeRepository;
 }
 
 export class CompositionRepository {
-  private loader: Loader;
   public modelRepository: ModelRepository;
   public typeRepository: TypeRepository;
 
   constructor(options?: CompositionRepositoryOptions) {
-    this.loader = options?.loader || new Loader();
     this.modelRepository = options?.modelRepository || new ModelRepository();
     this.typeRepository =
-      options?.typeRepository || new TypeRepository(this.loader);
+      options?.typeRepository || new TypeRepository();
   }
 
   public async load(composition: Composition, url?: URL) {
@@ -33,7 +30,7 @@ export class CompositionRepository {
   }
 
   public async loadFromUrl(url: URL) {
-    var module = await this.loader.import(url);
+    var module = await import(url.toString());
     const composition: Composition = module.default;
     await this.load(composition, url);
   }
@@ -49,7 +46,7 @@ export class CompositionRepository {
     return {
       types: this.typeRepository.typesUrl
         ? new URL(this.typeRepository.typesUrl.toString())
-        : this.typeRepository.typeTree,
+        : this.typeRepository.typeTree || {} as TypeTree,
       modelsByType: mbt,
     };
   }

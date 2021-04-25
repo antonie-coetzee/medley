@@ -1,2 +1,2 @@
-export * from "./Model.js"
-export * from "./ModelRepository.js"
+export * from "./Model.ts"
+export * from "./ModelRepository.ts"

@@ -1,5 +1,5 @@
-import { v4 as uuidv4 } from "uuid";
-import { ModelsOfType, TypedModel } from "./Model.js";
+import { v4 as uuidv4 } from "https://deno.land/std@0.95.0/uuid/mod.ts";
+import { ModelsOfType, TypedModel } from "./Model.ts";
 
 export interface ModelRepositoryOptions {
   typedModelLoadHook?: (typedModel: TypedModel) => TypedModel;
@@ -62,7 +62,7 @@ export class ModelRepository {
     const uModel: TypedModel = {
       ...model,
       typeId,
-      id: currentModel?.id || uuidv4(),
+      id: currentModel?.id || uuidv4.generate(),
       name: model.name || currentModel?.name,
     };
 
