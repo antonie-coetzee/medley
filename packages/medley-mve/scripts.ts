@@ -4,6 +4,7 @@ export default <ScriptsConfiguration> {
   scripts: {
     format: "deno fmt",
     build: "deno bundle ./mod.ts ./mod.js",
+    types: "deno run --allow-read --allow-write --unstable .\generateTypes.ts",
     test: "deno test --allow-net --allow-read",
   },
 };

@@ -1,5 +1,3 @@
-import { assertEquals } from "../../deps.ts";
-
 import { ModelViewEngine } from "../ModelViewEngine.ts";
 import { CompositionRepository } from "../CompositionRepository.ts";
 
