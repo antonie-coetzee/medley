@@ -17,6 +17,7 @@ const output = typingBundle
   .split("\n")
   .filter((k) => !k.includes("import {"))
   .filter((k) => !k.includes("export *"))
+  .filter((k) => !k.startsWith("///"))
   .join("\n");
 
-Deno.writeTextFile("./mod.d.ts", output);
+Deno.writeTextFile("./esmod.d.ts", output);
