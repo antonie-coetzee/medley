@@ -20,4 +20,4 @@ const output = typingBundle
   .filter((k) => !k.startsWith("///"))
   .join("\n");
 
-Deno.writeTextFile("./esmod.d.ts", output);
+Deno.writeTextFile("./dist/medley.d.ts", output);

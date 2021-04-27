@@ -4,8 +4,9 @@ export default <ScriptsConfiguration> {
   scripts: {
     format: "deno fmt",
     build: [
-      "deno bundle ./mod.ts ./esmod.js",
-      "deno run --allow-read --allow-write --unstable ./generateTypes.ts",
+      "deno run --allow-read --allow-write --unstable ./bin/preBuild.ts",
+      "deno bundle ./mod.ts ./dist/medley.js",
+      "deno run --allow-read --allow-write --unstable ./bin/generateTypes.ts",
     ],
     test: "deno test --allow-net --allow-read",
   },

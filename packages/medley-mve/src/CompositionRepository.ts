@@ -1,7 +1,6 @@
 import { Composition } from "./Composition.ts";
-import { ViewFunction } from "./Core/index.ts";
-import { ModelRepository, ModelsOfType, TypedModel } from "./Models/index.ts";
-import { Type, TypeRepository, TypeTree } from "./Types/index.ts";
+import { ModelRepository } from "./Models/index.ts";
+import { TypeRepository, TypeTree } from "./Types/index.ts";
 
 export interface CompositionRepositoryOptions {
   modelRepository?: ModelRepository;
