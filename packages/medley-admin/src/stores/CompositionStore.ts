@@ -1,18 +1,16 @@
 import {
   Composition,
   CompositionRepository,
-  Loader,
   ModelRepository,
   ModelViewEngine,
   TypeRepository,
-} from "@medley/medley-mve";
+} from "@medley/medley-mve/dist/medley.js";
 import { makeAutoObservable, runInAction } from "mobx";
 
 export class CompositionStore {
   private repository: CompositionRepository | undefined;
 
   constructor(
-    private loader: Loader,
     private typeRepo: TypeRepository,
     private modelRepo: ModelRepository
   ) {}
@@ -21,7 +19,6 @@ export class CompositionStore {
     const repo = new CompositionRepository({
       typeRepository: this.typeRepo,
       modelRepository: this.modelRepo,
-      loader: this.loader,
     });
     await repo.load(composition);
     this.repository = repo;

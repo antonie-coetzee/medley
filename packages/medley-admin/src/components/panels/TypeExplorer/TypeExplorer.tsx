@@ -5,7 +5,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import TreeItem from "@material-ui/lab/TreeItem";
 import { Stores, useStores } from "../../../stores/Stores";
-import { Type, TypeTree, TypeVersion } from "@medley/medley-mve";
+import { Type, TypeTree, TypeVersion } from "@medley/medley-mve/dist/medley.js";
 import { Observer, observer } from "mobx-react";
 import { LayoutStore } from "../../../stores/LayoutStore";
 

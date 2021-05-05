@@ -1,0 +1,27 @@
+{
+  "name": "@medley/medley-composer",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {},
+  "devDependencies": {
+    "@rollup/plugin-alias": "^3.1.2",
+    "@rollup/plugin-commonjs": "18.0.0",
+    "@rollup/plugin-html": "^0.2.3",
+    "@rollup/plugin-node-resolve": "11.2.1",
+    "@rollup/plugin-replace": "^2.4.2",
+    "@rollup/plugin-typescript": "8.2.1",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "rollup": "2.45.2",
+    "rollup-plugin-delete": "2.0.0",
+    "rollup-plugin-generate-html-template": "1.7.0",
+    "rollup-plugin-livereload": "^2.0.0",
+    "rollup-plugin-postcss": "^4.0.0",
+    "rollup-plugin-serve": "1.1.0",
+    "typescript": "4.2.4"
+  },
+  "dependencies": {
+    "@material-ui/core": "4.11.4",
+    "tslib": "2.2.0"
+  }
+}

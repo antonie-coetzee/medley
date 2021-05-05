@@ -1,4 +1,4 @@
-import { TypeVersion } from "@medley/medley-mve";
+import { TypeVersion } from "@medley/medley-mve/dist/medley.js";
 import { Layout } from "flexlayout-react";
 import { TypeStore } from "./TypeStore";
 

@@ -1,4 +1,4 @@
-import { ModelRepository, ModelsOfType, TypedModel } from "@medley/medley-mve";
+import { ModelRepository, ModelsOfType, TypedModel } from "@medley/medley-mve/dist/medley.js";
 import { observable } from "mobx";
 
 export class ModelStore {

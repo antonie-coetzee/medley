@@ -1,4 +1,4 @@
-import { Loader, Type, TypeRepository, TypeTree } from "@medley/medley-mve";
+import { Type, TypeRepository, TypeTree } from "@medley/medley-mve/dist/medley.js";
 import { makeAutoObservable, runInAction } from "mobx";
 
 export class TypeStore {

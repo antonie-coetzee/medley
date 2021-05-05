@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",                          
+    "module": "esnext",
+    "moduleResolution": "node",   
+    "allowSyntheticDefaultImports": true,                  
+    "noEmitOnError": true,
+    "lib": ["ESNext", "DOM"],                            
+    "strict": true,  
+    "esModuleInterop": true,                 
+    "outDir": "./dist",
+    "rootDir": "./",
+    "jsx": "react"
+  }
+  ,
+  "include": ["./src/**/*.ts", "./src/**/*.tsx"]
+}

@@ -7,17 +7,17 @@ export interface ModelRepositoryOptions {
 }
 
 export class ModelRepository {
-  public modelsById: Map<string, TypedModel>;
-  private typedModelLoadHook: (typedModel: TypedModel) => TypedModel;
-  public modelsByTypeId: Map<string, ModelsOfType>;
-  private modelsOfTypeLoadHook: (modelsofType: ModelsOfType) => ModelsOfType;
+  public modelsById: Map<string, TypedModel> = new Map();
+  private typedModelLoadHook: (typedModel: TypedModel) => TypedModel = (tm) =>
+    tm;
+  public modelsByTypeId: Map<string, ModelsOfType> = new Map();
+  private modelsOfTypeLoadHook: (modelsofType: ModelsOfType) => ModelsOfType = (
+    mot,
+  ) => mot;
 
-  constructor() {
+  constructor(options?: ModelRepositoryOptions) {
     this.getModelById = this.getModelById.bind(this);
-    this.modelsById = new Map();
-    this.modelsByTypeId = new Map();
-    this.typedModelLoadHook = (tm) => tm;
-    this.modelsOfTypeLoadHook = (mot) => mot;
+    this.updateOptions(options);
   }
 
   public updateOptions(options?: ModelRepositoryOptions) {

@@ -19,6 +19,7 @@ export class TypeRepository {
   public typeTree: TypeTree | undefined;
 
   constructor(options?: TypeRepositoryOptions) {
+    this.updateOptions(options);
     this.getViewFunction = this.getViewFunction.bind(this);
   }
 

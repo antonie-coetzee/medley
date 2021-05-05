@@ -7,6 +7,10 @@
 	{
       "name": "@medley/medley-admin",
       "path": "./packages/medley-admin"
+    },
+	{
+      "name": "@medley/medley-composer",
+      "path": "./packages/medley-composer"
     }
   ],
   "settings": {

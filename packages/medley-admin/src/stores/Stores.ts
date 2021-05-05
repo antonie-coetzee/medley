@@ -1,4 +1,4 @@
-import { Loader, ModelRepository, TypeRepository } from "@medley/medley-mve";
+import { ModelRepository, TypeRepository } from "@medley/medley-mve/dist/medley.js";
 import { MobXProviderContext } from "mobx-react";
 import React from "react";
 import { CompositionStore } from "./CompositionStore";
@@ -16,17 +16,13 @@ export class Stores {
   public typeStore: TypeStore;
   public modelStore: ModelStore;
 
-  private loader:Loader;
-
   constructor() {
-    const loader = new Loader();
-    const typeRepo = new TypeRepository(loader);
+    const typeRepo = new TypeRepository();
     const modelRepo = new ModelRepository();
 
-    this.loader = loader;
     this.typeStore = new TypeStore(typeRepo);
     this.modelStore = new ModelStore(modelRepo);
-    this.compositionStore = new CompositionStore(loader, typeRepo, modelRepo);
+    this.compositionStore = new CompositionStore(typeRepo, modelRepo);
     this.layoutStore = new LayoutStore(this.typeStore);
   }
 }
