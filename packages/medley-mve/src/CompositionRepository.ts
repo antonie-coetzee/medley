@@ -5,15 +5,18 @@ import { TypeRepository, TypeTree } from "./Types/index.ts";
 export interface CompositionRepositoryOptions {
   modelRepository?: ModelRepository;
   typeRepository?: TypeRepository;
+  import?: (url: string) => Promise<any>;
 }
 
 export class CompositionRepository {
+  private import: (url: string) => Promise<any> = (url) => import(url);
   public modelRepository: ModelRepository;
   public typeRepository: TypeRepository;
 
   constructor(options?: CompositionRepositoryOptions) {
     this.modelRepository = options?.modelRepository || new ModelRepository();
     this.typeRepository = options?.typeRepository || new TypeRepository();
+    this.import = options?.import || this.import;
   }
 
   public async load(composition: Composition, url?: URL) {
@@ -28,7 +31,7 @@ export class CompositionRepository {
   }
 
   public async loadFromUrl(url: URL) {
-    var module = await import(url.toString());
+    var module = await this.import(url.toString());
     const composition: Composition = module.default;
     await this.load(composition, url);
   }
