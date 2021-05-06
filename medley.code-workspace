@@ -2,7 +2,7 @@
   "folders": [
     {
       "name": "@medley/medley",
-      "path": "./packages/medley-mve"
+      "path": "./packages/medley"
     },
 	{
       "name": "@medley/medley-admin",
