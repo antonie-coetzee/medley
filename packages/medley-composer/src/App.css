@@ -1,0 +1,42 @@
+html,
+body
+{
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow:hidden;
+  font-size: medium;
+  font-family: Roboto, Arial, sans-serif;
+  background-color:black;
+}
+
+#container  {
+  left:0px;
+  top:0px;
+  right:0px;
+  bottom:0px;
+  position:absolute;
+  display:flex;
+  overflow:hidden;
+  background-color:white;
+}
+
+#app {
+  display:flex;
+  flex-direction: column;
+  flex-grow:1;
+}
+
+#header {
+  display: flex;
+  align-items:center;
+}
+
+#contents {
+  flex-grow:1;
+  left:0;
+  top:0;
+  right:0;
+  bottom:0;
+  position:relative;
+}

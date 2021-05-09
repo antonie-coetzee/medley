@@ -1,17 +1,25 @@
-import React, {useRef} from 'react';
-import ReactDOM from 'react-dom';
+import React from "react";
+import { Provider } from "mobx-react";
 
-import {CssBaseline, Button } from "@material-ui/core";
+import "./App.css";
 
+import { Stores } from "./stores/Stores";
+import { PanelContainer } from "./components/panels/PanelContainer";
+import { Header } from "./components/header/Header";
 
-ReactDOM.render(
-  <React.StrictMode>
-    <React.Fragment>
-    <CssBaseline />
-    <div id="container">
-      <Button variant="contained" color="primary">Hello World</Button>
-    </div>
-    </React.Fragment> 
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+const stores = new Stores();
+
+function App() {
+  return   <div id="app" >
+	<Provider {...stores}>
+		<div id="header">
+			<Header/>
+		</div>
+		<div id="contents">
+			<PanelContainer/>
+		</div>
+	</Provider>
+</div>
+}
+
+export default App;

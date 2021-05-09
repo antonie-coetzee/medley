@@ -5,7 +5,7 @@ Deno.test("can render simple composition", async () => {
   const compoRepo = new CompositionRepository();
   await compoRepo.loadFromUrl(
     new URL(
-      "file://C:/Dev/medley/packages/medley-mve/src/Tests/assets/composition.js",
+      "file://C:/Dev/medley/packages/medley/src/Tests/assets/composition.js",
     ),
   );
   const mve = new ModelViewEngine(compoRepo);

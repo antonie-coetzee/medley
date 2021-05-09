@@ -2,7 +2,8 @@
   "compilerOptions": {
     "target": "ESNext",                          
     "module": "esnext",
-    "moduleResolution": "node",   
+    "moduleResolution": "node",
+    "skipLibCheck": true,   
     "allowSyntheticDefaultImports": true,                  
     "noEmitOnError": true,
     "lib": ["ESNext", "DOM"],                            
@@ -10,8 +11,10 @@
     "esModuleInterop": true,                 
     "outDir": "./dist",
     "rootDir": "./",
-    "jsx": "react"
+    "jsx": "react",
+    "paths": {
+      "@medley":["../"]}
   }
   ,
-  "include": ["./src/**/*.ts", "./src/**/*.tsx"]
+  "include": ["./src/**/*.ts", "./src/**/*.tsx", "../medley/dist/medley.d.ts"]
 }

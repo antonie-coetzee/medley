@@ -7,4 +7,5 @@ export {
   render,
   version,
   unmountComponentAtNode,
+  unstable_batchedUpdates
 } from "react-dom";
