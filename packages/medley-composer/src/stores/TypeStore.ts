@@ -1,4 +1,4 @@
-import { Type, TypeRepository, TypeTree } from "@medley";
+import { Type, TypeRepository, TypeTree } from "medley";
 import { makeAutoObservable, runInAction } from "mobx";
 
 export class TypeStore {

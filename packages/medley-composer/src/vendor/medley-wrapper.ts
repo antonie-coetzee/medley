@@ -1,1 +1,1 @@
-export * from "@medley"
+export * from "medley"

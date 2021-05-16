@@ -4,7 +4,7 @@ import {
   ModelRepository,
   ModelViewEngine,
   TypeRepository,
-} from "@medley";
+} from "medley";
 import { makeAutoObservable, runInAction } from "mobx";
 
 export class CompositionStore {

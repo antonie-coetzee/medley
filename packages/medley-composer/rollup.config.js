@@ -25,7 +25,7 @@ export default [
           "mobx": "/vendor/mobx.6.1.8.js",
           "mobx-react": "/vendor/mobx-react.7.1.0.js",
           "react-dom": "/vendor/react-dom.17.0.2.js",
-          "@medley" : "/vendor/medley.1.0.0.js"
+          "medley" : "/vendor/medley.1.0.0.js"
         }
       },
     ],
@@ -34,7 +34,7 @@ export default [
       "react-dom",
       "mobx",
       "mobx-react",
-      "@medley"
+      "medley"
     ],
     plugins: [
       image(),

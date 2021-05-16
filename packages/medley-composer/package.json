@@ -1,5 +1,5 @@
 {
-  "name": "@medley/medley-composer",
+  "name": "medley-composer",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -15,6 +15,8 @@
     "@rollup/plugin-node-resolve": "11.2.1",
     "@rollup/plugin-replace": "2.4.2",
     "@rollup/plugin-typescript": "8.2.1",
+    "@types/react": "^17.0.5",
+    "@types/react-dom": "^17.0.5",
     "postcss-assets": "^5.0.0",
     "rollup": "2.45.2",
     "rollup-plugin-delete": "2.0.0",
@@ -29,6 +31,7 @@
     "@material-ui/icons": "4.11.2",
     "@material-ui/lab": "4.0.0-alpha.57",
     "flexlayout-react": "0.5.5",
+    "medley": "1.0.0",
     "mobx": "6.1.8",
     "mobx-react": "7.1.0",
     "postcss": "^8.2.14",

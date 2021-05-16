@@ -1,4 +1,4 @@
-import { ModelRepository, ModelsOfType, TypedModel } from "@medley"
+import { ModelRepository, ModelsOfType, TypedModel } from "medley"
 import { observable } from "mobx";
 
 export class ModelStore {

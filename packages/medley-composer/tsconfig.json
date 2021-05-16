@@ -1,8 +1,8 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    //"sourceMap": true,
-    //"inlineSources": true,
+    "sourceMap": true,
+    "inlineSources": true,
     "target": "ESNext",                          
     "module": "esnext",
     "moduleResolution": "node",
@@ -15,9 +15,6 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "jsx": "react",
-     "paths": {
-       "@medley":["../medley"]}
   },
-  "references": [{ "path": "../medley" }],
   "include": ["./src/**/*.ts", "./src/**/*.tsx"]
 }

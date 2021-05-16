@@ -1,4 +1,4 @@
-import { ModelRepository, TypeRepository } from "@medley";
+import { ModelRepository, TypeRepository } from "medley";
 import { MobXProviderContext } from "mobx-react";
 import React from "react";
 import { CompositionStore } from "./CompositionStore";
