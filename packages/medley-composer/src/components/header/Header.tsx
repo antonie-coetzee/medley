@@ -15,8 +15,7 @@ import {
   Theme,
   Toolbar,
 } from "@material-ui/core";
-import { Composition } from "../../../../medley/dist/medley.js";
-//import { Composition } from "medley.js";
+import { Composition } from "@medley";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

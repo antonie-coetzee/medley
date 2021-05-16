@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "name": "medley",
+  "version": "1.0.0",
+  "main": "dist/medley.js",
+  "types": "dist/medley.d.ts",
+  "license": "MIT"
+}

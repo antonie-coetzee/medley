@@ -10,22 +10,7 @@ import livereload from "rollup-plugin-livereload";
 import replace from "@rollup/plugin-replace";
 import url from "postcss-url";
 
-const pathResolve = (id)=>{
-  if(/@material-ui\/lab/.test(id)){
-    return  "/vendor/material-ui-lab.4.0.0.js"
-  }
-  if(/@material-ui\/core/.test(id)){
-    return  "/vendor/material-ui.4.11.4.js"
-  }
-  const mappings = {
-    "react": "/vendor/react.17.0.2.js",
-    "react-dom": "/vendor/react-dom.17.0.2.js",
-    "flexlayout-react": "/vendor/flexlayout-react.0.5.5.js",
-    "mobx": "/vendor/mobx.6.1.8.js",
-    "mobx-react": "/vendor/mobx-react.7.1.0.js",
-  }
-  return mappings[id];
-}
+const production = false;
 
 export default [
   {
@@ -34,31 +19,26 @@ export default [
       {
         file: "dist/index.js",
         format: "es",
+        sourcemap: true,
         paths: {
-          "@material-ui/lab": "/vendor/material-ui-lab.4.0.0.js",
-          "@material-ui/core": "/vendor/material-ui.4.11.4.js",
-          "@material-ui/icons": "/vendor/material-ui-icons.4.11.2.js",
           "react": "/vendor/react.17.0.2.js",
-          "react-dom": "/vendor/react-dom.17.0.2.js",
-          "flexlayout-react": "/vendor/flexlayout-react.0.5.5.js",
           "mobx": "/vendor/mobx.6.1.8.js",
           "mobx-react": "/vendor/mobx-react.7.1.0.js",
+          "react-dom": "/vendor/react-dom.17.0.2.js",
+          "@medley" : "/vendor/medley.1.0.0.js"
         }
       },
     ],
     external: [
       "react",
       "react-dom",
-      /@material-ui\/lab/,
-      /@material-ui\/core/,
-      /@material-ui\/icons/,
       "mobx",
       "mobx-react",
-      "flexlayout-react",
+      "@medley"
     ],
     plugins: [
       image(),
-      typescript(),
+      typescript({ sourceMap: !production, inlineSources: !production }),
       replace({
         preventAssignment: true,
         values: {
@@ -66,7 +46,7 @@ export default [
         },
       }),
       nodeResolve(),
-      //commonjs(),
+      commonjs(),
       postcss({
         extract: true,
         minimize: true,

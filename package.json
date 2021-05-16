@@ -13,13 +13,6 @@
   "devDependencies": {
     "lerna": "3.18.4"
   },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "roots": [
-      "<rootDir>/packages/medley-mve/src"
-    ]
-  },
   "workspaces": [
     "packages/**"
   ]

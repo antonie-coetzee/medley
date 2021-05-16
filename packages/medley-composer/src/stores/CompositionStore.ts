@@ -4,7 +4,7 @@ import {
   ModelRepository,
   ModelViewEngine,
   TypeRepository,
-} from "../../../medley/dist/medley.js";
+} from "@medley";
 import { makeAutoObservable, runInAction } from "mobx";
 
 export class CompositionStore {
@@ -20,7 +20,7 @@ export class CompositionStore {
       typeRepository: this.typeRepo,
       modelRepository: this.modelRepo,
     });
-    await repo.load(composition);
+    await repo.load(composition, new URL(window.location.toString()));
     this.repository = repo;
     // try{
     //   const mve = new ModelViewEngine(repo);

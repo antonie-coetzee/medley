@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build:vendor":"npx rollup -c rollup.vendor.config.js",
-    "build:dev":"npx rollup -c rollup.config.js",
-    "build:watch":"npx rollup -cw rollup.config.js"
+    "build:vendor": "npx rollup -c rollup.vendor.config.js",
+    "build:dev": "npx rollup -c rollup.config.js",
+    "build:watch": "npx rollup -cw rollup.config.js"
   },
   "devDependencies": {
-    "@rollup/plugin-alias": "3.1.2",
+    "@rollup/plugin-alias": "^3.1.2",
     "@rollup/plugin-commonjs": "18.0.0",
     "@rollup/plugin-html": "0.2.3",
     "@rollup/plugin-image": "^2.0.6",
