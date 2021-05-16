@@ -1,5 +1,5 @@
-import { ViewFunction } from "../Core/index.ts";
-import { Type, TypeTree, TypeVersion } from "./Type.ts";
+import { ViewFunction } from "../Core/index";
+import { Type, TypeTree, TypeVersion } from "./Type";
 
 export interface TypeRepositoryOptions {
   onResolvedTypeTreeUpdate?: (typeTree: TypeTree) => void;

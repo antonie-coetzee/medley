@@ -4,11 +4,7 @@
       "name": "@medley/medley",
       "path": "./packages/medley"
     },
-	{
-      "name": "@medley/medley-admin",
-      "path": "./packages/medley-admin"
-    },
-	{
+    {
       "name": "@medley/medley-composer",
       "path": "./packages/medley-composer"
     }

@@ -1,5 +1,5 @@
-import { uuidv4 } from "../../deps.ts";
-import { ModelsOfType, TypedModel } from "./Model.ts";
+import { v4 as uuidv4} from "uuid";
+import { ModelsOfType, TypedModel } from "./Model";
 
 export interface ModelRepositoryOptions {
   typedModelLoadHook?: (typedModel: TypedModel) => TypedModel;
@@ -62,7 +62,7 @@ export class ModelRepository {
     const uModel: TypedModel = {
       ...model,
       typeId,
-      id: currentModel?.id || uuidv4.generate(),
+      id: currentModel?.id || uuidv4(),
       name: model.name || currentModel?.name,
     };
 

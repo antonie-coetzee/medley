@@ -1,17 +1,13 @@
 {
   "private": true,
   "name": "medley",
-  "version": "0.0.1",
-  "main": "index.js",
+  "version": "1.0.0",
   "license": "MIT",
   "scripts": {
     "build:mve": "npx lerna run build:mve --stream",
     "build:admin": "npx lerna run build:admin --stream",
     "start:admin": "npx lerna run start:admin --stream",
     "test:mve": "npx lerna run test:mve --stream"
-  },
-  "devDependencies": {
-    "lerna": "3.18.4"
   },
   "workspaces": [
     "packages/**"

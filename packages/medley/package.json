@@ -4,5 +4,15 @@
   "version": "1.0.0",
   "main": "dist/medley.js",
   "types": "dist/medley.d.ts",
-  "license": "MIT"
+  "module": "dist/medley.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "19.0.0",
+    "@rollup/plugin-node-resolve": "13.0.0",
+    "@rollup/plugin-typescript": "8.2.1",
+    "@types/uuid": "8.3.0",
+    "rollup": "2.48.0",
+    "typescript": "4.2.4",
+    "uuid": "8.3.2"
+  }
 }

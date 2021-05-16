@@ -1,15 +1,7 @@
 {
-    "lit-html.tags": [
-        "html",
-        "raw",
-        "xml"
-    ],
-    "explorer.autoReveal": false,
-    "debug.javascript.terminalOptions": {
-        "skipFiles": [
-          "<node_internals>/**"
-        ]
-      },
-      "deno.lint": false,
-      "deno.unstable": false,
+  "lit-html.tags": ["html", "raw", "xml"],
+  "explorer.autoReveal": false,
+  "debug.javascript.terminalOptions": {
+    "skipFiles": ["<node_internals>/**"]
+  }
 }
