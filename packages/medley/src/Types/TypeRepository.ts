@@ -1,27 +1,26 @@
+import { VIEW_FUNCTION } from "../Core/Constants";
 import { ViewFunction } from "../Core/index";
+import { Loader } from "../Core/Loader";
 import { Type, TypeTree, TypeVersion } from "./Type";
 
 export interface TypeRepositoryOptions {
   onResolvedTypeTreeUpdate?: (typeTree: TypeTree) => void;
   onTypeTreeUpdate?: (typeTree: TypeTree) => void;
   onTypesUrlUpdate?: (typesUrl: URL) => void;
-  import?: (url: string) => Promise<any>;
 }
 
 export class TypeRepository {
-  private typeVersionMap: Map<string, { type: Type; version: TypeVersion }> =
+  private typeVersionMap: Map<string, { type: Type; typeVersion: TypeVersion }> =
     new Map();
   private onResolvedTypeTreeUpdate: (typeTree: TypeTree) => void = () => {};
   private onTypeTreeUpdate: (typeTree: TypeTree) => void = () => {};
   private onTypesUrlUpdate: (typesUrl: URL) => void = () => {};
-  private import: (url: string) => Promise<any> = (url) => import(url);
 
   public typesUrl: URL | undefined;
   public resolvedTypeTree: TypeTree | undefined;
   public typeTree: TypeTree | undefined;
 
-  constructor(options?: TypeRepositoryOptions) {
-    this.updateOptions(options);
+  constructor(public loader:Loader) {
     this.getViewFunction = this.getViewFunction.bind(this);
   }
 
@@ -30,13 +29,12 @@ export class TypeRepository {
       this.onResolvedTypeTreeUpdate;
     this.onTypeTreeUpdate = options?.onTypeTreeUpdate || this.onTypeTreeUpdate;
     this.onTypesUrlUpdate = options?.onTypesUrlUpdate || this.onTypesUrlUpdate;
-    this.import = options?.import || this.import;
   }
 
   public async loadFromUrl(url: URL): Promise<void> {
     this.typesUrl = url;
     this.onTypesUrlUpdate(this.typesUrl);
-    var module = await this.import(url.toString());
+    var module = await this.loader.importUrl(url);
     const typeTree: TypeTree = module.default;
     return this.load(typeTree);
   }
@@ -61,25 +59,13 @@ export class TypeRepository {
   }
 
   public async getViewFunction(typeVersionId: string): Promise<ViewFunction> {
-    const { type, version } = this.typeVersionMap.get(typeVersionId) || {};
-    if (type === undefined || version === undefined) {
+    const { type, typeVersion} = this.typeVersionMap.get(typeVersionId) || {};
+    if (type === undefined || typeVersion === undefined) {
       throw new Error(`type with version id: ${typeVersionId} not found`);
     }
 
-    const typeModuleUrl = new URL(
-      version.viewFunction.url.toString(),
-      this.typesUrl,
-    );
-    if (typeModuleUrl === undefined) {
-      throw new Error("typeModuleUrl is undefined");
-    }
-
-    const typeModule = await this.import(typeModuleUrl.toString());
-    if (version.viewFunction.name) {
-      return typeModule[version.viewFunction.name];
-    } else {
-      return typeModule.default;
-    }
+    const module = await this.loader.importModule(typeVersion.module);
+    return module[VIEW_FUNCTION];
   }
 
   private async resolveTypeTree(
@@ -120,18 +106,18 @@ export class TypeRepository {
 
   private indexType(type: Type) {
     type.versions.forEach((version) => {
-      this.typeVersionMap.set(version.id, { type, version });
+      this.typeVersionMap.set(version.id, { type, typeVersion: version });
     });
   }
 
   public async loadGroup(url: URL): Promise<TypeTree> {
-    var module = await this.import(url.toString());
+    var module = await this.loader.importUrl(url);
     const typeTree: TypeTree = module.default;
     return typeTree;
   }
 
   private async loadType(url: URL): Promise<Type> {
-    const typeModule = await this.import(url.toString());
+    const typeModule = await this.loader.importUrl(url);
     const type: Type = typeModule.default;
     return type;
   }

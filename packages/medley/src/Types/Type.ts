@@ -1,21 +1,23 @@
-export interface ModuleExport {
-  url: URL;
-  name?: string;
-}
+import { Module } from "../Core/Module";
 
 export interface TypeVersion {
-  number: string;
+  version: string;
   id: string;
-  viewFunction: ModuleExport;
-  editUrl?: URL;
-  schema?: {
-    input?: URL;
-    output?: URL;
-  };
-  migration?: {
-    up: ModuleExport;
-    down: ModuleExport;
-  };
+  module: Module;
+  
+  // viewFunction: ModuleExport;
+  // edit?: {
+  //   component: ModuleExport;
+  //   save: ModuleExport;
+  // }
+  // schema?: {
+  //   input?: ModuleExport;
+  //   output?: ModuleExport;
+  // };
+  // migration?: {
+  //   up?: ModuleExport;
+  //   down?: ModuleExport;
+  // };
 }
 
 export interface Type {
