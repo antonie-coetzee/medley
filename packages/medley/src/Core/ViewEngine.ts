@@ -3,19 +3,19 @@ import { Typed } from "./Typed";
 export type ViewFunction = (cntx: any, ...args: any[]) => Promise<any>;
 
 export class ViewEngine {
-  private context: {} = {};
+  private context: any = {};
 
-  getContext(): {} {
+  getContext(): any {
     return this.context;
   }
 
-  setContext(context: {}): void {
+  setContext(context: any): void {
     this.context = context;
   }
 
   constructor(
     private getModel: (modelId: string) => Promise<Typed>,
-    private getViewFunction: (typeId: string) => Promise<ViewFunction>,
+    private getViewFunction: (typeId: string) => Promise<ViewFunction>
   ) {
     this.setContext = this.setContext.bind(this);
     this.renderModel = this.renderModel.bind(this);
@@ -24,22 +24,22 @@ export class ViewEngine {
   public async renderModel<T>(modelId: string, ...args: any[]): Promise<T> {
     if (!modelId) throw new Error("modelId is null or empty");
 
-    const model = await this.getModel(modelId);
-    const viewFunction = await this.getViewFunction(model.typeId);
+    const oldContext = this.context;
 
-    let oldContext = this.context;
-
-    let viewEngine = {
+    const viewEngine = {
       renderModel: this.renderModel,
       setContext: this.setContext,
     };
 
-    let cntx = {
+    const model = await this.getModel(modelId);
+    const cntx = {
       ...this.context,
       model,
       viewEngine,
     };
 
+    const viewFunction = await this.getViewFunction(model.typeId);
+    
     try {
       return await viewFunction(cntx, ...args);
     } finally {

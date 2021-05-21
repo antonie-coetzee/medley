@@ -4,20 +4,6 @@ export interface TypeVersion {
   version: string;
   id: string;
   module: Module;
-  
-  // viewFunction: ModuleExport;
-  // edit?: {
-  //   component: ModuleExport;
-  //   save: ModuleExport;
-  // }
-  // schema?: {
-  //   input?: ModuleExport;
-  //   output?: ModuleExport;
-  // };
-  // migration?: {
-  //   up?: ModuleExport;
-  //   down?: ModuleExport;
-  // };
 }
 
 export interface Type {

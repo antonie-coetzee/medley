@@ -34,8 +34,7 @@ export class TypeRepository {
   public async loadFromUrl(url: URL): Promise<void> {
     this.typesUrl = url;
     this.onTypesUrlUpdate(this.typesUrl);
-    var module = await this.loader.importUrl(url);
-    const typeTree: TypeTree = module.default;
+    const typeTree: TypeTree = await this.loader.loadJson(url);
     return this.load(typeTree);
   }
 
@@ -111,14 +110,12 @@ export class TypeRepository {
   }
 
   public async loadGroup(url: URL): Promise<TypeTree> {
-    var module = await this.loader.importUrl(url);
-    const typeTree: TypeTree = module.default;
+    const typeTree: TypeTree = await this.loader.loadJson(url);
     return typeTree;
   }
 
   private async loadType(url: URL): Promise<Type> {
-    const typeModule = await this.loader.importUrl(url);
-    const type: Type = typeModule.default;
+    const type: Type = await this.loader.loadJson(url);
     return type;
   }
 }

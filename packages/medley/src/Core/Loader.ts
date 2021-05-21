@@ -1,20 +1,25 @@
 import { Module } from "./Module";
-import "systemjs/dist/s.min.js";
+
+export interface PlatformLoaders {
+  json?: (url:string)=>Promise<any>,
+  systemJs?: (url:string)=>Promise<any>
+}
 
 export class Loader {
-  static moduleType: "ESM" | "SYSTEM" = "ESM";
+  constructor(private platformLoaders:PlatformLoaders){}
 
   async importModule(module: Module):Promise<any>{
-    const url = Loader.moduleType === "ESM" ? module.esmUrl : module.systemUrl;
-    const importedModule = await this.importUrl(url)
-    return importedModule;
+    if(this.platformLoaders.systemJs){
+      return this.platformLoaders.systemJs(module.systemUrl.toString())    
+    }else{
+      return import(module.esmUrl.toString());
+    }
   }
 
-  async importUrl (url:URL): Promise<any>{
-    if(Loader.moduleType === "ESM"){
-      return await import(url.toString());
-    }else{     
-      return await System.import(url.toString());
+  async loadJson (url:URL): Promise<any>{
+    if(this.platformLoaders.json == null){
+      throw new Error("platform json loader not defined")
     }
+    return this.platformLoaders.json(url.toString());
   }
 }

@@ -2,8 +2,10 @@ import { CompositionRepository } from "./CompositionRepository";
 import { ViewEngine } from "./Core";
 import { ModelRepository } from "./Models";
 import { TypeRepository } from "./Types";
-import { Loader } from "./Core/Loader";
+import { Loader, PlatformLoaders } from "./Core/Loader";
 import { Composition } from "./Composition";
+
+export interface MedleyOptions extends PlatformLoaders {}
 
 export class Medley {
   public typeRepository: TypeRepository;
@@ -12,8 +14,8 @@ export class Medley {
   public viewEngine: ViewEngine;
   public loader: Loader;
 
-  constructor() {
-    this.loader = new Loader();
+  constructor(options?:MedleyOptions) {
+    this.loader = new Loader(options || {});
     this.typeRepository = new TypeRepository(this.loader);
     this.modelRepository = new ModelRepository();
     this.compositionRepository = new CompositionRepository(

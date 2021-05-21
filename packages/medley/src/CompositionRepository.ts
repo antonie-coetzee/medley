@@ -27,8 +27,7 @@ export class CompositionRepository {
   }
 
   public async loadFromUrl(url: URL) {
-    var module = await this.loader.importUrl(url);
-    const composition: Composition = module.default;
+    const composition: Composition = await this.loader.loadJson(url);
     await this.load(composition, url);
   }
 

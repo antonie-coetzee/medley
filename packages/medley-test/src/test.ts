@@ -1,4 +1,4 @@
-import { Medley } from "../Medley";
+import { Medley } from "medley";
 
 describe('Medley', function() {
     it('should load and run ESM modules', async function() {
