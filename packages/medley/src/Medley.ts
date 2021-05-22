@@ -36,7 +36,7 @@ export class Medley {
     await this.compositionRepository.loadFromUrl(url);
   }
 
-  public async renderModel<T>(modelId: string, args?: any[]): Promise<T> {
+  public async renderModel<T>(modelId: string, args?: any[]): Promise<T | undefined> {
     return this.viewEngine.renderModel<T>(modelId, args);
   }
 

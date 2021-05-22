@@ -24,7 +24,7 @@ export class ViewEngine {
     this.viewFunctionCache = new Map();
   }
 
-  public async renderModel<T>(modelId: string, ...args: any[]): Promise<T> {
+  public async renderModel<T>(modelId: string, ...args: any[]): Promise<T | undefined> {
     if (!modelId) throw new Error("modelId is null or empty");
 
     const oldContext = this.context;
