@@ -36,6 +36,7 @@ export default [
         outDir: "dist/dts",
         declarationDir: "dist/dts",
         emitDeclarationOnly: true,
+        declaration:true
       }),
     ],
   },
