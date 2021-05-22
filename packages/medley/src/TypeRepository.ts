@@ -1,5 +1,5 @@
-import { ViewFunction, Type, TypeTree, TypeVersion, Loader } from "./Core";
-import { VIEW_FUNCTION } from "./Core/Constants";
+import { ViewFunction, Type, TypeTree, TypeVersion, Loader } from "./core";
+import { VIEW_FUNCTION } from "./core/Constants";
 
 export interface TypeRepositoryOptions {
   onResolvedTypeTreeUpdate?: (typeTree: TypeTree) => void;

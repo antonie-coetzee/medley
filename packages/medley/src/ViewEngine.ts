@@ -1,4 +1,4 @@
-import { Context, TypedModel, ViewFunction } from "./Core";
+import { Context, TypedModel, ViewFunction } from "./core";
 
 export class ViewEngine {
   private viewFunctionCache: Map<string, ViewFunction> = new Map();

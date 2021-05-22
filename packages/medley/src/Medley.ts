@@ -1,6 +1,6 @@
 import { Composition } from "./Composition";
 import { CompositionRepository } from "./CompositionRepository";
-import { Loader, PlatformOptions } from "./Core";
+import { Loader, PlatformOptions } from "./core";
 import { ModelRepository } from "./ModelRepository";
 import { TypeRepository } from "./TypeRepository";
 import { ViewEngine } from "./ViewEngine";
