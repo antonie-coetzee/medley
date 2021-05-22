@@ -1,10 +1,10 @@
 import fs from "fs/promises"
 import path from "path"
 import {URL} from "url"
-import { Medley, MedleyOptions } from "medley";
+import { Medley, MedleyOptions } from "../../src/index";
 import "systemjs";
 
-const rootPath = path.resolve(__dirname + "/../..");
+const rootPath = path.resolve(__dirname + "/..");
 
 describe('Medley', function() {
     it('should load and run basic composition without error', async function() {
@@ -19,7 +19,7 @@ describe('Medley', function() {
         }
       };
       const medley = new Medley(options);
-      await medley.loadFromUrl(new URL(`file:///${rootPath}/dist/compositions/composition.json`));
+      await medley.loadFromUrl(new URL(`file:///${rootPath}/fixtures/compositions/composition.json`));
       const result = await medley.renderModel("e0754165-d127-48be-92c5-85fc25dbca19");
       console.log(result);
     });

@@ -3,10 +3,6 @@
     {
       "name": "@medley/medley",
       "path": "./packages/medley"
-    },  
-    {
-      "name": "@medley/medley-test",
-      "path": "./packages/medley-test"
     },
     {
       "name": "@medley/medley-composer",
