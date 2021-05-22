@@ -4,6 +4,6 @@ export type Context = {
   model: TypedModel;
   viewEngine: {
     setContext: (ctx: any) => void;
-    renderModel: <T>(modelId: string, ...args: []) => Promise<T> | void;
+    renderModel: <T>(modelId: string, ...args: []) => Promise<T> | undefined;
   };
 };
