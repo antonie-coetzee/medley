@@ -46,7 +46,7 @@ export class ViewEngine {
       (await this.getViewFunction(model.typeId));
 
     try {
-      return await viewFunction(cntx, ...args);
+      return viewFunction(cntx, ...args);
     } finally {
       this.context = oldContext;
     }
