@@ -7,7 +7,7 @@ import "systemjs";
 const rootPath = path.resolve(__dirname + "/../..");
 
 describe('Medley', function() {
-    it('should load and run basic composition', async function() {
+    it('should load and run basic composition without error', async function() {
       const options:MedleyOptions = {
         systemJsImport:async (url)=>{
           const module = await System.import(url)

@@ -8,7 +8,7 @@ export interface ModelsOfType {
 export interface Model {
   id: string;
   name?: string;
-  references?: string[];
+  refs?: string[];
   value?: any;
 }
 
