@@ -1,11 +1,11 @@
 import { Composition } from "./Composition";
 import { CompositionRepository } from "./CompositionRepository";
-import { Loader, PlatformOptions } from "./core";
+import { Loader, Platform } from "./core";
 import { ModelRepository } from "./ModelRepository";
 import { TypeRepository } from "./TypeRepository";
 import { ViewEngine } from "./ViewEngine";
 
-export interface MedleyOptions extends PlatformOptions {}
+export interface MedleyOptions extends Platform {}
 
 export class Medley {
   public typeRepository: TypeRepository;

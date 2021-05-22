@@ -1,17 +1,13 @@
 import { Module } from "./Module";
-
-export interface PlatformOptions {
-  loadJson?: (url:string)=>Promise<any>,
-  systemJsImport?: (url:string)=>Promise<any>
-}
+import { Platform } from "./Platform";
 
 export class Loader {
-  constructor(private platformOptions:PlatformOptions){}
+  constructor(private platform:Platform){}
 
   async importModule(module: Module, baseUrl?:URL):Promise<any>{
-    if(this.platformOptions.systemJsImport){
+    if(this.platform.systemJsImport){
       const resolvedUrl = baseUrl ? new URL(module.systemUrl.toString(), new URL(module.baseUrl.toString(), baseUrl)) : module.systemUrl;
-      return this.platformOptions.systemJsImport(resolvedUrl.toString())    
+      return this.platform.systemJsImport(resolvedUrl.toString())    
     }else{
       const resolvedUrl = baseUrl ? new URL(module.esmUrl.toString(), new URL(module.baseUrl.toString(), baseUrl)) : module.esmUrl;
       return import(resolvedUrl.toString());
@@ -19,9 +15,9 @@ export class Loader {
   }
 
   async loadJson (url:URL): Promise<any>{
-    if(this.platformOptions.loadJson == null){
+    if(this.platform.loadJson == null){
       throw new Error("platform json loader not defined")
     }
-    return this.platformOptions.loadJson(url.toString());
+    return this.platform.loadJson(url.toString());
   }
 }
