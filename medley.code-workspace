@@ -3,15 +3,14 @@
     {
       "name": "@medley/medley",
       "path": "./packages/medley"
+    },  
+    {
+      "name": "@medley/medley-test",
+      "path": "./packages/medley-test"
     },
     {
       "name": "@medley/medley-composer",
       "path": "./packages/medley-composer"
     }
-  ],
-  "settings": {
-    "deno.enable": false,
-    "deno.lint": false,
-    "deno.unstable": false
-  }
+  ]
 }

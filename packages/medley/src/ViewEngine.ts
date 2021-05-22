@@ -1,6 +1,4 @@
-import { Typed } from "./Typed";
-
-export type ViewFunction = (cntx: any, ...args: any[]) => Promise<any>;
+import { Context, TypedModel, ViewFunction } from "./Core";
 
 export class ViewEngine {
   private context: any = {};
@@ -14,7 +12,7 @@ export class ViewEngine {
   }
 
   constructor(
-    private getModel: (modelId: string) => Promise<Typed>,
+    private getModel: (modelId: string) => Promise<TypedModel>,
     private getViewFunction: (typeId: string) => Promise<ViewFunction>
   ) {
     this.setContext = this.setContext.bind(this);
@@ -32,7 +30,7 @@ export class ViewEngine {
     };
 
     const model = await this.getModel(modelId);
-    const cntx = {
+    const cntx:Context = {
       ...this.context,
       model,
       viewEngine,

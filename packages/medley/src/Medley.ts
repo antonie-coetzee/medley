@@ -1,11 +1,11 @@
-import { CompositionRepository } from "./CompositionRepository";
-import { ViewEngine } from "./Core";
-import { ModelRepository } from "./Models";
-import { TypeRepository } from "./Types";
-import { Loader, PlatformLoaders } from "./Core/Loader";
 import { Composition } from "./Composition";
+import { CompositionRepository } from "./CompositionRepository";
+import { Loader, PlatformOptions } from "./Core";
+import { ModelRepository } from "./ModelRepository";
+import { TypeRepository } from "./TypeRepository";
+import { ViewEngine } from "./ViewEngine";
 
-export interface MedleyOptions extends PlatformLoaders {}
+export interface MedleyOptions extends PlatformOptions {}
 
 export class Medley {
   public typeRepository: TypeRepository;
@@ -14,7 +14,7 @@ export class Medley {
   public viewEngine: ViewEngine;
   public loader: Loader;
 
-  constructor(options?:MedleyOptions) {
+  constructor(options?: MedleyOptions) {
     this.loader = new Loader(options || {});
     this.typeRepository = new TypeRepository(this.loader);
     this.modelRepository = new ModelRepository();
@@ -36,7 +36,7 @@ export class Medley {
     await this.compositionRepository.loadFromUrl(url);
   }
 
-  public async renderModel<T>(modelId: string, args: any[]): Promise<T> {
+  public async renderModel<T>(modelId: string, args?: any[]): Promise<T> {
     return this.viewEngine.renderModel<T>(modelId, args);
   }
 }

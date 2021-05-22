@@ -1,7 +1,5 @@
-import { VIEW_FUNCTION } from "../Core/Constants";
-import { ViewFunction } from "../Core/index";
-import { Loader } from "../Core/Loader";
-import { Type, TypeTree, TypeVersion } from "./Type";
+import { ViewFunction, Type, TypeTree, TypeVersion, Loader } from "./Core";
+import { VIEW_FUNCTION } from "./Core/Constants";
 
 export interface TypeRepositoryOptions {
   onResolvedTypeTreeUpdate?: (typeTree: TypeTree) => void;
@@ -10,8 +8,10 @@ export interface TypeRepositoryOptions {
 }
 
 export class TypeRepository {
-  private typeVersionMap: Map<string, { type: Type; typeVersion: TypeVersion }> =
-    new Map();
+  private typeVersionMap: Map<
+    string,
+    { type: Type; typeVersion: TypeVersion }
+  > = new Map();
   private onResolvedTypeTreeUpdate: (typeTree: TypeTree) => void = () => {};
   private onTypeTreeUpdate: (typeTree: TypeTree) => void = () => {};
   private onTypesUrlUpdate: (typesUrl: URL) => void = () => {};
@@ -20,13 +20,13 @@ export class TypeRepository {
   public resolvedTypeTree: TypeTree | undefined;
   public typeTree: TypeTree | undefined;
 
-  constructor(public loader:Loader) {
+  constructor(public loader: Loader) {
     this.getViewFunction = this.getViewFunction.bind(this);
   }
 
   public updateOptions(options?: TypeRepositoryOptions) {
-    this.onResolvedTypeTreeUpdate = options?.onResolvedTypeTreeUpdate ||
-      this.onResolvedTypeTreeUpdate;
+    this.onResolvedTypeTreeUpdate =
+      options?.onResolvedTypeTreeUpdate || this.onResolvedTypeTreeUpdate;
     this.onTypeTreeUpdate = options?.onTypeTreeUpdate || this.onTypeTreeUpdate;
     this.onTypesUrlUpdate = options?.onTypesUrlUpdate || this.onTypesUrlUpdate;
   }
@@ -58,18 +58,21 @@ export class TypeRepository {
   }
 
   public async getViewFunction(typeVersionId: string): Promise<ViewFunction> {
-    const { type, typeVersion} = this.typeVersionMap.get(typeVersionId) || {};
+    const { type, typeVersion } = this.typeVersionMap.get(typeVersionId) || {};
     if (type === undefined || typeVersion === undefined) {
       throw new Error(`type with version id: ${typeVersionId} not found`);
     }
 
-    const module = await this.loader.importModule(typeVersion.module);
-    return module[VIEW_FUNCTION];
+    const module = await this.loader.importModule(
+      typeVersion.module,
+      this.typesUrl
+    );
+    return module[typeVersion.exportMap?.viewFunction || VIEW_FUNCTION];
   }
 
   private async resolveTypeTree(
     partialTypeTree: TypeTree,
-    resolvedTypeTree: TypeTree,
+    resolvedTypeTree: TypeTree
   ): Promise<void> {
     for await (const type of partialTypeTree.types) {
       if ((type as Type).name === undefined) {

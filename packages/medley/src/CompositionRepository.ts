@@ -1,7 +1,5 @@
-import { Composition } from "./Composition";
-import { Loader } from "./Core/Loader";
-import { ModelRepository } from "./Models";
-import { TypeRepository, TypeTree } from "./Types";
+import { Loader, TypeTree } from "./Core";
+import { ModelRepository, TypeRepository, Composition } from ".";
 
 export interface CompositionRepositoryOptions {
   modelRepository?: ModelRepository;
