@@ -8,8 +8,9 @@
           "version": "1.0.0",
           "id": "bf96ada6-aab4-49b4-b42a-0d9ae82dc9df",
           "module": {
-            "systemUrl": "../modules/moduleOne/moduleOne-system.js",
-            "esmUrl": "../modules/moduleOne/moduleOne-system.js"
+            "baseUrl": "../modules/moduleOne/",
+            "systemUrl": "moduleOne-system.js",
+            "esmUrl": "moduleOne-esm.js"
           }
         }
       ]

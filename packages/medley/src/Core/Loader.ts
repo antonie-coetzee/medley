@@ -10,10 +10,10 @@ export class Loader {
 
   async importModule(module: Module, baseUrl?:URL):Promise<any>{
     if(this.platformOptions.systemJsImport){
-      const resolvedUrl = baseUrl ? new URL(module.systemUrl.toString(), baseUrl) : module.systemUrl;
+      const resolvedUrl = baseUrl ? new URL(module.systemUrl.toString(), new URL(module.baseUrl.toString(), baseUrl)) : module.systemUrl;
       return this.platformOptions.systemJsImport(resolvedUrl.toString())    
     }else{
-      const resolvedUrl = baseUrl ? new URL(module.esmUrl.toString(), baseUrl) : module.esmUrl;
+      const resolvedUrl = baseUrl ? new URL(module.esmUrl.toString(), new URL(module.baseUrl.toString(), baseUrl)) : module.esmUrl;
       return import(resolvedUrl.toString());
     }
   }

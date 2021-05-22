@@ -5,8 +5,9 @@
       "number": "1.0.0",
       "id": "ce8512f1-b8fa-4bf7-8b9c-89d15f8b748c",
       "module": {
-        "systemUrl": "../modules/moduleTwo/moduleTwo-system.js",
-        "esmUrl": "../modules/moduleTwo/moduleTwo-system.js"
+        "baseUrl": "../modules/moduleTwo/",
+        "systemUrl": "moduleTwo-system.js",
+        "esmUrl": "moduleTwo-esm.js"
       }
     }
   ]

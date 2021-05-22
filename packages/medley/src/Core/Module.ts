@@ -1,4 +1,5 @@
 export interface Module {
-  esmUrl: URL;
-  systemUrl: URL;
+  baseUrl: URL;
+  esmUrl: string;
+  systemUrl: string;
 }

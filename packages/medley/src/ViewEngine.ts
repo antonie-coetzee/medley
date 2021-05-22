@@ -1,6 +1,7 @@
 import { Context, TypedModel, ViewFunction } from "./Core";
 
 export class ViewEngine {
+  private viewFunctionCache: Map<string, ViewFunction> = new Map();
   private context: any = {};
 
   getContext(): any {
@@ -19,6 +20,10 @@ export class ViewEngine {
     this.renderModel = this.renderModel.bind(this);
   }
 
+  public clearCache(){
+    this.viewFunctionCache = new Map();
+  }
+
   public async renderModel<T>(modelId: string, ...args: any[]): Promise<T> {
     if (!modelId) throw new Error("modelId is null or empty");
 
@@ -30,14 +35,16 @@ export class ViewEngine {
     };
 
     const model = await this.getModel(modelId);
-    const cntx:Context = {
+    const cntx: Context = {
       ...this.context,
       model,
       viewEngine,
     };
 
-    const viewFunction = await this.getViewFunction(model.typeId);
-    
+    const viewFunction =
+      this.viewFunctionCache.get(model.typeId) ||
+      (await this.getViewFunction(model.typeId));
+
     try {
       return await viewFunction(cntx, ...args);
     } finally {

@@ -4,7 +4,7 @@ import { Medley, MedleyOptions } from "medley";
 import "systemjs";
 
 describe('Medley', function() {
-    it('should load and run systemjs modules', async function() {
+    it('should load and run basic composition', async function() {
       const options:MedleyOptions = {
         systemJsImport:async (url)=>{
           const module = await System.import(url)

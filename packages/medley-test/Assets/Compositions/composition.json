@@ -18,8 +18,20 @@
       "models": [
         {
           "id": "6d49b510-e790-42cf-a16e-01e4c152229a",
-          "name": "modelTwo",
-          "value": "modelTwo return value"
+          "name": "modelTwoViewFunction",
+          "value": {
+            "childModelId": "6d49b510-e790-42cf-a16e-01e4c152229e"
+          }
+        }
+      ]
+    },
+    {
+      "typeId": "ce8512f1-b8fa-4bf7-8b9c-89d15f8b748d",
+      "models": [
+        {
+          "id": "6d49b510-e790-42cf-a16e-01e4c152229e",
+          "name": "modelTwoOtherViewFunction",
+          "value": "modelTwo value"
         }
       ]
     }

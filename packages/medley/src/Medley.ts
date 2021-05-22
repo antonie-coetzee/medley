@@ -39,4 +39,8 @@ export class Medley {
   public async renderModel<T>(modelId: string, args?: any[]): Promise<T> {
     return this.viewEngine.renderModel<T>(modelId, args);
   }
+
+  public clearCache(){
+    this.viewEngine.clearCache();
+  }
 }

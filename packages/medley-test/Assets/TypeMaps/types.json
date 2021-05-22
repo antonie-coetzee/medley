@@ -5,16 +5,34 @@
       "name": "typeOne",
       "versions": [
         {
-          "number": "1.0.0",
+          "version": "1.0.0",
           "id": "bf96ada6-aab4-49b4-b42a-0d9ae82dc9de",
           "module": {
-            "systemUrl": "../modules/moduleOne/moduleOne-system.js",
-            "esmUrl": "../modules/moduleOne/moduleOne-system.js"
+            "baseUrl": "../modules/moduleOne/",
+            "systemUrl": "moduleOne-system.js",
+            "esmUrl": "moduleOne-esm.js"
           }
         }
       ]
     },
-    "typeTwo.json"
+    "typeTwo.json",
+    {
+      "name": "typeTwoOther",
+      "versions": [
+        {
+          "version": "1.0.0",
+          "id": "ce8512f1-b8fa-4bf7-8b9c-89d15f8b748d",
+          "module": {
+            "baseUrl": "../modules/moduleTwo/",
+            "systemUrl": "moduleTwo-system.js",
+            "esmUrl": "moduleTwo-esm.js"
+          },
+          "exportMap": {
+            "viewFunction" : "otherViewFunction"
+          }
+        }
+      ]
+    }    
   ],
   "groups": ["groups.json"]
 }
