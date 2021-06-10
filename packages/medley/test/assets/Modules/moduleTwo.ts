@@ -1,17 +1,17 @@
-import { ViewFunction } from "medley";
+import { Context } from "medley";
 
 type config = {
   childModelId:string;
 }
 
-export const viewFunction:ViewFunction = async (ctx) => {
-  const config = ctx.model.value as config;
+export async function viewFunction(this:Context){
+  const config = this.getModelValue<config>();
   if(config){
-    const res = await ctx.viewEngine.renderModel(config.childModelId);
+    const res = await this.viewEngine.renderModel(config.childModelId);
     return "<moduleTwo viewFunction> " + res;
   }
 }
 
-export const otherViewFunction:ViewFunction = async (ctx) => {
-  return "<moduleTwo otherViewFunction> value: " + ctx.model.value;
+export async function otherViewFunction(this:Context){
+  return "<moduleTwo otherViewFunction> value: " + this.model.value;
 }

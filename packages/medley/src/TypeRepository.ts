@@ -43,7 +43,7 @@ export class TypeRepository {
     this.onTypeTreeUpdate(this.typeTree);
     this.resolvedTypeTree = {
       name: typeTree.name,
-      iconUrl: typeTree.iconUrl,
+      icon: typeTree.icon,
       types: [],
       groups: [],
     };
@@ -96,7 +96,7 @@ export class TypeRepository {
         }
         const resolvedGroup: TypeTree = {
           name: groupTypeTree.name,
-          iconUrl: groupTypeTree.iconUrl,
+          icon: groupTypeTree.icon,
           types: [],
           groups: [],
         };

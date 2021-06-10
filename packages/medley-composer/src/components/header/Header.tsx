@@ -119,5 +119,4 @@ fill="#000000" stroke="none">
     </React.Fragment>
   );
 };
-
 export const Header = HeaderComponent;

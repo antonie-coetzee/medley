@@ -11,7 +11,7 @@
   "scripts": {
     "build": "npx rollup -c",
     "build:test": "npx rollup -c rollup.config.test.js",
-    "test": "yarn run build:test && npx jest"
+    "test": "npx jest --verbose"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "19.0.0",

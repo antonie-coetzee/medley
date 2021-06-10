@@ -9,7 +9,7 @@ export interface Model {
   id: string;
   name?: string;
   refs?: string[];
-  value?: any;
+  value?: {};
 }
 
 export interface TypedModel extends Model, Typed {}

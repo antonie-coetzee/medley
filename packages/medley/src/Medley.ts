@@ -37,10 +37,11 @@ export class Medley {
   }
 
   public async renderModel<T>(modelId: string, args?: any[]): Promise<T | undefined> {
-    return this.viewEngine.renderModel<T>(modelId, args);
-  }
-
-  public clearCache(){
-    this.viewEngine.clearCache();
+    const res = this.viewEngine.renderModel(modelId, args);
+    if(res){
+      return res as Promise<T>;
+    }else{
+      return undefined;
+    } 
   }
 }

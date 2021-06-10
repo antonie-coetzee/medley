@@ -1,13 +1,20 @@
-import { ViewFunction } from "medley";
+import { Context } from "medley";
 
 type config = {
   childModelId:string;
 }
 
-export const viewFunction:ViewFunction = async (ctx) => {
-  const config = ctx.model.value as config;
-  if(config){
-    const res = await ctx.viewEngine.renderModel<string>(config.childModelId);
-    return "<moduleOne> " + res;
+export async function viewFunction(this:Context){
+  const config = this.getModelValue<config>();
+  if(config == null){
+    return;
   }
+
+  try{
+    await this.viewEngine.renderModel<string>(""); // test empty case
+  }catch{}
+
+  await this.viewEngine.renderModel<string>(config.childModelId); // test viewFunction cachings
+  const res = await this.viewEngine.renderModel<string>(config.childModelId);
+  return "<moduleOne> " + res;
 }
