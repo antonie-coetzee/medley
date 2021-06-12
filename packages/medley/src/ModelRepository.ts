@@ -44,7 +44,7 @@ export class ModelRepository {
 
   public async getModelById(id: string): Promise<TypedModel> {
     const model = this.modelsById.get(id);
-    if (model === undefined) throw new Error(`model with id: ${id}, not found`);
+    if (model == null) throw new Error(`model with id: ${id}, not found`);
     return Promise.resolve(model);
   }
 
@@ -55,7 +55,7 @@ export class ModelRepository {
   public async upsertModel(model: Partial<TypedModel>): Promise<void> {
     const currentModel = this.modelsById.get(model.id || "");
 
-    if (currentModel?.typeId === undefined && model.typeId === undefined) {
+    if (currentModel?.typeId == null && model.typeId == null) {
       throw new Error("typeId missing");
     }
     const typeId = currentModel?.typeId || model.typeId || "";
@@ -67,14 +67,14 @@ export class ModelRepository {
     };
 
     const modelGroup = this.getModelsByTypeId(typeId);
-    if (modelGroup === undefined) {
+    if (modelGroup == null) {
       // no models of this type yet
       const modelsOfType = this.modelsOfTypeLoadHook({
         typeId,
         models: [uModel],
       });
       this.modelsByTypeId.set(typeId, modelsOfType);
-    } else if (currentModel === undefined) {
+    } else if (currentModel == null) {
       // new model instert
       modelGroup.models.push(this.typedModelLoadHook(uModel));
     }

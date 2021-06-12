@@ -14,7 +14,7 @@ export class CompositionRepository {
   ) {}
 
   public async load(composition: Composition, url?: URL) {
-    if ((composition.types as TypeTree).name === undefined) {
+    if ((composition.types as TypeTree).name == null) {
       await this.typeRepository.loadFromUrl(
         new URL(composition.types.toString(), url)
       );

@@ -51,7 +51,7 @@ export class TypeRepository {
 
   public async getViewFunction(typeId: string): Promise<Function> {
     const type = this.typeMap.get(typeId);
-    if (type === undefined) {
+    if (type == null) {
       throw new Error(`type with id: '${typeId}' not found`);
     }
 
@@ -64,7 +64,7 @@ export class TypeRepository {
     resolvedTypeTree: TypeTree
   ): Promise<void> {
     for await (const type of partialTypeTree.types) {
-      if ((type as Type).name === undefined) {
+      if ((type as Type).name == null) {
         const typeUrl = new URL(type.toString(), this.typesUrl);
         const typeLoaded = await this.loadType(typeUrl);
         resolvedTypeTree.types.push(typeLoaded);
@@ -77,7 +77,7 @@ export class TypeRepository {
     if (partialTypeTree.groups !== undefined) {
       for await (const group of partialTypeTree.groups) {
         let groupTypeTree: TypeTree;
-        if ((group as TypeTree).name === undefined) {
+        if ((group as TypeTree).name == null) {
           const groupUrl = new URL(group.toString(), this.typesUrl);
           groupTypeTree = await this.loadGroup(groupUrl);
         } else {
