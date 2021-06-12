@@ -1,20 +1,20 @@
 import { Context } from "medley";
 
+interface ChildModuleViewFunction {
+  ():Promise<string>;
+}
+
 type config = {
   childModelId:string;
 }
 
 export async function viewFunction(this:Context){
-  const config = this.getModelValue<config>();
+  const config = this.medley.getModelValue<config>();
   if(config == null){
     return;
   }
 
-  try{
-    await this.viewEngine.renderModel<string>(""); // test empty case
-  }catch{}
-
-  await this.viewEngine.renderModel<string>(config.childModelId); // test viewFunction cachings
-  const res = await this.viewEngine.renderModel<string>(config.childModelId);
+  const viewFunc = await this.medley.getViewFunction<ChildModuleViewFunction>(config.childModelId);
+  const res = await viewFunc();
   return "<moduleOne> " + res;
 }

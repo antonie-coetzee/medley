@@ -19,12 +19,10 @@ describe('Medley', function() {
         }
       };
       const medley = new Medley(options);
-      medley.viewEngine.setContext("foo");
-      const ctx = medley.viewEngine.getContext();
-      expect(ctx).toEqual("foo");
       await medley.loadFromUrl(new URL(`file:///${rootPath}/fixtures/compositions/composition.json`));
-      const result = await medley.renderModel("e0754165-d127-48be-92c5-85fc25dbca19");
-      expect(result).toEqual("<moduleOne> <moduleTwo viewFunction> <moduleTwo otherViewFunction> value: modelTwo value");
+      const viewFunc = await medley.getViewFunction<()=>Promise<string>>("e0754165-d127-48be-92c5-85fc25dbca19");
+      const res = await viewFunc();
+      expect(res).toEqual("<moduleOne> <moduleTwo viewFunction> <moduleTwo otherViewFunction> value: modelTwo value");
     });
     it('should return the active composition', async function() {
       const options:MedleyOptions = {

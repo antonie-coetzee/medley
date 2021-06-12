@@ -23,9 +23,9 @@ export class Medley {
       this.modelRepository,
       this.typeRepository
     );
-    const getViewFunction = this.typeRepository.getViewFunction;
+    const getViewFunctionFromType = this.typeRepository.getViewFunction;
     const getModel = this.modelRepository.getModelById;
-    this.viewEngine = new ViewEngine(getModel, getViewFunction);
+    this.viewEngine = new ViewEngine(getModel, getViewFunctionFromType);
   }
 
   public async load(composition: Composition, url?: URL) {
@@ -36,12 +36,7 @@ export class Medley {
     await this.compositionRepository.loadFromUrl(url);
   }
 
-  public async renderModel<T>(modelId: string, args?: any[]): Promise<T | undefined> {
-    const res = this.viewEngine.renderModel(modelId, args);
-    if(res){
-      return res as Promise<T>;
-    }else{
-      return undefined;
-    } 
+  public async getViewFunction<T extends Function>(modelId:string, context?:{}):Promise<T>{
+    return this.viewEngine.getViewFunction(modelId, context);
   }
 }

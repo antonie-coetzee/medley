@@ -5,13 +5,14 @@ type config = {
 }
 
 export async function viewFunction(this:Context){
-  const config = this.getModelValue<config>();
+  const config = this.medley.getModelValue<config>();
   if(config){
-    const res = await this.viewEngine.renderModel(config.childModelId);
+    const viewFunc = await this.medley.getViewFunction<()=>Promise<string>>(config.childModelId);
+    const res = await viewFunc();
     return "<moduleTwo viewFunction> " + res;
   }
 }
 
 export async function otherViewFunction(this:Context){
-  return "<moduleTwo otherViewFunction> value: " + this.model.value;
+  return "<moduleTwo otherViewFunction> value: " + this.medley.model.value;
 }
