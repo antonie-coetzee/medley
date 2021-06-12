@@ -1,4 +1,4 @@
-import { Type, TypeTree, TypeVersion, Loader } from "./core";
+import { Type, TypeTree, Loader } from "./core";
 import { VIEW_FUNCTION } from "./core/Constants";
 
 export interface TypeRepositoryOptions {
@@ -8,10 +8,7 @@ export interface TypeRepositoryOptions {
 }
 
 export class TypeRepository {
-  private typeVersionMap: Map<
-    string,
-    { type: Type; typeVersion: TypeVersion }
-  > = new Map();
+  private typeMap: Map<string, Type> = new Map();
   private onResolvedTypeTreeUpdate: (typeTree: TypeTree) => void = () => {};
   private onTypeTreeUpdate: (typeTree: TypeTree) => void = () => {};
   private onTypesUrlUpdate: (typesUrl: URL) => void = () => {};
@@ -47,27 +44,19 @@ export class TypeRepository {
       types: [],
       groups: [],
     };
-    this.typeVersionMap = new Map();
+    this.typeMap = new Map();
     await this.resolveTypeTree(typeTree, this.resolvedTypeTree);
     this.onResolvedTypeTreeUpdate(this.resolvedTypeTree);
   }
 
-  public versionToType(versionId: string): Type | undefined {
-    const { type } = this.typeVersionMap.get(versionId) || {};
-    return type;
-  }
-
-  public async getViewFunction(typeVersionId: string): Promise<Function> {
-    const { type, typeVersion } = this.typeVersionMap.get(typeVersionId) || {};
-    if (type === undefined || typeVersion === undefined) {
-      throw new Error(`type with version id: ${typeVersionId} not found`);
+  public async getViewFunction(typeId: string): Promise<Function> {
+    const type = this.typeMap.get(typeId);
+    if (type === undefined) {
+      throw new Error(`type with id: '${typeId}' not found`);
     }
 
-    const module = await this.loader.importModule(
-      typeVersion.module,
-      this.typesUrl
-    );
-    return module[typeVersion.exportMap?.viewFunction || VIEW_FUNCTION];
+    const module = await this.loader.importModule(type.module, this.typesUrl);
+    return module[type.exportMap?.viewFunction || VIEW_FUNCTION];
   }
 
   private async resolveTypeTree(
@@ -107,9 +96,7 @@ export class TypeRepository {
   }
 
   private indexType(type: Type) {
-    type.versions.forEach((version) => {
-      this.typeVersionMap.set(version.id, { type, typeVersion: version });
-    });
+    this.typeMap.set(type.id, type);
   }
 
   public async loadGroup(url: URL): Promise<TypeTree> {

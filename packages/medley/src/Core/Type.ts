@@ -15,17 +15,14 @@ export interface ExportMap {
   [MIGRATION_DOWN]?: string;
 }
 
-export interface TypeVersion {
-  version: string;
+export interface Type {
+  icon?: URL;
+  name: string;
   id: string;
+  version: string;
   module: Module;
   exportMap?: ExportMap;
-}
-
-export interface Type {
-  name: string;
-  icon?: URL;
-  versions: TypeVersion[];
+  versions?: URL | Type[];
 }
 
 export interface TypeTree {

@@ -1,14 +1,10 @@
 {
   "name": "typeTwo",
-  "versions": [
-    {
-      "number": "1.0.0",
-      "id": "ce8512f1-b8fa-4bf7-8b9c-89d15f8b748c",
-      "module": {
-        "baseUrl": "../modules/moduleTwo/",
-        "systemUrl": "moduleTwo-system.js",
-        "esmUrl": "moduleTwo-esm.js"
-      }
-    }
-  ]
+  "version": "1.0.0",
+  "id": "ce8512f1-b8fa-4bf7-8b9c-89d15f8b748c",
+  "module": {
+    "baseUrl": "../modules/moduleTwo/",
+    "systemUrl": "moduleTwo-system.js",
+    "esmUrl": "moduleTwo-esm.js"
+  }
 }
