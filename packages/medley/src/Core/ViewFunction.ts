@@ -1,1 +1,0 @@
-export type ViewFunction = (...args: any[]) => any | undefined;

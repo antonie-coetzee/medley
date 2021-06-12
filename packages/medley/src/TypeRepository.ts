@@ -1,4 +1,4 @@
-import { ViewFunction, Type, TypeTree, TypeVersion, Loader } from "./core";
+import { Type, TypeTree, TypeVersion, Loader } from "./core";
 import { VIEW_FUNCTION } from "./core/Constants";
 
 export interface TypeRepositoryOptions {
@@ -57,7 +57,7 @@ export class TypeRepository {
     return type;
   }
 
-  public async getViewFunction(typeVersionId: string): Promise<ViewFunction> {
+  public async getViewFunction(typeVersionId: string): Promise<Function> {
     const { type, typeVersion } = this.typeVersionMap.get(typeVersionId) || {};
     if (type === undefined || typeVersion === undefined) {
       throw new Error(`type with version id: ${typeVersionId} not found`);

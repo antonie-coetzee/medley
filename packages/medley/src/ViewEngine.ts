@@ -1,9 +1,9 @@
-import { Context, TypedModel, ViewFunction } from "./core";
+import { Context, TypedModel} from "./core";
 
 export class ViewEngine {
   constructor(
     private getModel: (modelId: string) => Promise<TypedModel>,
-    private getViewFunctionFromType: (typeId: string) => Promise<ViewFunction>
+    private getViewFunctionFromType: (typeId: string) => Promise<Function>
   ) {
     this.getViewFunction = this.getViewFunction.bind(this);
   }
@@ -23,7 +23,7 @@ export class ViewEngine {
       }
     };
     
-    const viewFunction = await this.getViewFunctionFromType(model.typeId) as Function;
+    const viewFunction = await this.getViewFunctionFromType(model.typeId);
     if(typeof viewFunction !== "function") throw new Error("viewFunction is not a function");
     const boundViewFunction = viewFunction.bind(cntx);
     return boundViewFunction as T;
