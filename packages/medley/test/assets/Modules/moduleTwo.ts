@@ -4,6 +4,10 @@ type config = {
   childModelId:string;
 }
 
+type extendedContext = Context & {
+  customContextProp:string;
+}
+
 export async function viewFunction(this:Context){
   const config = this.medley.getModelValue<config>();
   if(config){
@@ -13,6 +17,6 @@ export async function viewFunction(this:Context){
   }
 }
 
-export async function otherViewFunction(this:Context){
-  return "<moduleTwo otherViewFunction> value: " + this.medley.model.value;
+export async function otherViewFunction(this:extendedContext){
+  return "<moduleTwo otherViewFunction> value: " + this.medley.model.value + ", custom context prop: " + this.customContextProp;
 }

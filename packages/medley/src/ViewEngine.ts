@@ -1,31 +1,77 @@
-import { Context, TypedModel} from "./core";
+import { Context, Type, TypedModel } from "./core";
 
 export class ViewEngine {
   constructor(
     private getModel: (modelId: string) => Promise<TypedModel>,
     private getViewFunctionFromType: (typeId: string) => Promise<Function>
-  ) {
-    this.getViewFunction = this.getViewFunction.bind(this);
-  }
+  ) {}
 
-  public async getViewFunction<T extends Function>(modelId:string, context?:{}):Promise<T>{
+  public async getViewFunction<T extends Function>(
+    modelId: string,
+    context?: {}
+  ): Promise<T> {
     if (!modelId) throw new Error("modelId is null or empty");
 
-    const model = await this.getModel(modelId);
+    const getModel = this.getModel.bind(this);
+    const createContext = this.createContext;
+    const getBoundViewFunction = this.getBoundViewFunction.bind(this);
+
+    const getViewFunction = async function <P extends Function>(
+      this: Context | undefined,
+      modelId: string,
+      context?: {}
+    ): Promise<P> {
+      const model = await getModel(modelId);
+      const cntx = createContext(
+        model,
+        getViewFunction,
+        this, // parentContext
+        context // optional context object to be merged with parent
+      );
+      // retrieve viewFunction from type module, bind it to the created context
+      const boundViewFunction = await getBoundViewFunction(model.typeId, cntx);
+      return boundViewFunction as P;
+    };
+
+    const boundViewFunction = await getViewFunction.call(
+      undefined,
+      modelId,
+      context
+    );
+    return boundViewFunction as T;
+  }
+
+  private createContext(
+    model: TypedModel,
+    getViewFunction: <T extends Function>(
+      modelId: string,
+      context?: {}
+    ) => Promise<T>,
+    parentContext?: Context,
+    context?: {}
+  ): Context {
     const cntx: Context = {
+      ...parentContext,
       ...context,
-      medley:{
+      medley: {
         model,
         getModelValue: <P>() => {
           return model.value as P;
         },
-        getViewFunction: this.getViewFunction,
-      }
+        getViewFunction: getViewFunction, // chicken
+      },
     };
-    
-    const viewFunction = await this.getViewFunctionFromType(model.typeId);
-    if(typeof viewFunction !== "function") throw new Error("viewFunction is not a function");
-    const boundViewFunction = viewFunction.bind(cntx);
-    return boundViewFunction as T;
-  }  
+    cntx.medley.getViewFunction = getViewFunction.bind(cntx); // or egg
+    return cntx;
+  }
+
+  private async getBoundViewFunction(
+    typeId: string,
+    context: Context
+  ): Promise<Function> {
+    const viewFunction = await this.getViewFunctionFromType(typeId);
+    if (typeof viewFunction !== "function")
+      throw new Error("viewFunction is not a function");
+    return viewFunction.bind(context);
+  }
 }

@@ -14,7 +14,7 @@ export async function viewFunction(this:Context){
     return;
   }
 
-  const viewFunc = await this.medley.getViewFunction<ChildModuleViewFunction>(config.childModelId);
+  const viewFunc = await this.medley.getViewFunction<ChildModuleViewFunction>(config.childModelId, {customContextProp:"custom value"});
   const res = await viewFunc();
   return "<moduleOne> " + res;
 }
