@@ -1,7 +1,7 @@
 import { v4 as uuidv4} from "uuid";
 import { ModelsOfType, TypedModel } from "./core";
 
-export interface ModelRepositoryOptions {
+export interface ModelRepositoryHooks {
   typedModelLoadHook?: (typedModel: TypedModel) => TypedModel;
   modelsOfTypeLoadHook?: (modelsofType: ModelsOfType) => ModelsOfType;
 }
@@ -15,15 +15,14 @@ export class ModelRepository {
     mot,
   ) => mot;
 
-  constructor(options?: ModelRepositoryOptions) {
+  constructor() {
     this.getModelById = this.getModelById.bind(this);
-    this.updateOptions(options);
   }
 
-  public updateOptions(options?: ModelRepositoryOptions) {
-    this.typedModelLoadHook = options?.typedModelLoadHook ||
+  public updateHooks(hooks?: ModelRepositoryHooks) {
+    this.typedModelLoadHook = hooks?.typedModelLoadHook ||
       this.typedModelLoadHook;
-    this.modelsOfTypeLoadHook = options?.modelsOfTypeLoadHook ||
+    this.modelsOfTypeLoadHook = hooks?.modelsOfTypeLoadHook ||
       this.modelsOfTypeLoadHook;
   }
 

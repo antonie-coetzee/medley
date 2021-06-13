@@ -71,7 +71,7 @@ export class ViewEngine {
   ): Promise<Function> {
     const viewFunction = await this.getViewFunctionFromType(typeId);
     if (typeof viewFunction !== "function")
-      throw new Error("viewFunction is not a function");
+      throw new Error(`viewFunction is not a function for type: ${typeId}`);
     return viewFunction.bind(context);
   }
 }

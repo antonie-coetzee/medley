@@ -19,11 +19,14 @@ export async function viewFunction(this: Context) {
     config.childModelTwoId,
     { customContextProp: "custom value" }
   );
-  const res = await viewFunc();
+  const moduleTwo = await viewFunc();
+
   const viewFuncThree = await this.medley.getViewFunction<ChildModuleViewFunction>(
     config.childModelThreeId
   );
-  const resThree = await viewFuncThree();
-
-  return "<moduleOne> " + res + resThree;
+  const moduleThree = await viewFuncThree();
+  return `<moduleOne>
+  ${moduleTwo}
+  ${moduleThree}
+</moduleOne>`
 }

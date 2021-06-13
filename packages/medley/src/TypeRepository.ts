@@ -1,7 +1,7 @@
 import { Type, TypeTree, Loader } from "./core";
 import { VIEW_FUNCTION } from "./core/Constants";
 
-export interface TypeRepositoryOptions {
+export interface TypeRepositoryHooks {
   onResolvedTypeTreeUpdate?: (typeTree: TypeTree) => void;
   onTypeTreeUpdate?: (typeTree: TypeTree) => void;
   onTypesUrlUpdate?: (typesUrl: URL) => void;
@@ -21,11 +21,11 @@ export class TypeRepository {
     this.getViewFunction = this.getViewFunction.bind(this);
   }
 
-  public updateOptions(options?: TypeRepositoryOptions) {
+  public updateHooks(hooks?: TypeRepositoryHooks) {
     this.onResolvedTypeTreeUpdate =
-      options?.onResolvedTypeTreeUpdate || this.onResolvedTypeTreeUpdate;
-    this.onTypeTreeUpdate = options?.onTypeTreeUpdate || this.onTypeTreeUpdate;
-    this.onTypesUrlUpdate = options?.onTypesUrlUpdate || this.onTypesUrlUpdate;
+      hooks?.onResolvedTypeTreeUpdate || this.onResolvedTypeTreeUpdate;
+    this.onTypeTreeUpdate = hooks?.onTypeTreeUpdate || this.onTypeTreeUpdate;
+    this.onTypesUrlUpdate = hooks?.onTypesUrlUpdate || this.onTypesUrlUpdate;
   }
 
   public async loadFromUrl(url: URL): Promise<void> {
@@ -96,10 +96,13 @@ export class TypeRepository {
   }
 
   private indexType(type: Type) {
+    if(this.typeMap.has(type.id)){
+      throw new Error(`type with id: '${type.id}', already registered`);
+    }
     this.typeMap.set(type.id, type);
   }
 
-  public async loadGroup(url: URL): Promise<TypeTree> {
+  private async loadGroup(url: URL): Promise<TypeTree> {
     const typeTree: TypeTree = await this.loader.loadJson(url);
     return typeTree;
   }

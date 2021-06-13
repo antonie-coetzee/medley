@@ -1,11 +1,6 @@
 import { Loader, TypeTree } from "./core";
 import { ModelRepository, TypeRepository, Composition } from ".";
 
-export interface CompositionRepositoryOptions {
-  modelRepository?: ModelRepository;
-  typeRepository?: TypeRepository;
-}
-
 export class CompositionRepository {
   constructor(
     private loader: Loader,

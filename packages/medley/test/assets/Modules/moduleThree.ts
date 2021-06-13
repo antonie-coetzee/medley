@@ -5,5 +5,7 @@ type extendedContext = Context & {
 }
 
 export async function viewFunction(this:extendedContext){
-  return " <moduleThree> customContextProp: " + this.customContextProp;
+  return `<moduleThree>
+    ${"customContextProp: " + this.customContextProp}
+  </moduleThree>`
 }
