@@ -12,7 +12,7 @@ export class ViewEngine {
   ): Promise<T> {
     if (!modelId) throw new Error("modelId is null or empty");
 
-    const getModel = this.getModel.bind(this);
+    const getModel = this.getModel;
     const createContext = this.createContext;
     const getBoundViewFunction = this.getBoundViewFunction.bind(this);
 

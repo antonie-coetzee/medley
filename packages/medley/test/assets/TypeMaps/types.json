@@ -24,7 +24,17 @@
       "exportMap": {
         "viewFunction" : "otherViewFunction"
       }
-    }    
+    },
+    {
+      "name": "typeThree",
+      "version": "1.0.0",
+      "id": "bf96ada6-aab4-49b4-b42a-0d9ae82dc9df",
+      "module": {
+        "baseUrl": "../modules/moduleThree/",
+        "systemUrl": "moduleThree-system.js",
+        "esmUrl": "moduleThree-esm.js"
+      }
+    }  
   ],
   "groups": ["groups.json"]
 }

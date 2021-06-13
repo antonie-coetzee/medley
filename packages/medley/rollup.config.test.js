@@ -25,6 +25,26 @@ export default [
     ],
   },
   {
+    input: "test/assets/Modules/moduleThree.ts",
+    output: [
+      {
+        file: "test/fixtures/modules/moduleThree/moduleThree-esm.js",
+        format: "es",
+        sourcemap: true,
+      },
+      {
+        file: "test/fixtures/modules/moduleThree/moduleThree-system.js",
+        format: "system",
+        sourcemap: true,
+      },
+    ],
+    plugins: [
+      nodeResolve(),
+      commonjs(),
+      typescript( { module: "esnext", target: "esnext" , tsconfig:"./test/assets/tsconfig.modules.json"}),
+    ],
+  },  
+  {
     input: "test/assets/Modules/moduleTwo.ts",
     output: [
       {

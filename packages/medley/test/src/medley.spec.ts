@@ -22,7 +22,7 @@ describe('Medley', function() {
       await medley.loadFromUrl(new URL(`file:///${rootPath}/fixtures/compositions/composition.json`));
       const viewFunc = await medley.getViewFunction<()=>Promise<string>>("e0754165-d127-48be-92c5-85fc25dbca19");
       const res = await viewFunc();
-      expect(res).toEqual("<moduleOne> <moduleTwo viewFunction> <moduleTwo otherViewFunction> value: modelTwo value, custom context prop: custom value");
+      expect(res).toEqual("<moduleOne> <moduleTwo viewFunction> <moduleTwo otherViewFunction> value: modelTwo value, custom context prop: custom value <moduleThree> customContextProp: undefined");
     });
     it('should return the active composition', async function() {
       const options:MedleyOptions = {

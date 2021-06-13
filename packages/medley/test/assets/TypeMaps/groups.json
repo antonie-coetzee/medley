@@ -4,7 +4,7 @@
     {
       "name": "groupsOne",
       "version": "1.0.0",
-      "id": "bf96ada6-aab4-49b4-b42a-0d9ae82dc9df",
+      "id": "bf96ada6-aab4-49b4-b42a-0d9ae82ec9df",
       "module": {
         "baseUrl": "../modules/moduleOne/",
         "systemUrl": "moduleOne-system.js",

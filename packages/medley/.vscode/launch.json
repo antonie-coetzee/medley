@@ -2,16 +2,25 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Launch Program",
+      "program": "${workspaceFolder}/app.js",
+      "request": "launch",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "type": "pwa-node"
+    },
+    {
       "type": "node",
       "request": "launch",
       "name": "Debug Jest Tests",
       "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/../../node_modules/jest/bin/jest.js",
+      "console": "integratedTerminal",
       "args": [
-        "--inspect-brk",
-        "${workspaceRoot}/node_modules/.bin/jest",
         "--runInBand",
         "--config",
-        "${workspaceRoot}/jest.config.js"
+        "${workspaceFolder}/jest.config.cjs"
       ]
     }
   ]
