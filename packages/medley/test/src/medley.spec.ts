@@ -42,6 +42,7 @@ describe('Medley', function() {
       };
       const medley = new Medley(options);
       await medley.loadFromUrl(new URL(`file:///${rootPath}/fixtures/compositions/composition.json`));
-      const compo = await medley.compositionRepository.composition;
+      const compo = medley.compositionRepository.composition;
+      console.log(JSON.stringify(compo, null, 2));
     });
 });

@@ -28,15 +28,19 @@ export class TypeRepository {
     this.onTypesUrlUpdate = hooks?.onTypesUrlUpdate || this.onTypesUrlUpdate;
   }
 
-  public async loadFromUrl(url: URL): Promise<void> {
-    this.typesUrl = url;
+  public async loadFromUrl(url: string, base?: URL): Promise<void> {
+    this.typesUrl = new URL(url, base);
     this.onTypesUrlUpdate(this.typesUrl);
-    const typeTree: TypeTree = await this.loader.loadJson(url);
-    return this.load(typeTree);
+    const typeTree: TypeTree = await this.loader.loadJson(this.typesUrl);
+    await this.load(typeTree);
+    if(this.resolvedTypeTree){
+      this.resolvedTypeTree.origin = url;
+    }
   }
 
-  public async load(typeTree: TypeTree): Promise<void> {
+  public async load(typeTree: TypeTree, base?:URL): Promise<void> {
     this.typeTree = typeTree;
+    this.typesUrl = base;
     this.onTypeTreeUpdate(this.typeTree);
     this.resolvedTypeTree = {
       name: typeTree.name,
@@ -65,8 +69,8 @@ export class TypeRepository {
   ): Promise<void> {
     for await (const type of partialTypeTree.types) {
       if ((type as Type).name == null) {
-        const typeUrl = new URL(type.toString(), this.typesUrl);
-        const typeLoaded = await this.loadType(typeUrl);
+        const typeLoaded = await this.loadType(type.toString(), this.typesUrl);
+        typeLoaded.origin = type.toString();
         resolvedTypeTree.types.push(typeLoaded);
         this.indexType(typeLoaded);
       } else {
@@ -78,14 +82,14 @@ export class TypeRepository {
       for await (const group of partialTypeTree.groups) {
         let groupTypeTree: TypeTree;
         if ((group as TypeTree).name == null) {
-          const groupUrl = new URL(group.toString(), this.typesUrl);
-          groupTypeTree = await this.loadGroup(groupUrl);
+          groupTypeTree = await this.loadGroup(group.toString(), this.typesUrl);
         } else {
           groupTypeTree = group as TypeTree;
         }
         const resolvedGroup: TypeTree = {
           name: groupTypeTree.name,
           icon: groupTypeTree.icon,
+          origin:groupTypeTree.origin,
           types: [],
           groups: [],
         };
@@ -102,13 +106,15 @@ export class TypeRepository {
     this.typeMap.set(type.id, type);
   }
 
-  private async loadGroup(url: URL): Promise<TypeTree> {
-    const typeTree: TypeTree = await this.loader.loadJson(url);
+  private async loadGroup(url: string, base?:URL): Promise<TypeTree> {
+    const typeTree: TypeTree = await this.loader.loadJson(new URL(url, base));
+    typeTree.origin = url;
     return typeTree;
   }
 
-  private async loadType(url: URL): Promise<Type> {
-    const type: Type = await this.loader.loadJson(url);
+  private async loadType(url: string, base?:URL): Promise<Type> {
+    const type: Type = await this.loader.loadJson(new URL(url, base));
+    type.origin = url;
     return type;
   }
 }

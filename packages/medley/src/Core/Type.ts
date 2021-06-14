@@ -16,6 +16,7 @@ export interface ExportMap {
 }
 
 export interface Type {
+  origin?: string;
   icon?: URL;
   name: string;
   id: string;
@@ -26,6 +27,7 @@ export interface Type {
 }
 
 export interface TypeTree {
+  origin?: string;
   name: string;
   icon?: URL;
   types: (URL | Type)[];

@@ -5,6 +5,7 @@ export type Context = {
     model: TypedModel;
     getModelValue: <T extends {}>() => (T | undefined);
     getViewFunction: <T extends Function>(modelId:string, context?:{})=>Promise<T>;
+    callStack: string[];
   }
 };
 

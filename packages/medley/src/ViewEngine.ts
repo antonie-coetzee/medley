@@ -50,6 +50,8 @@ export class ViewEngine {
     parentContext?: Context,
     context?: {}
   ): Context {
+
+    const callStack = parentContext == null ? [model.id] : parentContext?.medley.callStack.concat(model.id);
     const cntx: Context = {
       ...parentContext,
       ...context,
@@ -59,6 +61,7 @@ export class ViewEngine {
           return model.value as P;
         },
         getViewFunction: getViewFunction, // chicken
+        callStack
       },
     };
     cntx.medley.getViewFunction = getViewFunction.bind(cntx); // or egg

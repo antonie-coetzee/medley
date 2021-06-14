@@ -10,11 +10,9 @@ export class CompositionRepository {
 
   public async load(composition: Composition, url?: URL) {
     if ((composition.types as TypeTree).name == null) {
-      await this.typeRepository.loadFromUrl(
-        new URL(composition.types.toString(), url)
-      );
+      await this.typeRepository.loadFromUrl(composition.types.toString(), url);
     } else {
-      await this.typeRepository.load(composition.types as TypeTree);
+      await this.typeRepository.load(composition.types as TypeTree, url);
     }
     await this.modelRepository.load(composition.modelsByType);
   }
@@ -33,9 +31,7 @@ export class CompositionRepository {
       return val;
     });
     return {
-      types: this.typeRepository.typesUrl
-        ? new URL(this.typeRepository.typesUrl.toString())
-        : this.typeRepository.typeTree || ({} as TypeTree),
+      types: this.typeRepository.resolvedTypeTree || ({} as TypeTree),
       modelsByType: mbt,
     };
   }
