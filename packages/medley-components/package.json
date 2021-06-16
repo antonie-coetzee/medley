@@ -1,0 +1,30 @@
+{
+  "name": "medley-components",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "author": "Antonie Coetzee",
+  "devDependencies": {
+    "@babel/core": "7.14.6",
+    "@rollup/plugin-commonjs": "19.0.0",
+    "@rollup/plugin-node-resolve": "13.0.0",
+    "@rollup/plugin-typescript": "8.2.1",
+    "@storybook/addon-actions": "6.2.9",
+    "@storybook/addon-essentials": "6.2.9",
+    "@storybook/addon-links": "6.2.9",
+    "@storybook/react": "6.2.9",
+    "babel-loader": "8.2.2",
+    "rollup": "2.48.0",
+    "typescript": "4.3.2"
+  },
+  "dependencies": {
+    "@material-ui/core": "^4.11.4",
+    "react": "17.0.2",
+    "react-dnd": "^14.0.2",
+    "react-dom": "17.0.2"
+  },
+  "scripts": {
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
+  }
+}

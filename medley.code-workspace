@@ -7,6 +7,10 @@
     {
       "name": "@medley/medley-composer",
       "path": "./packages/medley-composer"
+    },
+    {
+	  "name": "@medley/medley-components",
+      "path": "packages/medley-components"
     }
   ]
 }

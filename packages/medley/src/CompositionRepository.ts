@@ -22,7 +22,7 @@ export class CompositionRepository {
     await this.load(composition, url);
   }
 
-  public get composition(): Composition {
+  public getComposition(): Promise<Composition> {
     const mot = Array.from(this.modelRepository.modelsByTypeId.values());
     const mbt = mot.map((val) => {
       val.models = val.models.map((m) => {
@@ -30,9 +30,9 @@ export class CompositionRepository {
       });
       return val;
     });
-    return {
+    return Promise.resolve({
       types: this.typeRepository.resolvedTypeTree || ({} as TypeTree),
       modelsByType: mbt,
-    };
+    });
   }
 }

@@ -13,7 +13,7 @@ export class TypeRepository {
   private onTypeTreeUpdate: (typeTree: TypeTree) => void = () => {};
   private onTypesUrlUpdate: (typesUrl: URL) => void = () => {};
 
-  public typesUrl: URL | undefined;
+  public typesBaseUrl: URL | undefined;
   public resolvedTypeTree: TypeTree | undefined;
   public typeTree: TypeTree | undefined;
 
@@ -29,9 +29,9 @@ export class TypeRepository {
   }
 
   public async loadFromUrl(url: string, base?: URL): Promise<void> {
-    this.typesUrl = new URL(url, base);
-    this.onTypesUrlUpdate(this.typesUrl);
-    const typeTree: TypeTree = await this.loader.loadJson(this.typesUrl);
+    this.typesBaseUrl = new URL(url, base);
+    this.onTypesUrlUpdate(this.typesBaseUrl);
+    const typeTree: TypeTree = await this.loader.loadJson(this.typesBaseUrl);
     await this.load(typeTree);
     if(this.resolvedTypeTree){
       this.resolvedTypeTree.origin = url;
@@ -40,13 +40,13 @@ export class TypeRepository {
 
   public async load(typeTree: TypeTree, base?:URL): Promise<void> {
     this.typeTree = typeTree;
-    this.typesUrl = base;
+    this.typesBaseUrl = base ?? this.typesBaseUrl;
     this.onTypeTreeUpdate(this.typeTree);
     this.resolvedTypeTree = {
       name: typeTree.name,
       icon: typeTree.icon,
       types: [],
-      groups: [],
+      groups: []
     };
     this.typeMap = new Map();
     await this.resolveTypeTree(typeTree, this.resolvedTypeTree);
@@ -59,7 +59,7 @@ export class TypeRepository {
       throw new Error(`type with id: '${typeId}' not found`);
     }
 
-    const module = await this.loader.importModule(type.module, this.typesUrl);
+    const module = await this.loader.importModule(type.module, this.typesBaseUrl);
     return module[type.exportMap?.viewFunction || VIEW_FUNCTION];
   }
 
@@ -69,7 +69,7 @@ export class TypeRepository {
   ): Promise<void> {
     for await (const type of partialTypeTree.types) {
       if ((type as Type).name == null) {
-        const typeLoaded = await this.loadType(type.toString(), this.typesUrl);
+        const typeLoaded = await this.loadType(type.toString(), this.typesBaseUrl);
         typeLoaded.origin = type.toString();
         resolvedTypeTree.types.push(typeLoaded);
         this.indexType(typeLoaded);
@@ -82,7 +82,7 @@ export class TypeRepository {
       for await (const group of partialTypeTree.groups) {
         let groupTypeTree: TypeTree;
         if ((group as TypeTree).name == null) {
-          groupTypeTree = await this.loadGroup(group.toString(), this.typesUrl);
+          groupTypeTree = await this.loadGroup(group.toString(), this.typesBaseUrl);
         } else {
           groupTypeTree = group as TypeTree;
         }
