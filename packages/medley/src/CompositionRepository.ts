@@ -1,38 +1,90 @@
-import { Loader, TypeTree } from "./core";
+import { Loader, Model, Type, TypedModel, TypeTree } from "./core";
 import { ModelRepository, TypeRepository, Composition } from ".";
 
 export class CompositionRepository {
-  constructor(
-    private loader: Loader,
-    public modelRepository: ModelRepository,
-    public typeRepository: TypeRepository
-  ) {}
+  private loadedComposition?: Composition;
+  private modelRepository: ModelRepository;
+  private typeRepository: TypeRepository;
 
-  public async load(composition: Composition, url?: URL) {
-    if ((composition.types as TypeTree).name == null) {
-      await this.typeRepository.loadFromUrl(composition.types.toString(), url);
-    } else {
-      await this.typeRepository.load(composition.types as TypeTree, url);
-    }
-    await this.modelRepository.load(composition.modelsByType);
+  constructor(private loader: Loader) {
+    this.typeRepository = new TypeRepository(loader);
+    this.modelRepository = new ModelRepository();
+  }
+
+  public async load(composition: Composition, baseUrl?: URL) {
+    this.loadedComposition = composition;
+    this.typeRepository.load(composition.types, baseUrl);
+    this.modelRepository.load(composition.modelsByType);
   }
 
   public async loadFromUrl(url: URL) {
     const composition: Composition = await this.loader.loadJson(url);
-    await this.load(composition, url);
+    this.loadedComposition = composition;
+    this.load(composition, url);
   }
 
-  public getComposition(): Promise<Composition> {
-    const mot = Array.from(this.modelRepository.modelsByTypeId.values());
-    const mbt = mot.map((val) => {
-      val.models = val.models.map((m) => {
-        return { ...m, typeId: undefined };
-      });
-      return val;
-    });
+  public async getTypedModelById(modelId:string){
+    return this.modelRepository.getModelById(modelId);
+  }
+
+  public upsertModel(type: Type, model: Model) {
+    const hasType = this.typeRepository.hasTypeById(type.id);
+    if (hasType === false) {
+      this.typeRepository.addType(type);
+    }
+    this.modelRepository.upsertModel({ ...model, typeId: type.id });
+  }
+
+  public listModelsByTypeId(typeId: string) {
+    return this.modelRepository.getModelsByTypeId(typeId);
+  }
+
+  public deleteModelById(modelId: string) {
+    const typeId = this.modelRepository.getTypeIdFromModelId(modelId);
+    this.modelRepository.deleteModelById(modelId);
+    // prune type if not referenced
+    if (typeId) {
+      const models = this.modelRepository.getModelsByTypeId(typeId);
+      if (models?.length == null || models?.length === 0) {
+        this.typeRepository.deleteType(typeId);
+      }
+    }
+  }
+
+  public getTypeById(typeId: string) {
+    return this.typeRepository.getTypeById(typeId);
+  }
+
+  public getTypes() {
+    return this.typeRepository.getTypes();
+  }
+
+  public async getViewFunctionFromTypeId(typeId:string){
+    return this.typeRepository.getViewFunction(typeId);
+  }
+
+  public deleteTypeById(typeId: string) {
+    this.modelRepository.deleteModelsByTypeId(typeId);
+    this.typeRepository.deleteType(typeId);
+  }
+
+  public getComposition() {
+    const modelsByType = this.typeRepository
+      .getTypes()
+      .map((el) => {
+        return {
+          typeId: el.id,
+          models: this.modelRepository
+            .getModelsByTypeId(el.id)
+            .map((tm) => ({ ...tm, typeId: undefined })),
+        };
+      })
+      .filter((mbt) => mbt.models?.length > 0);
+    const usedTypes = modelsByType.map((mbt) => mbt.typeId);
     return Promise.resolve({
-      types: this.typeRepository.resolvedTypeTree || ({} as TypeTree),
-      modelsByType: mbt,
+      ...this.loadedComposition,
+      types: usedTypes.map((typeId) => this.typeRepository.getTypeById(typeId)),
+      modelsByType,
     });
   }
 }

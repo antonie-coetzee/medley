@@ -1,6 +1,6 @@
-import { ModelsOfType, TypeTree } from "./core";
+import {ModelsByType, Type} from "./core";
 
 export interface Composition {
-  types: URL | TypeTree;
-  modelsByType: ModelsOfType[];
+  types: Type[];
+  modelsByType: ModelsByType[];
 }
