@@ -12,13 +12,13 @@ export class Medley {
   private loader: Loader;
   private viewEngine: ViewEngine;
 
-  constructor(options?: MedleyOptions) {
+  constructor(private options?: MedleyOptions) {
     this.loader = new Loader(options || {});
     this.typeRepository = new TypeRepository(this.loader);
     this.modelRepository = new ModelRepository();
     const getViewFunctionFromType = this.typeRepository.getViewFunction;
     const getModel = this.modelRepository.getModelById;
-    this.viewEngine = new ViewEngine(getModel, getViewFunctionFromType);
+    this.viewEngine = new ViewEngine(getModel, getViewFunctionFromType, options);
   }
 
   public async load(composition: Composition, baseUrl: URL) {
@@ -90,10 +90,10 @@ export class Medley {
           .map((tm) => ({ ...tm, typeId: undefined })),
       };
     });
-    return Promise.resolve({
+    return {
       ...this.loadedComposition,
       types,
       modelsByType,
-    });
+    };
   }
 }

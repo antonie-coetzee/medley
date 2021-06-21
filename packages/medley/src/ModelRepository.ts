@@ -34,7 +34,7 @@ export class ModelRepository {
     return Array.from(this.typedModelIndex.values()).filter(el=>el.typeId === typeId);
   }
 
-  public getTypedModels(): TypedModel[] {
+  public getModels(): TypedModel[] {
     return Array.from(this.typedModelIndex.values());
   }
 

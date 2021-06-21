@@ -1,4 +1,4 @@
-import { Type, TypeTree, Loader } from "./core";
+import { Type, Loader } from "./core";
 import { VIEW_FUNCTION } from "./core/Constants";
 
 export class TypeRepository {

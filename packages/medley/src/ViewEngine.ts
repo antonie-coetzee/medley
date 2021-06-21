@@ -1,9 +1,11 @@
-import { Context, Type, TypedModel } from "./core";
+import { Context, Loader, LoaderOptions, Type, TypedModel } from "./core";
+import { Medley, MedleyOptions } from "./Medley";
 
 export class ViewEngine {
   constructor(
     private getModel: (modelId: string) => TypedModel,
-    private getViewFunctionFromType: (typeId: string) => Promise<Function>
+    private getViewFunctionFromType: (typeId: string) => Promise<Function>,
+    private loaderOptions?:LoaderOptions
   ) {}
 
   public async getViewFunction<T extends Function>(
@@ -15,6 +17,7 @@ export class ViewEngine {
     const getModel = this.getModel;
     const createContext = this.createContext;
     const getBoundViewFunction = this.getBoundViewFunction.bind(this);
+    const loaderOptions = this.loaderOptions;
 
     const getViewFunction = async function <P extends Function>(
       this: Context | undefined,
@@ -25,6 +28,7 @@ export class ViewEngine {
       const cntx = createContext(
         model,
         getViewFunction,
+        loaderOptions,
         this, // parentContext
         context // optional context object to be merged with parent
       );
@@ -47,6 +51,7 @@ export class ViewEngine {
       modelId: string,
       context?: {}
     ) => Promise<T>,
+    loaderOptions?:LoaderOptions,
     parentContext?: Context,
     context?: {}
   ): Context {
@@ -61,7 +66,8 @@ export class ViewEngine {
           return model.value as P;
         },
         getViewFunction: getViewFunction, // chicken
-        callStack
+        callStack,
+        loaderOptions: loaderOptions
       },
     };
     cntx.medley.getViewFunction = getViewFunction.bind(cntx); // or egg
