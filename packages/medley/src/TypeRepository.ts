@@ -3,14 +3,14 @@ import { VIEW_FUNCTION } from "./core/Constants";
 
 export class TypeRepository {
   private typeIndex: Map<string, Type> = new Map();
-  private baseUrl: URL | undefined;
+  private baseUrl?: URL;
 
   constructor(private loader: Loader) {
     this.getViewFunction = this.getViewFunction.bind(this);
   }
 
-  public load(types: Type[], base?: URL) {
-    this.baseUrl = base;
+  public load(types: Type[], baseUrl: URL) {
+    this.baseUrl = baseUrl;
     this.typeIndex = new Map();
     for (const type of types) {
       if (this.typeIndex.has(type.id)) {
@@ -31,7 +31,7 @@ export class TypeRepository {
   }
 
   public getTypes(): Type[] {
-    return [...this.typeIndex.values()];
+    return Array.from(this.typeIndex.values());
   }
 
   public getTypeById(typeId: string): Type {

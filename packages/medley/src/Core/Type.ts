@@ -1,7 +1,7 @@
 import {
   EDIT_COMPONENT,
-  MIGRATION_DOWN,
-  MIGRATION_UP,
+  MIGRATE_DOWN,
+  MIGRATE_UP,
   VIEW_FUNCTION,
   TYPES
 } from "./Constants";
@@ -11,25 +11,16 @@ export interface ExportMap {
   [VIEW_FUNCTION]?: string;
   [EDIT_COMPONENT]?: string;
   [TYPES]?: string;
-  [MIGRATION_UP]?: string;
-  [MIGRATION_DOWN]?: string;
+  [MIGRATE_UP]?: string;
+  [MIGRATE_DOWN]?: string;
 }
 
 export interface Type {
-  origin?: string;
-  icon?: URL;
   name: string;
   id: string;
   version: string;
   module: Module;
   exportMap?: ExportMap;
   versions?: URL | Type[];
-}
-
-export interface TypeTree {
-  origin?: string;
-  name: string;
   icon?: URL;
-  types: (URL | Type)[];
-  groups?: (URL | TypeTree)[];
 }

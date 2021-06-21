@@ -1,32 +1,35 @@
 import { esmModule, Module, systemModule } from "./Module";
-import { Platform } from "./Platform";
+
+export interface LoaderOptions {
+  systemJsImport?: (url: string) => Promise<any>;
+  esmImport?: (url: string) => Promise<any>;
+}
 
 export class Loader {
-  constructor(private platform:Platform){}
+  constructor(private loaderOptions: LoaderOptions) {}
 
-  async importModule(module: Module, baseUrl?:URL):Promise<any>{
-    let resolvedBasedUrl:URL | undefined;
-    if(module.baseUrl){
-      resolvedBasedUrl = new URL(module.baseUrl.toString(), baseUrl);
+  async importModule(module: Module, baseUrl?: URL): Promise<any> {
+    let resolvedModuleBaseUrl: URL | undefined;
+    if (module.base) {
+      resolvedModuleBaseUrl = new URL(module.base.toString(), baseUrl);
     }
 
-    if(this.platform.systemJsImport){
-      const systemModule = module as systemModule;   
-      const resolvedUrl = new URL(systemModule.systemUrl.toString(), resolvedBasedUrl)
-      return this.platform.systemJsImport(resolvedUrl.toString())    
-    }else if(this.platform.esmImport) {
-      const esmModule = module as esmModule;   
-      const resolvedUrl = new URL(esmModule.esmUrl.toString(), resolvedBasedUrl)
-      return this.platform.esmImport(resolvedUrl.toString());
-    }else{
-      throw new Error("platform module loader not defined");
+    if (this.loaderOptions.systemJsImport) {
+      const systemModule = module as systemModule;
+      const resolvedUrl = new URL(
+        systemModule.system.toString(),
+        resolvedModuleBaseUrl
+      );
+      return this.loaderOptions.systemJsImport(resolvedUrl.toString());
+    } else if (this.loaderOptions.esmImport) {
+      const esmModule = module as esmModule;
+      const resolvedUrl = new URL(
+        esmModule.esm.toString(),
+        resolvedModuleBaseUrl
+      );
+      return this.loaderOptions.esmImport(resolvedUrl.toString());
+    } else {
+      throw new Error("module loader not defined");
     }
-  }
-
-  async loadJson (url:URL): Promise<any>{
-    if(this.platform.loadJson == null){
-      throw new Error("platform json loader not defined");
-    }
-    return this.platform.loadJson(url.toString());
   }
 }

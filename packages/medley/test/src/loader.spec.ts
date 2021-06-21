@@ -1,58 +1,46 @@
 import { URL } from "url";
-import { Loader, Module, Platform } from "../../src/index";
+import { Loader, Module, LoaderOptions } from "../../src/index";
 
 describe("Loader", function () {
-  let platform: Platform | null = null;
+  let loaderOptions: LoaderOptions | null = null;
   beforeEach(() => {
     const importFn = jest.fn((url: string) => Promise.resolve(true));
-    platform = {
+    loaderOptions = {
       esmImport: importFn,
-      systemJsImport: importFn,
-      loadJson: importFn,
+      systemJsImport: importFn
     };
   });
-  it("should throw an error when json loader is not set", async function () {
-    expect.assertions(1);
-    if (platform == null) throw new Error("platform null");
-    platform.loadJson = undefined;
-    const loader = new Loader(platform);
-    try {
-      await loader.loadJson(new URL("foo:/bar.json"));
-    } catch (e) {
-      expect(e.message).toEqual("platform json loader not defined");
-    }
-  });
   it("should load a systemjs module without a baseUrl", async function () {
-    if (platform == null) throw new Error("platform null");
-    const loader = new Loader(platform);
+    if (loaderOptions == null) throw new Error("loaderOptions null");
+    const loader = new Loader(loaderOptions);
     let module: Module = {
-      systemUrl: "foo:/bar.js",
+      system: "foo:/bar.js",
     };
     const res = await loader.importModule(module);
     expect(res).toEqual(true);
   });
   it("should load an esm module without a baseUrl", async function () {
-    if (platform == null) throw new Error("platform null");
-    platform.systemJsImport = undefined;
-    const loader = new Loader(platform);
+    if (loaderOptions == null) throw new Error("loaderOptions null");
+    loaderOptions.systemJsImport = undefined;
+    const loader = new Loader(loaderOptions);
     let module: Module = {
-      esmUrl: "foo:/bar.js",
+      esm: "foo:/bar.js",
     };
     const res = await loader.importModule(module);
     expect(res).toEqual(true);
   });
   it("should throw error if module loader missing", async function () {
     expect.assertions(1);
-    if (platform == null) throw new Error("platform null");
-    platform.systemJsImport = undefined;
-    platform.esmImport = undefined;
-    const loader = new Loader(platform);
+    if (loaderOptions == null) throw new Error("loaderOptions null");
+    loaderOptions.systemJsImport = undefined;
+    loaderOptions.esmImport = undefined;
+    const loader = new Loader(loaderOptions);
     try {
       const res = await loader.importModule({
-        esmUrl: "foo:/bar.js",
+        esm: "foo:/bar.js",
       });
     } catch (e) {
-      expect(e.message).toEqual("platform module loader not defined");
+      expect(e.message).toEqual("module loader not defined");
     }
   });
 });

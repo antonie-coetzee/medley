@@ -31,17 +31,17 @@ export class ModelRepository {
   }
 
   public getModelsByTypeId(typeId: string): TypedModel[] {
-    return [...this.typedModelIndex.values()].filter(el=>el.typeId === typeId);
+    return Array.from(this.typedModelIndex.values()).filter(el=>el.typeId === typeId);
   }
 
   public getTypedModels(): TypedModel[] {
-    return [...this.typedModelIndex.values()];
+    return Array.from(this.typedModelIndex.values());
   }
 
   public getUsedTypeIds(): string[] {
     const typeMap = new Map();
     this.typedModelIndex.forEach(el=>typeMap.set(el.typeId,el.typeId));
-    return [...typeMap.keys()];
+    return Array.from(typeMap.keys());
   }
 
   public upsertModel(model: TypedModel){
@@ -53,7 +53,7 @@ export class ModelRepository {
   }
 
   public deleteModelsByTypeId(typeId: string){
-    const modelsToDelete = [...this.typedModelIndex.values()].filter(el=>el.typeId = typeId);
+    const modelsToDelete = Array.from(this.typedModelIndex.values()).filter(el=>el.typeId = typeId);
     for(const model of modelsToDelete){
       this.deleteModelById(model.id);   
     }

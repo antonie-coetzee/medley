@@ -2,7 +2,7 @@ import { Context, Type, TypedModel } from "./core";
 
 export class ViewEngine {
   constructor(
-    private getModel: (modelId: string) => Promise<TypedModel>,
+    private getModel: (modelId: string) => TypedModel,
     private getViewFunctionFromType: (typeId: string) => Promise<Function>
   ) {}
 
@@ -21,7 +21,7 @@ export class ViewEngine {
       modelId: string,
       context?: {}
     ): Promise<P> {
-      const model = await getModel(modelId);
+      const model = getModel(modelId);
       const cntx = createContext(
         model,
         getViewFunction,

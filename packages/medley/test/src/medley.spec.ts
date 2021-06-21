@@ -12,14 +12,13 @@ describe('Medley', function() {
         systemJsImport:async (url)=>{
           const module = await System.import(url)
           return module;
-        },
-        loadJson:async (url)=>{
-          const json = await fs.readFile(new URL(url), {encoding:"utf-8"});
-          return JSON.parse(json);
         }
       };
       const medley = new Medley(options);
-      await medley.loadFromUrl(new URL(`file:///${rootPath}/fixtures/compositions/composition.json`));
+      const baseUrl = new URL(`file:///${rootPath}/fixtures/compositions/`)
+      const compositionJson = await fs.readFile(new URL("composition.json", baseUrl), {encoding:"utf-8"});
+      const composition = JSON.parse(compositionJson);
+      await medley.load(composition, baseUrl);
       const viewFunc = await medley.getViewFunction<()=>Promise<string>>("e0754165-d127-48be-92c5-85fc25dbca19");
       const res = await viewFunc();
       expect(res).toEqual(`<moduleOne>
@@ -34,14 +33,13 @@ describe('Medley', function() {
 </moduleOne>`);
     });
     it('should return the active composition', async function() {
-      const options:MedleyOptions = {
-        loadJson:async (url)=>{
-          const json = await fs.readFile(new URL(url), {encoding:"utf-8"});
-          return JSON.parse(json);
-        }
-      };
-      const medley = new Medley(options);
-      await medley.loadFromUrl(new URL(`file:///${rootPath}/fixtures/compositions/composition.json`));
+      const medley = new Medley();
+
+      const baseUrl = new URL(`file:///${rootPath}/fixtures/compositions/`)
+      const compositionJson = await fs.readFile(new URL("composition.json", baseUrl), {encoding:"utf-8"});
+      const composition = JSON.parse(compositionJson);   
+      await medley.load(composition, baseUrl);
+      
       //const compo = medley.compositionRepository.composition;
     });
 });

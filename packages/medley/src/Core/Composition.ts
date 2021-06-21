@@ -1,4 +1,4 @@
-import {ModelsByType, Type} from "./core";
+import {ModelsByType, Type} from ".";
 
 export interface Composition {
   types: Type[];

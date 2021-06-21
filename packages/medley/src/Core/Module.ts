@@ -1,13 +1,13 @@
 export interface BaseModule {
-  baseUrl?: URL;
+  base?: URL;
 }
 
 export interface esmModule extends BaseModule {
-  esmUrl: string;
+  esm: string;
 }
 
 export interface systemModule extends BaseModule {
-  systemUrl: string;
+  system: string;
 }
 
 export type Module = esmModule | systemModule;
