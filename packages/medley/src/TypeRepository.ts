@@ -1,5 +1,5 @@
 import { Type, Loader } from "./core";
-import { VIEW_FUNCTION } from "./core/Constants";
+import { MIGRATE_DOWN, MIGRATE_UP, VIEW_FUNCTION } from "./core/Constants";
 
 export class TypeRepository {
   private typeIndex: Map<string, Type> = new Map();
@@ -28,6 +28,26 @@ export class TypeRepository {
 
     const module = await this.loader.importModule(type.module, this.baseUrl);
     return module[type.exportMap?.viewFunction || VIEW_FUNCTION];
+  }
+
+  public async getMigrateUpFunction(typeId: string): Promise<Function> {
+    const type = this.typeIndex.get(typeId);
+    if (type == null) {
+      throw new Error(`type with id: '${typeId}' not found`);
+    }
+
+    const module = await this.loader.importModule(type.module, this.baseUrl);
+    return module[type.exportMap?.migrateUp || MIGRATE_UP];
+  }
+
+  public async getMigrateDownFunction(typeId: string): Promise<Function> {
+    const type = this.typeIndex.get(typeId);
+    if (type == null) {
+      throw new Error(`type with id: '${typeId}' not found`);
+    }
+
+    const module = await this.loader.importModule(type.module, this.baseUrl);
+    return module[type.exportMap?.migrateDown || MIGRATE_DOWN];
   }
 
   public getTypes(): Type[] {

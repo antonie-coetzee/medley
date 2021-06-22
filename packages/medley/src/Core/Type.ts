@@ -19,6 +19,7 @@ export interface Type {
   name: string;
   id: string;
   version: string;
+  previousVersionId?: string;
   module: Module;
   exportMap?: ExportMap;
   versions?: URL | Type[];

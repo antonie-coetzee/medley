@@ -13,17 +13,18 @@ export class ViewEngine {
     context?: {}
   ): Promise<T> {
     if (!modelId) throw new Error("modelId is null or empty");
-
     const getModel = this.getModel;
     const createContext = this.createContext;
     const getBoundViewFunction = this.getBoundViewFunction.bind(this);
     const loaderOptions = this.loaderOptions;
+    const checkForCircularReference = this.checkForCircularReference;
 
     const getViewFunction = async function <P extends Function>(
       this: Context | undefined,
       modelId: string,
       context?: {}
     ): Promise<P> {
+      checkForCircularReference(this?.medley.callStack, modelId);
       const model = getModel(modelId);
       const cntx = createContext(
         model,
@@ -82,5 +83,14 @@ export class ViewEngine {
     if (typeof viewFunction !== "function")
       throw new Error(`viewFunction is not a function for type: ${typeId}`);
     return viewFunction.bind(context);
+  }
+
+  private checkForCircularReference(callStack:string[] | undefined, modelId:string){
+    if(callStack == null)
+      return;
+
+    if(callStack.findIndex(el=>el===modelId) > -1){
+      throw new Error(`circular reference detected with modelId: '${modelId}'`);
+    }
   }
 }

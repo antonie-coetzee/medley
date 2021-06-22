@@ -2,6 +2,7 @@ import { Loader, Model, LoaderOptions, Type, Composition } from "./core";
 import { TypeRepository } from "./TypeRepository";
 import { ModelRepository } from "./ModelRepository";
 import { ViewEngine } from "./ViewEngine";
+import { Migrate } from "./Migrate";
 
 export interface MedleyOptions extends LoaderOptions {}
 
@@ -9,6 +10,7 @@ export class Medley {
   private loadedComposition?: Composition;
   private modelRepository: ModelRepository;
   private typeRepository: TypeRepository;
+  private migrate: Migrate;
   private loader: Loader;
   private viewEngine: ViewEngine;
 
@@ -19,6 +21,7 @@ export class Medley {
     const getViewFunctionFromType = this.typeRepository.getViewFunction;
     const getModel = this.modelRepository.getModelById;
     this.viewEngine = new ViewEngine(getModel, getViewFunctionFromType, options);
+    this.migrate = new Migrate(this.modelRepository, this.typeRepository);
   }
 
   public async load(composition: Composition, baseUrl: URL) {
@@ -77,6 +80,14 @@ export class Medley {
   public deleteTypeById(typeId: string) {
     this.modelRepository.deleteModelsByTypeId(typeId);
     this.typeRepository.deleteType(typeId);
+  }
+
+  public async migrateTypeUp(type:Type){
+    return this.migrate.up(type);
+  }
+
+  public async migrateTypeDown(type:Type){
+    return this.migrate.down(type);
   }
 
   public getComposition() {
