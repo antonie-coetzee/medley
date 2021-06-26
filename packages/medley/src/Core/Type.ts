@@ -1,7 +1,7 @@
 import { Module } from "./Module";
 
-export interface ExportMap {
-  [name:string]:string | undefined;
+export interface Typed {
+  typeId: string;
 }
 
 export interface Type {
@@ -11,7 +11,9 @@ export interface Type {
   parentId?: string;
   module: Module;
   category?: string[];
-  exportMap?: ExportMap;
+  exportMap?: {
+    [name: string]: string | undefined;
+  };
   registry?: URL;
   icon?: URL;
 }

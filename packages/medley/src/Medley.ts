@@ -95,7 +95,7 @@ export class Medley {
   }
 
   public getExportFromTypeId = async <T>(typeId: string, exportName: string) => {
-    return await this.typeRepository.getExport(typeId, exportName) as T;
+    return this.typeRepository.getExport(typeId, exportName) as Promise<T>;
   }
 
   public deleteTypeById = (typeId: string) => {

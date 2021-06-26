@@ -1,4 +1,4 @@
-import { Typed } from "./Typed";
+import { Typed } from "./Type";
 
 export interface Model {
   id: string;
