@@ -4,9 +4,7 @@ import { Model, ModelsByType, TypedModel } from "./core";
 export class ModelRepository {
   public typedModelIndex: Map<string, TypedModel> = new Map();
 
-  constructor() {
-    this.getModelById = this.getModelById.bind(this);
-  }
+  constructor() {}
 
   public load(modelsByType: ModelsByType[]): void {
     this.typedModelIndex.clear();
@@ -19,7 +17,7 @@ export class ModelRepository {
     });
   }
 
-  public getModelById(id: string): TypedModel {
+  public getModelById = (id: string): TypedModel => {
     const model = this.typedModelIndex.get(id);
     if (model == null) throw new Error(`model with id: ${id}, not found`);
     return model;
@@ -45,7 +43,9 @@ export class ModelRepository {
   }
 
   public upsertModel(model: TypedModel){
+    const isNew = this.typedModelIndex.has(model.id);
     this.typedModelIndex.set(model.id, model);
+    return isNew;
   }
 
   public deleteModelById(id: string): boolean {
@@ -57,5 +57,6 @@ export class ModelRepository {
     for(const model of modelsToDelete){
       this.deleteModelById(model.id);   
     }
+    return modelsToDelete?.length > 0 ? true : false;
   }
 }

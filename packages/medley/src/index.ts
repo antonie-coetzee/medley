@@ -3,4 +3,5 @@ export * from "./TypeRepository";
 export * from "./core";
 export * from "./Medley";
 export * from "./ViewEngine";
+export * from "./Context";
 export * as constants from "./core/Constants";

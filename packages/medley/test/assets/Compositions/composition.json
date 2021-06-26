@@ -55,7 +55,7 @@
             "childModelTwoId": "6d49b510-e790-42cf-a16e-01e4c152229a",
             "childModelThreeId": "6d49b510-e790-42cf-a16e-01e4c152229b"
           },
-          "refs":["6d49b510-e790-42cf-a16e-01e4c152229a"]        
+          "refs":["6d49b510-e790-42cf-a16e-01e4c152229a", "6d49b510-e790-42cf-a16e-01e4c152229b"]        
         }
       ]
     },

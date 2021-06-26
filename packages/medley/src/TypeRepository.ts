@@ -5,9 +5,7 @@ export class TypeRepository {
   private typeIndex: Map<string, Type> = new Map();
   private baseUrl?: URL;
 
-  constructor(private loader: Loader) {
-    this.getViewFunction = this.getViewFunction.bind(this);
-  }
+  constructor(private loader: Loader) {}
 
   public load(types: Type[], baseUrl: URL) {
     this.baseUrl = baseUrl;
@@ -20,34 +18,33 @@ export class TypeRepository {
     }
   }
 
-  public async getViewFunction(typeId: string): Promise<Function> {
-    const type = this.typeIndex.get(typeId);
-    if (type == null) {
-      throw new Error(`type with id: '${typeId}' not found`);
-    }
-
-    const module = await this.loader.importModule(type.module, this.baseUrl);
-    return module[type.exportMap?.viewFunction || VIEW_FUNCTION];
+  public getViewFunction = async (typeId: string): Promise<Function> => {
+    return this.getExportFunction(typeId, VIEW_FUNCTION);
   }
 
   public async getMigrateUpFunction(typeId: string): Promise<Function> {
-    const type = this.typeIndex.get(typeId);
-    if (type == null) {
-      throw new Error(`type with id: '${typeId}' not found`);
-    }
-
-    const module = await this.loader.importModule(type.module, this.baseUrl);
-    return module[type.exportMap?.migrateUp || MIGRATE_UP];
+    return this.getExportFunction(typeId, MIGRATE_UP);
   }
 
   public async getMigrateDownFunction(typeId: string): Promise<Function> {
+    return this.getExportFunction(typeId, MIGRATE_DOWN);
+  }
+
+  public async getExportFunction(typeId: string, functionName:string){
+    const moduleFunction = await this.getExport(typeId, functionName);   
+    if(typeof moduleFunction !== 'function'){
+      throw new Error(`export for ${typeId}.${functionName} not a function`);
+    }
+    return moduleFunction as Function;
+  }
+
+  public async getExport(typeId: string, name:string){
     const type = this.typeIndex.get(typeId);
     if (type == null) {
       throw new Error(`type with id: '${typeId}' not found`);
     }
-
     const module = await this.loader.importModule(type.module, this.baseUrl);
-    return module[type.exportMap?.migrateDown || MIGRATE_DOWN];
+    return module[type.exportMap?.[name] || name];   
   }
 
   public getTypes(): Type[] {

@@ -6,7 +6,7 @@ export interface LoaderOptions {
 }
 
 export class Loader {
-  constructor(private loaderOptions: LoaderOptions) {}
+  constructor(private loaderOptions?: LoaderOptions) {}
 
   async importModule(module: Module, baseUrl?: URL): Promise<any> {
     let resolvedModuleBaseUrl: URL | undefined;
@@ -14,14 +14,14 @@ export class Loader {
       resolvedModuleBaseUrl = new URL(module.base.toString(), baseUrl);
     }
 
-    if (this.loaderOptions.systemJsImport) {
+    if (this.loaderOptions?.systemJsImport) {
       const systemModule = module as systemModule;
       const resolvedUrl = new URL(
         systemModule.system.toString(),
         resolvedModuleBaseUrl
       );
       return this.loaderOptions.systemJsImport(resolvedUrl.toString());
-    } else if (this.loaderOptions.esmImport) {
+    } else if (this.loaderOptions?.esmImport) {
       const esmModule = module as esmModule;
       const resolvedUrl = new URL(
         esmModule.esm.toString(),
