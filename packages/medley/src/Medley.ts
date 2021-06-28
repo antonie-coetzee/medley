@@ -34,6 +34,10 @@ export class Medley {
     return new Medley(this.options);
   }
 
+  public updateOptions = (options: Partial<MedleyOptions>) =>{
+    this.options = {...this.options, ...options};
+  }
+
   public load = (composition: Composition, baseUrl: URL) => {
     this.loadedComposition = composition;
     this.typeRepository.load(composition.types, baseUrl);
@@ -51,21 +55,29 @@ export class Medley {
     return this.modelRepository.getModelById(modelId);
   }
 
-  public upsertModel = (type: Type, model: Model) => {
+  public upsertTypedModel = (typedModel: Partial<TypedModel>) => {
+    if(typedModel.typeId == null){
+      throw new Error('typedModel requires typeId to be defined');
+    }
+    const type = this.typeRepository.getTypeById(typedModel.typeId);
+    return this.upsertModel(type, typedModel);
+  }
+
+  public upsertModel = (type: Type, model: Partial<Model>) => {
     const hasType = this.typeRepository.hasTypeById(type.id);
     if (hasType === false) {
       this.typeRepository.addType(type);
       this.options?.eventHooks?.typesUpdate?.call(null, this.typeRepository.getTypes());
     }
-    const typedModel = { ...model, typeId: type.id };
-    const isNew = this.modelRepository.upsertModel(typedModel);
+    const {isNew,model:typedModel} = this.modelRepository.upsertModel({...model, typeId: type.id });
     if(isNew){
       this.options?.eventHooks?.modelsOfTypeUpdate?.call(null, type, this.modelRepository.getModelsByTypeId(type.id));
     } 
     this.options?.eventHooks?.modelUpdate?.call(null, type, typedModel);
+    return typedModel;
   }
 
-  public listModelsByTypeId = (typeId: string) => {
+  public getModelsByTypeId = (typeId: string) => {
     return this.modelRepository.getModelsByTypeId(typeId);
   }
 
