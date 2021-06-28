@@ -1,6 +1,11 @@
 import { Medley } from "./Medley";
 import { TypedModel } from "./core";
-import { Context} from "./Context";
+import { Context } from "./Context";
+
+export type GetViewFunction = <T extends Function>(
+  modelId: string,
+  context?: {}
+) => Promise<T>;
 
 export class ViewEngine {
   constructor(
@@ -49,10 +54,7 @@ export class ViewEngine {
 
   private createContext(
     model: TypedModel,
-    getViewFunction: <T extends Function>(
-      modelId: string,
-      context?: {}
-    ) => Promise<T>,
+    getViewFunction: GetViewFunction,
     medley: Medley,
     parentContext?: Context,
     context?: {}
@@ -61,23 +63,19 @@ export class ViewEngine {
       parentContext == null
         ? [model.id]
         : parentContext?.medley.callStack.concat(model.id);
-    const medleyContext = Object.assign(
-      {},
-      medley,
-      {
-        model,
-        getModelValue: <P>() => {
-          return model.value as P;
-        },
-        callStack,
-      }
-    );
+    const medleyContext = Object.assign({}, medley, {
+      model,
+      getModelValue: <P>() => {
+        return model.value as P;
+      },
+      callStack,
+    });
     const cntx: Context = {
       ...parentContext,
       ...context,
       medley: medleyContext,
     };
-    cntx.medley.getViewFunction = getViewFunction.bind(cntx); 
+    cntx.medley.getViewFunction = getViewFunction.bind(cntx);
     return cntx;
   }
 
@@ -89,7 +87,7 @@ export class ViewEngine {
     if (typeof viewFunction !== "function")
       throw new Error(`viewFunction is not a function for type: ${typeId}`);
     return viewFunction.bind(context);
-  }
+  };
 
   private checkForCircularReference(
     callStack: string[] | undefined,

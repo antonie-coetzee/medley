@@ -1,10 +1,11 @@
-import { ModelRepository, TypeRepository } from "medley";
+import { Medley, MedleyOptions } from "medley";
 import { MobXProviderContext } from "mobx-react";
 import React from "react";
 import { CompositionStore } from "./CompositionStore";
 import { LayoutStore } from "./LayoutStore";
 import { ModelStore } from "./ModelStore";
 import { TypeStore } from "./TypeStore";
+import "systemjs";
 
 export function useStores() {
   return React.useContext(MobXProviderContext) as Stores;
@@ -17,12 +18,16 @@ export class Stores {
   public modelStore: ModelStore;
 
   constructor() {
-    const typeRepo = new TypeRepository();
-    const modelRepo = new ModelRepository();
-
-    this.typeStore = new TypeStore(typeRepo);
-    this.modelStore = new ModelStore(modelRepo);
-    this.compositionStore = new CompositionStore(typeRepo, modelRepo);
+    const options: MedleyOptions = {
+      loader: {
+        systemJsImport: (url) => System.import(url),
+        esmImport: (url) => import(url)
+      },
+    };
+    const medley = new Medley(options)
+    this.typeStore = new TypeStore(medley);
+    this.modelStore = new ModelStore(medley);
+    this.compositionStore = new CompositionStore(medley);
     this.layoutStore = new LayoutStore(this.typeStore);
   }
 }
