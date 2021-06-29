@@ -4,6 +4,10 @@ interface ChildModuleViewFunction {
   (): Promise<string>;
 }
 
+interface ModuleThreeViewFunction {
+  (arg01:String): Promise<string>;
+}
+
 type config = {
   childModelTwoId: string;
   childModelThreeId: string;
@@ -15,18 +19,17 @@ export async function viewFunction(this: Context) {
     return;
   }
 
-  const viewFunc = await this.medley.getViewFunction<ChildModuleViewFunction>(
-    config.childModelTwoId,
-    { customContextProp: "custom value" }
+  const modelTwoReturn = await this.medley.runViewFunction<ChildModuleViewFunction>(
+    {modelId: config.childModelTwoId,
+      context: { customContextProp: "custom value" }}
   );
-  const moduleTwo = await viewFunc();
 
-  const viewFuncThree = await this.medley.getViewFunction<ChildModuleViewFunction>(
-    config.childModelThreeId
+  const viewFuncThreeReturn = await this.medley.runViewFunction<ModuleThreeViewFunction>(
+    config.childModelThreeId,
+    "module three argument"
   );
-  const moduleThree = await viewFuncThree();
   return `<moduleOne>
-  ${moduleTwo}
-  ${moduleThree}
+  ${modelTwoReturn}
+  ${viewFuncThreeReturn}
 </moduleOne>`
 }

@@ -1,7 +1,7 @@
 import { Loader, Model, LoaderOptions, Type, Composition, TypedModel } from "./core";
 import { TypeRepository } from "./TypeRepository";
 import { ModelRepository } from "./ModelRepository";
-import { ViewEngine } from "./ViewEngine";
+import { ReturnedPromiseResolvedType, ViewEngine } from "./ViewEngine";
 import { Migration } from "./Migration";
 
 export interface MedleyOptions {
@@ -49,6 +49,14 @@ export class Medley {
     context?: {}
   ): Promise<T> => {
     return this.viewEngine.getViewFunction(modelId, context);
+  }
+
+  
+  public runViewFunction = async <T extends (...args: any) => any>(
+    target:string | {modelId:string, context: {}},
+    ...args:Parameters<T> 
+  ): Promise<ReturnedPromiseResolvedType<T>> => {
+    return this.viewEngine.runViewFunction(target, ...args);
   }
 
   public getTypedModelById = async (modelId: string) => {

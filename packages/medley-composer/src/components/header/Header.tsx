@@ -68,15 +68,12 @@ export const HeaderComponent: React.FC<HeaderProps> = () => {
       <AppBar position="static" color={"transparent"} elevation={0} className={classes.header}>
         <Toolbar variant="dense" className={classes.root}>
           <Icon>
-            <img src={notes} height={24} width={24} />
-            {/* <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
- width="24" height="24" viewBox="0 0 24 24"
+            {/* <img src={notes} height={24} width={24} /> */}
+            { <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+ width="24" height="24" viewBox="0 0 1280 1280"
  preserveAspectRatio="xMidYMid meet">
-<metadata>
-Created by potrace 1.16, written by Peter Selinger 2001-2019
-</metadata>
 <g
-fill="#000000" stroke="none">
+fill="#000000" stroke="none" transform="translate(0.000000,0.000000) scale(0.10000)">
 <path d="M7870 10835 c-2709 -491 -4969 -900 -5023 -910 l-97 -17 0 -2638 0
 -2637 -78 27 c-98 35 -238 66 -364 79 -428 47 -905 -81 -1308 -350 -503 -337
 -845 -833 -967 -1408 -25 -117 -27 -144 -28 -366 0 -194 4 -257 18 -330 69
@@ -93,7 +90,7 @@ fill="#000000" stroke="none">
 -767 553 -515 1456 -534 2189 -45 141 93 225 161 352 288 320 316 528 689 626
 1122 l26 115 2 3000 c2 1650 2 3214 1 3476 l-3 476 -4925 -892z"/>
 </g>
-</svg> */}
+</svg>}
           </Icon>
           <ButtonGroup color="default" aria-label="outlined button group">
             <Button

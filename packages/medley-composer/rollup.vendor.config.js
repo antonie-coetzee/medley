@@ -10,10 +10,7 @@ export default [
     output: [
       {
         file: "dist/vendor/react-dom.17.0.2.js",
-        format: "es",
-        paths: {
-          "react": "/vendor/react.17.0.2.js",         
-       },
+        format: "system"
       },
     ],
     external: ["react"],
@@ -35,7 +32,7 @@ export default [
     output: [
       {
         file: "dist/vendor/react.17.0.2.js",
-        format: "es",
+        format: "system",
       },
     ],
     plugins: [
@@ -56,10 +53,7 @@ export default [
     output: [
       {
         file: "dist/vendor/mobx.6.1.8.js",
-        format: "es",
-        paths: {
-          "react": "/vendor/react.17.0.2.js",
-        },
+        format: "system"
       },
     ],
     external: ["react"],
@@ -81,12 +75,7 @@ export default [
     output: [
       {
         file: "dist/vendor/mobx-react.7.1.0.js",
-        format: "es",
-        paths: {
-          "react": "/vendor/react.17.0.2.js",
-          "mobx": "/vendor/mobx.6.1.8.js",
-          "react-dom": "/vendor/react-dom.17.0.2.js",
-        },
+        format: "system"
       },
     ],
     external: ["react", "mobx", "react-dom"],
@@ -108,7 +97,7 @@ export default [
     output: [
       {
         file: "dist/vendor/medley.1.0.0.js",
-        format: "es",
+        format: "system",
       },
     ],
     plugins: [

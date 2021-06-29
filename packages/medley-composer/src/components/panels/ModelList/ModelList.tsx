@@ -32,7 +32,7 @@ export function ModelListComponent(node: TabNode) {
 
   const typeVersionId = node.getConfig()?.typeVersionId as string;
   const { modelStore } = useStores();
-  const typedModels = modelStore.getModelsByTypeVersionId(typeVersionId);
+  const typedModels = modelStore.getModelsByTypeId(typeVersionId);
 
   const createModel = async (name: string) => {
     if (name) {
@@ -56,8 +56,8 @@ export function ModelListComponent(node: TabNode) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {typedModels?.typeId &&
-              typedModels.models.map((row) => (
+            {typedModels &&
+              typedModels.map((row) => (
                 <TableRow key={row.name}>
                   <TableCell component="th" scope="row">
                     {row.name}

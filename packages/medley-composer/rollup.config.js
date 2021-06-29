@@ -18,15 +18,8 @@ export default [
     output: [
       {
         file: "dist/index.js",
-        format: "es",
+        format: "system",
         sourcemap: true,
-        paths: {
-          "react": "/vendor/react.17.0.2.js",
-          "mobx": "/vendor/mobx.6.1.8.js",
-          "mobx-react": "/vendor/mobx-react.7.1.0.js",
-          "react-dom": "/vendor/react-dom.17.0.2.js",
-          "medley" : "/vendor/medley.1.0.0.js"
-        }
       },
     ],
     external: [

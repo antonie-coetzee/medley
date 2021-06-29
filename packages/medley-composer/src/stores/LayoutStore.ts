@@ -1,4 +1,4 @@
-import { TypeVersion } from "medley";
+import { Type } from "medley";
 import { Layout } from "flexlayout-react";
 import { TypeStore } from "./TypeStore";
 
@@ -41,16 +41,12 @@ export class LayoutStore {
 		this.layout = layout;
 	}
 
-	public addModelList(typeVersion: TypeVersion){
+	public addModelList(type: Type){
 		if(this.layout == null) return;
-    
-    const type = this.typeStore.typeVersionToType(typeVersion.id);
-    if(type == undefined) return;
-
 		this.layout.addTabToActiveTabSet({
 			component: MODEL_LIST,
-			name: `${type.name} - ${typeVersion.number}`,
-      config: {typeVersionId: typeVersion.id}
+			name: `${type.name} - ${type.version}`,
+      config: {typeVersionId: type.id}
 		})
 	}
 }

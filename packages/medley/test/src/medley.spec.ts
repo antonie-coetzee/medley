@@ -35,6 +35,7 @@ describe("Medley", function () {
     </moduleTwo-otherViewFunction>
   </moduleTwo-viewFunction>
   <moduleThree>
+    arg01: module three argument
     customContextProp: undefined
   </moduleThree>
 </moduleOne>`);

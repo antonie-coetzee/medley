@@ -18,6 +18,11 @@ export default [
         format: "cjs",
         sourcemap: true,
       },
+      {
+        file: "dist/medley-sjs.js",
+        format: "system",
+        sourcemap: true,
+      }      
     ],
     plugins: [nodeResolve(), commonjs(), typescript()],
   },

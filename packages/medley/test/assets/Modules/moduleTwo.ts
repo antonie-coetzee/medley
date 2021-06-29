@@ -11,8 +11,7 @@ type extendedContext = Context & {
 export async function viewFunction(this:Context){
   const config = this.medley.getModelValue<config>();
   if(config){
-    const viewFunc = await this.medley.getViewFunction<()=>Promise<string>>(config.childModelId);
-    const res = await viewFunc(); 
+    const res = await this.medley.runViewFunction<()=>Promise<string>>(config.childModelId);
     return `<moduleTwo-viewFunction>
     ${res}
   </moduleTwo-viewFunction>`

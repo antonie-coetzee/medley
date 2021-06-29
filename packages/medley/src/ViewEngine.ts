@@ -2,10 +2,19 @@ import { Medley } from "./Medley";
 import { TypedModel } from "./core";
 import { Context } from "./Context";
 
+type AnyFunction = (...args: any) => any;
+
 export type GetViewFunction = <T extends Function>(
   modelId: string,
   context?: {}
 ) => Promise<T>;
+
+export type RunViewFunction = <T extends AnyFunction>(
+  target: string | { modelId: string; context: {} },
+  ...args: Parameters<T>
+) => Promise<ReturnedPromiseResolvedType<T>>;
+
+export type ReturnedPromiseResolvedType<T> = T extends (...args: any[]) => Promise<infer R> ? R : never;
 
 export class ViewEngine {
   constructor(
@@ -19,44 +28,118 @@ export class ViewEngine {
     context?: {}
   ): Promise<T> {
     if (!modelId) throw new Error("modelId is null or empty");
-    const getModel = this.getModel;
-    const createContext = this.createContext;
-    const getBoundViewFunction = this.getBoundViewFunction;
-    const checkForCircularReference = this.checkForCircularReference;
-    const medley = this.medley;
 
+    // use closure to capture viewengine on initial invocation
+    const viewEngine = this;
+    const getViewFunction = async function (this: Context | void) {
+      const viewFuction = await ViewEngine.buildViewFunction(
+        viewEngine,
+        modelId,
+        this,
+        context
+      );
+      return viewFuction;
+    };
+
+    const viewFunction = await getViewFunction();
+    return viewFunction as T;
+  }
+
+  public runViewFunction = async <T extends (...args: any) => any>(
+    target: string | { modelId: string; context: {} },
+    ...args: Parameters<T>
+  ): Promise<ReturnedPromiseResolvedType<T>> => {
+    let modelId: string;
+    let context: {} | undefined;
+    if (typeof target === "string") {
+      modelId = target;
+    } else {
+      modelId = target.modelId;
+      context = target.context;
+    }
+    // use closure to capture viewengine on initial invocation
+    const viewEngine = this;
+    const getViewFunction = async function (this: Context | void) {
+      const viewFuction = await ViewEngine.buildViewFunction(
+        viewEngine,
+        modelId,
+        this,
+        context
+      );
+      return viewFuction;
+    };
+    const viewFunction = await getViewFunction();
+    return viewFunction(args);
+  };
+
+  private static async buildViewFunction(
+    viewEngine: ViewEngine,
+    modelId: string,
+    parentContext: Context | void,
+    context: {} | undefined
+  ) {
     const getViewFunction = async function <P extends Function>(
       this: Context | undefined,
       modelId: string,
       context?: {}
     ): Promise<P> {
-      checkForCircularReference(this?.medley.callStack, modelId);
-      const model = getModel(modelId);
-      const cntx = createContext(
-        model,
-        getViewFunction,
-        medley,
-        this, // parentContext
-        context // optional context object to be merged with parent
+      const viewFuction = await ViewEngine.buildViewFunction(
+        viewEngine,
+        modelId,
+        this,
+        context
       );
-      // retrieve viewFunction from type module, bind it to the created context
-      const boundViewFunction = await getBoundViewFunction(model.typeId, cntx);
-      return boundViewFunction as P;
+      return viewFuction as P;
     };
 
-    const boundViewFunction = await getViewFunction.call(
-      undefined,
-      modelId,
+    const runViewFunction = async function <P extends (...args: any) => any>(
+      this: Context | undefined,
+      target: string | { modelId: string; context: {} },
+      ...args: Parameters<P>
+    ): Promise<ReturnedPromiseResolvedType<P>> {
+      let modelId: string;
+      let runContext: {} | undefined;
+      if (typeof target === "string") {
+        modelId = target;
+      } else {
+        modelId = target.modelId;
+        runContext = target.context;
+      }
+      const viewFuction = await ViewEngine.buildViewFunction(
+        viewEngine,
+        modelId,
+        this,
+        runContext
+      );
+      return viewFuction(args);
+    };
+    let callstack: string[] | undefined = [];
+    if (parentContext) {
+      callstack = parentContext?.medley?.callStack || undefined;
+    }
+    viewEngine.checkForCircularReference(callstack, modelId);
+    const model = viewEngine.getModel(modelId);
+    const cntx = viewEngine.createContext(
+      model,
+      getViewFunction,
+      runViewFunction,
+      viewEngine.medley,
+      parentContext,
       context
     );
-    return boundViewFunction as T;
+    const boundViewFunction = await viewEngine.getBoundViewFunction(
+      model.typeId,
+      cntx
+    );
+    return boundViewFunction;
   }
 
   private createContext(
     model: TypedModel,
     getViewFunction: GetViewFunction,
+    runViewFunction: RunViewFunction,
     medley: Medley,
-    parentContext?: Context,
+    parentContext?: Context | void,
     context?: {}
   ): Context {
     const callStack =
@@ -76,6 +159,7 @@ export class ViewEngine {
       medley: medleyContext,
     };
     cntx.medley.getViewFunction = getViewFunction.bind(cntx);
+    cntx.medley.runViewFunction = runViewFunction.bind(cntx);
     return cntx;
   }
 
