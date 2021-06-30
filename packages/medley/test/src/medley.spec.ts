@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { URL } from "url";
-import { Medley, MedleyOptions } from "../../src/index";
+import { Medley, MedleyOptions, ModuleType } from "../../src/index";
 import "systemjs";
 
 const rootPath = path.resolve(__dirname + "/..");
@@ -10,7 +10,8 @@ describe("Medley", function () {
   it("should load and run basic composition without error", async function () {
     const options: MedleyOptions = {
       loader: {
-        systemJsImport: async (url) => {
+        moduleType: ModuleType.SYSTEM,
+        import: async (url) => {
           const module = await System.import(url);
           return module;
         },
@@ -24,24 +25,29 @@ describe("Medley", function () {
     );
     const composition = JSON.parse(compositionJson);
     await medley.load(composition, baseUrl);
-    const viewFunc = await medley.getViewFunction<() => Promise<string>>(
+    const res = await medley.runViewFunction<() => Promise<string>>(
       "e0754165-d127-48be-92c5-85fc25dbca19"
     );
-    const res = await viewFunc();
     expect(res).toEqual(`<moduleOne>
-  <moduleTwo-viewFunction>
-    <moduleTwo-otherViewFunction>
-      modelTwo value, custom context prop: custom value
+  <moduleTwo-viewFunction childModelId="6d49b510-e790-42cf-a16e-01e4c152229e">
+    <moduleTwo-otherViewFunction childModelId="6d49b510-f790-42cf-a16e-01e4c152229b" context="custom value">
+      <moduleFour argument="moduleFour argument" context="custom value"></moduleFour>
     </moduleTwo-otherViewFunction>
   </moduleTwo-viewFunction>
-  <moduleThree>
-    arg01: module three argument
-    customContextProp: undefined
-  </moduleThree>
+  <moduleThree argument="moduleThree argument" context="undefined"></moduleThree>
 </moduleOne>`);
   });
   it("should return the active composition", async function () {
-    const medley = new Medley({});
+    const options: MedleyOptions = {
+      loader: {
+        moduleType: ModuleType.SYSTEM,
+        import: async (url) => {
+          const module = await System.import(url);
+          return module;
+        },
+      },
+    };    
+    const medley = new Medley(options);
 
     const baseUrl = new URL(`file:///${rootPath}/fixtures/compositions/`);
     const compositionJson = await fs.readFile(

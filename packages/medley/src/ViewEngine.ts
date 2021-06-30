@@ -2,19 +2,7 @@ import { Medley } from "./Medley";
 import { TypedModel } from "./core";
 import { Context } from "./Context";
 
-type AnyFunction = (...args: any) => any;
-
-export type GetViewFunction = <T extends Function>(
-  modelId: string,
-  context?: {}
-) => Promise<T>;
-
-export type RunViewFunction = <T extends AnyFunction>(
-  target: string | { modelId: string; context: {} },
-  ...args: Parameters<T>
-) => Promise<ReturnedPromiseResolvedType<T>>;
-
-export type ReturnedPromiseResolvedType<T> = T extends (...args: any[]) => Promise<infer R> ? R : never;
+export type ReturnedPromiseType<T> = T extends (...args: any[]) => Promise<infer R> ? R : never;
 
 export class ViewEngine {
   constructor(
@@ -48,7 +36,7 @@ export class ViewEngine {
   public runViewFunction = async <T extends (...args: any) => any>(
     target: string | { modelId: string; context: {} },
     ...args: Parameters<T>
-  ): Promise<ReturnedPromiseResolvedType<T>> => {
+  ): Promise<ReturnedPromiseType<T>> => {
     let modelId: string;
     let context: {} | undefined;
     if (typeof target === "string") {
@@ -96,7 +84,7 @@ export class ViewEngine {
       this: Context | undefined,
       target: string | { modelId: string; context: {} },
       ...args: Parameters<P>
-    ): Promise<ReturnedPromiseResolvedType<P>> {
+    ): Promise<ReturnedPromiseType<P>> {
       let modelId: string;
       let runContext: {} | undefined;
       if (typeof target === "string") {
@@ -113,9 +101,10 @@ export class ViewEngine {
       );
       return viewFuction(args);
     };
+    // parentContext can be void
     let callstack: string[] | undefined = [];
     if (parentContext) {
-      callstack = parentContext?.medley?.callStack || undefined;
+      callstack = parentContext.medley?.callStack || undefined;
     }
     viewEngine.checkForCircularReference(callstack, modelId);
     const model = viewEngine.getModel(modelId);
@@ -136,8 +125,14 @@ export class ViewEngine {
 
   private createContext(
     model: TypedModel,
-    getViewFunction: GetViewFunction,
-    runViewFunction: RunViewFunction,
+    getViewFunction: <T extends Function>(
+      modelId: string,
+      context?: {}
+    ) => Promise<T>,
+    runViewFunction: <T extends (...args: any) => any>(
+      target: string | { modelId: string; context: {} },
+      ...args: Parameters<T>
+    ) => Promise<ReturnedPromiseType<T>>,
     medley: Medley,
     parentContext?: Context | void,
     context?: {}

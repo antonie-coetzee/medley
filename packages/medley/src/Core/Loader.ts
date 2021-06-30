@@ -1,35 +1,34 @@
-import { esmModule, Module, systemModule } from "./Module";
+import { esmModule, Module, ModuleType, systemModule } from "./Module";
 
 export interface LoaderOptions {
-  systemJsImport?: (url: string) => Promise<any>;
-  esmImport?: (url: string) => Promise<any>;
+  moduleType: ModuleType;
+  import: (url: string) => Promise<any>;
 }
 
 export class Loader {
-  constructor(private loaderOptions?: LoaderOptions) {}
+  constructor(private loaderOptions: LoaderOptions) {}
 
   async importModule(module: Module, baseUrl?: URL): Promise<any> {
     let resolvedModuleBaseUrl: URL | undefined;
     if (module.base) {
       resolvedModuleBaseUrl = new URL(module.base.toString(), baseUrl);
     }
-
-    if (this.loaderOptions?.systemJsImport) {
-      const systemModule = module as systemModule;
-      const resolvedUrl = new URL(
-        systemModule.system.toString(),
-        resolvedModuleBaseUrl
-      );
-      return this.loaderOptions.systemJsImport(resolvedUrl.toString());
-    } else if (this.loaderOptions?.esmImport) {
-      const esmModule = module as esmModule;
-      const resolvedUrl = new URL(
-        esmModule.esm.toString(),
-        resolvedModuleBaseUrl
-      );
-      return this.loaderOptions.esmImport(resolvedUrl.toString());
-    } else {
-      throw new Error("module loader not defined");
+    let resolvedUrl: URL;
+    switch (this.loaderOptions.moduleType) {
+      case ModuleType.SYSTEM:
+        const systemModule = module as systemModule;
+        resolvedUrl = new URL(
+          systemModule.system.toString(),
+          resolvedModuleBaseUrl
+        );
+        break;
+      case ModuleType.ESM:
+        const esmModule = module as esmModule;
+        resolvedUrl = new URL(esmModule.esm.toString(), resolvedModuleBaseUrl);
+        break;
+      default:
+        throw new Error("module type not supported");
     }
+    return this.loaderOptions.import(resolvedUrl.toString());
   }
 }

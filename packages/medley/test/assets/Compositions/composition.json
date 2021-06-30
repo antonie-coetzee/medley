@@ -42,7 +42,17 @@
         "system": "moduleThree-system.js",
         "esm": "moduleThree-esm.js"
       }
-    }  
+    },
+    {
+      "name": "typeFour",
+      "version": "1.0.0",
+      "id": "bf96ada6-aab4-49b4-b42a-0d9be82dc9df",
+      "module": {
+        "base": "../modules/moduleFour/",
+        "system": "moduleFour-system.js",
+        "esm": "moduleFour-esm.js"
+      }
+    }    
   ],
   "modelsByType": [
     {
@@ -78,7 +88,9 @@
         {
           "id": "6d49b510-e790-42cf-a16e-01e4c152229e",
           "name": "modelTwoOtherViewFunction",
-          "value": "modelTwo value"
+          "value":  {
+            "childModelId": "6d49b510-f790-42cf-a16e-01e4c152229b"
+          }
         }
       ]
     },
@@ -89,6 +101,16 @@
           "id": "6d49b510-e790-42cf-a16e-01e4c152229b",
           "name": "modelThreeViewFunction",
           "value": "modelThree value"
+        }
+      ]
+    },
+    {
+      "typeId": "bf96ada6-aab4-49b4-b42a-0d9be82dc9df",
+      "models": [
+        {
+          "id": "6d49b510-f790-42cf-a16e-01e4c152229b",
+          "name": "modelFour",
+          "value": "modelFour value"
         }
       ]
     }

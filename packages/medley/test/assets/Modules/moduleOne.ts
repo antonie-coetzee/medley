@@ -26,7 +26,7 @@ export async function viewFunction(this: Context) {
 
   const viewFuncThreeReturn = await this.medley.runViewFunction<ModuleThreeViewFunction>(
     config.childModelThreeId,
-    "module three argument"
+    "moduleThree argument"
   );
   return `<moduleOne>
   ${modelTwoReturn}

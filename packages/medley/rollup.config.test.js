@@ -45,6 +45,26 @@ export default [
     ],
   },  
   {
+    input: "test/assets/Modules/moduleFour.ts",
+    output: [
+      {
+        file: "test/fixtures/modules/moduleFour/moduleFour-esm.js",
+        format: "es",
+        sourcemap: true,
+      },
+      {
+        file: "test/fixtures/modules/moduleFour/moduleFour-system.js",
+        format: "system",
+        sourcemap: true,
+      },
+    ],
+    plugins: [
+      nodeResolve(),
+      commonjs(),
+      typescript( { module: "esnext", target: "esnext" , tsconfig:"./test/assets/tsconfig.modules.json"}),
+    ],
+  },   
+  {
     input: "test/assets/Modules/moduleTwo.ts",
     output: [
       {

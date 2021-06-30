@@ -1,3 +1,8 @@
+export enum ModuleType {
+  ESM,
+  SYSTEM,
+}
+
 export interface BaseModule {
   base?: URL;
 }

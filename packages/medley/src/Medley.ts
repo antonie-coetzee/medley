@@ -1,11 +1,11 @@
 import { Loader, Model, LoaderOptions, Type, Composition, TypedModel } from "./core";
 import { TypeRepository } from "./TypeRepository";
 import { ModelRepository } from "./ModelRepository";
-import { ReturnedPromiseResolvedType, ViewEngine } from "./ViewEngine";
+import { ViewEngine, ReturnedPromiseType } from "./ViewEngine";
 import { Migration } from "./Migration";
 
 export interface MedleyOptions {
-  loader?:LoaderOptions;
+  loader:LoaderOptions;
   eventHooks?: {
     typesUpdate?:(types:Type[])=>void;
     modelsOfTypeUpdate?:(type:Type, models:TypedModel[])=>void;
@@ -55,7 +55,7 @@ export class Medley {
   public runViewFunction = async <T extends (...args: any) => any>(
     target:string | {modelId:string, context: {}},
     ...args:Parameters<T> 
-  ): Promise<ReturnedPromiseResolvedType<T>> => {
+  ): Promise<ReturnedPromiseType<T>> => {
     return this.viewEngine.runViewFunction(target, ...args);
   }
 
