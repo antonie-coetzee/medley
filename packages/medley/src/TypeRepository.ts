@@ -1,4 +1,4 @@
-import { Type, Loader } from "./core";
+import { Type, Loader, Part } from "./core";
 import { MIGRATE_DOWN, MIGRATE_UP, VIEW_FUNCTION } from "./core/Constants";
 
 export class TypeRepository {
@@ -7,9 +7,10 @@ export class TypeRepository {
 
   constructor(private loader: Loader) {}
 
-  public load(types: Type[], baseUrl: URL) {
+  public load(parts: Part[], baseUrl: URL) {
     this.baseUrl = baseUrl;
     this.typeIndex = new Map();
+    const types = parts.map(part=>part.type);
     for (const type of types) {
       if (this.typeIndex.has(type.id)) {
         throw new Error(`type with id: '${type.id}', already indexed`);
@@ -20,14 +21,6 @@ export class TypeRepository {
 
   public getViewFunction = async (typeId: string): Promise<Function> => {
     return this.getExportFunction(typeId, VIEW_FUNCTION);
-  }
-
-  public async getMigrateUpFunction(typeId: string): Promise<Function> {
-    return this.getExportFunction(typeId, MIGRATE_UP);
-  }
-
-  public async getMigrateDownFunction(typeId: string): Promise<Function> {
-    return this.getExportFunction(typeId, MIGRATE_DOWN);
   }
 
   public async getExportFunction(typeId: string, functionName:string){

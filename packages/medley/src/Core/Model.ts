@@ -1,4 +1,4 @@
-import { Typed } from "./Type";
+import { Type, Typed } from "./Type";
 
 export interface Model {
   id: string;
@@ -9,6 +9,3 @@ export interface Model {
 
 export interface TypedModel extends Model, Typed {}
 
-export interface ModelsByType extends Typed {
-  models: Model[];
-}

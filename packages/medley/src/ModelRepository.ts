@@ -1,17 +1,17 @@
 import { v4 as uuidv4 } from "uuid";
-import { Model, ModelsByType, Type, TypedModel } from "./core";
+import { Model, Part, Type, TypedModel } from "./core";
 
 export class ModelRepository {
   public typedModelIndex: Map<string, TypedModel> = new Map();
 
   constructor() {}
 
-  public load(modelsByType: ModelsByType[]): void {
+  public load(parts: Part[]): void {
     this.typedModelIndex.clear();
-    modelsByType.forEach((modelsWithTypeId) => {
-      const models = modelsWithTypeId.models;
+    parts.forEach(part => {
+      const models = part.models;
       models.forEach((model) => {
-        const typedModel = { ...model, typeId: modelsWithTypeId.typeId };
+        const typedModel = { ...model, typeId: part.type.id };
         this.typedModelIndex.set(model.id, typedModel);
       });
     });

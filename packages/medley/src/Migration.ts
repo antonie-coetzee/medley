@@ -1,4 +1,5 @@
-import { Loader, Type } from "./core";
+import { Type } from "./core";
+import { MIGRATE_DOWN, MIGRATE_UP } from "./core/Constants";
 import { ModelRepository } from "./ModelRepository";
 import { TypeRepository } from "./TypeRepository";
 
@@ -19,7 +20,7 @@ export class Migration {
     } 
     try{
       this.typeRepository.addType(type);  
-      const migrateUpFunc = await this.typeRepository.getMigrateUpFunction(type.id);
+      const migrateUpFunc = await this.typeRepository.getExportFunction(type.id, MIGRATE_UP);
       const upBuffer:Map<string,{}> = new Map();
       models.forEach(m=>{
         upBuffer.set(m.id, migrateUpFunc(m.value));
@@ -50,7 +51,7 @@ export class Migration {
     }   
     try{     
       this.typeRepository.addType(type);
-      const migrateDownFunc = await this.typeRepository.getMigrateDownFunction(currentType.id);
+      const migrateDownFunc = await this.typeRepository.getExportFunction(currentType.id, MIGRATE_DOWN);
       const downBuffer:Map<string,{}> = new Map();
       models.forEach(m=>{
         downBuffer.set(m.id, migrateDownFunc(m.value));

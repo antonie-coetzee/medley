@@ -1,6 +1,10 @@
-import {ModelsByType, Type} from ".";
+import {Model, Type} from ".";
 
 export interface Composition {
-  types: Type[];
-  modelsByType: ModelsByType[];
+  parts: Part[];
+}
+
+export interface Part{
+  type: Type;
+  models: Model[];
 }
