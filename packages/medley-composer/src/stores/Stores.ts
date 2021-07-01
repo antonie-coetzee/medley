@@ -1,4 +1,4 @@
-import { Medley, MedleyOptions } from "medley";
+import { Medley, MedleyOptions, ModuleType } from "medley";
 import { MobXProviderContext } from "mobx-react";
 import React from "react";
 import { CompositionStore } from "./CompositionStore";
@@ -20,8 +20,8 @@ export class Stores {
   constructor() {
     const options: MedleyOptions = {
       loader: {
-        systemJsImport: (url) => System.import(url),
-        esmImport: (url) => import(url)
+        import: (url) => System.import(url),
+        moduleType: ModuleType.SYSTEM
       },
     };
     const medley = new Medley(options)

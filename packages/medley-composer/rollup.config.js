@@ -65,11 +65,23 @@ export default [
               />
               <title>Medley Composer</title>
               <link rel="stylesheet" href="index.css">
+              <script type="systemjs-importmap">
+              {
+                "imports": {
+                  "react": "/vendor/react.17.0.2.js",
+                  "react-dom": "/vendor/react-dom.17.0.2.js",
+                  "mobx": "/vendor/mobx.6.1.8.js",
+                  "mobx-react": "/vendor/mobx-react.7.1.0.js",
+                  "medley": "/vendor/medley.1.0.0.js"
+                }
+              }
+            </script>
+            <script src="https://cdn.jsdelivr.net/npm/systemjs/dist/system.min.js"></script>              
             </head>
             <body>
               <noscript>You need to enable JavaScript to run this app.</noscript>
               <div id="root"></div>
-              <script type="module"src="index.js"></script>        
+              <script type="systemjs-module" src="index.js"></script>       
             </body>
           </html>
         `;
