@@ -5,7 +5,6 @@ import { CompositionStore } from "./CompositionStore";
 import { LayoutStore } from "./LayoutStore";
 import { ModelStore } from "./ModelStore";
 import { TypeStore } from "./TypeStore";
-import "systemjs";
 
 export function useStores() {
   return React.useContext(MobXProviderContext) as Stores;

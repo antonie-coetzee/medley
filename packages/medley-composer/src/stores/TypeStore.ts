@@ -1,9 +1,18 @@
-import { Medley, MedleyOptions } from "medley";
-import { makeAutoObservable, runInAction } from "mobx";
+import { Medley, MedleyOptions, Type } from "medley";
+import { makeAutoObservable, makeObservable, observable, runInAction } from "mobx";
 
 export class TypeStore {
-  constructor(private medley: Medley) {}
-  public getTypeFromId(typeId:string){
-    return this.medley.getTypeById(typeId);
+  typesActive: Type[] = [];
+
+  constructor(private medley: Medley) {
+    makeObservable(this, {typesActive: observable.shallow});
+    medley.updateOptions({
+      eventHooks: { typesUpdate: (types: Type[]) => {
+        runInAction(()=>{
+          this.typesActive = types;
+        })       
+      }},
+    });
+    this.typesActive = medley.getTypes();
   }
 }

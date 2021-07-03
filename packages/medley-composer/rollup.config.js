@@ -27,7 +27,13 @@ export default [
       "react-dom",
       "mobx",
       "mobx-react",
-      "medley"
+      "medley",
+      "@material-ui/core",
+      //"@material-ui/styles",
+      //"@material-ui/core/CssBaseline",
+      //"@material-ui/core/utils",
+      "@material-ui/icons",
+      "@material-ui/lab"
     ],
     plugins: [
       image(),
@@ -56,12 +62,13 @@ export default [
           <!DOCTYPE html>
           <html lang="en">
             <head>
+              <meta name="importmap-type" content="systemjs-importmap" />
               <meta charset="utf-8" />
               <meta name="viewport" content="width=device-width, initial-scale=1" />
               <meta name="theme-color" content="#000000" />
               <meta
                 name="description"
-                content="Medley composer application"
+                content="Medley composer application" 
               />
               <title>Medley Composer</title>
               <link rel="stylesheet" href="index.css">
@@ -72,16 +79,27 @@ export default [
                   "react-dom": "/vendor/react-dom.17.0.2.js",
                   "mobx": "/vendor/mobx.6.1.8.js",
                   "mobx-react": "/vendor/mobx-react.7.1.0.js",
-                  "medley": "/vendor/medley.1.0.0.js"
+                  "medley": "/vendor/medley.1.0.0.js",
+                  "@material-ui/core": "/vendor/material-core.4.11.4.js",
+                  "@material-ui/icons": "/vendor/material-ui-icon-4.11.2.js",
+                  "@material-ui/lab": "/vendor/material-ui-lab.4.0.0-alpha.57.js",
+                  "@material-ui/styles": "/vendor/material-ui-styles.4.11.4.js"
                 }
               }
             </script>
-            <script src="https://cdn.jsdelivr.net/npm/systemjs/dist/system.min.js"></script>              
+            <script src="https://cdn.jsdelivr.net/npm/systemjs/dist/system.js"></script>   
+            <script
+              type="text/javascript"
+              src="https://cdn.jsdelivr.net/npm/import-map-overrides/dist/import-map-overrides.js"
+            ></script>           
             </head>
             <body>
               <noscript>You need to enable JavaScript to run this app.</noscript>
               <div id="root"></div>
-              <script type="systemjs-module" src="index.js"></script>       
+              <script type="systemjs-module" src="index.js"></script>    
+              <import-map-overrides-full
+                show-when-local-storage="devtools"
+              ></import-map-overrides-full>                 
             </body>
           </html>
         `;

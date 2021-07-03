@@ -20,7 +20,7 @@ export interface MedleyOptions {
   };
 }
 
-export class Medley {
+export class Medley{
   private loadedComposition?: Composition;
   private modelRepository: ModelRepository;
   private typeRepository: TypeRepository;
@@ -48,7 +48,21 @@ export class Medley {
   public load = (composition: Composition, baseUrl: URL) => {
     this.loadedComposition = composition;
     this.typeRepository.load(composition.parts, baseUrl);
+    const loadedTypes = this.typeRepository.getTypes();
+    this.options?.eventHooks?.typesUpdate?.call(
+      null,
+      loadedTypes
+    );
     this.modelRepository.load(composition.parts);
+    if(this.options?.eventHooks?.modelsOfTypeUpdate){
+      const modelsOfTypeUpdate = this.options.eventHooks.modelsOfTypeUpdate;
+      loadedTypes.forEach(type=>{
+        modelsOfTypeUpdate(
+          type,
+          this.modelRepository.getModelsByTypeId(type.id)
+        );
+      })
+    }
   };
 
   public getViewFunction = async <T extends Function>(
@@ -164,7 +178,7 @@ export class Medley {
     return this.migration.down(type);
   };
 
-  public getComposition = () => {
+  public getComposition = <T extends Composition = Composition>() => {
     const types = this.typeRepository.getTypes();
     const modelsWithType = types.map((type) => {
       return {
@@ -175,9 +189,11 @@ export class Medley {
           .map((tm) => ({ ...tm, typeId: undefined })),
       };
     });
-    return {
-      ...this.loadedComposition,
-      parts: modelsWithType,
-    };
+    if(this.loadedComposition){
+      return {       
+         ...this.loadedComposition as T,   
+         parts: modelsWithType 
+      };
+    }   
   };
 }
