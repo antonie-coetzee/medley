@@ -36,7 +36,7 @@ export class TypeRepository {
     if (type == null) {
       throw new Error(`type with id: '${typeId}' not found`);
     }
-    const module = await this.loader.importModule(type.module, this.baseUrl);
+    const module = await this.loader.importModule(type.module, this.baseUrl, `version=${type.version}`);
     return module[type.exportMap?.[name] || name];   
   }
 

@@ -9,8 +9,12 @@
       "path": "./packages/medley-composer"
     },
     {
-	  "name": "@medley/medley-components",
+      "name": "@medley/medley-components",
       "path": "packages/medley-components"
+    },
+    {
+      "name": "@medley/medley-types",
+      "path": "packages/medley-types"
     }
   ]
 }

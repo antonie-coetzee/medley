@@ -8,7 +8,7 @@ export interface LoaderOptions {
 export class Loader {
   constructor(private loaderOptions: LoaderOptions) {}
 
-  async importModule(module: Module, baseUrl?: URL): Promise<any> {
+  async importModule(module: Module, baseUrl?: URL, search?:string): Promise<any> {
     let resolvedModuleBaseUrl: URL | undefined;
     if (module.base) {
       resolvedModuleBaseUrl = new URL(module.base.toString(), baseUrl);
@@ -29,6 +29,7 @@ export class Loader {
       default:
         throw new Error("module type not supported");
     }
+    resolvedUrl.search = search || "";
     return this.loaderOptions.import(resolvedUrl.toString());
   }
 }

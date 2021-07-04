@@ -1,5 +1,6 @@
 import React, { Fragment } from "react";
 import { makeStyles } from "@material-ui/core";
+import { TypedModel } from "medley"
 import {Table} from "@material-ui/core";
 import {TableBody} from "@material-ui/core";
 import {TableCell} from "@material-ui/core";
@@ -26,17 +27,16 @@ const useStyles = makeStyles({
   },
 });
 
-export function ModelListComponent(node: TabNode) {
+export function ModelListComponent(node: TabNode, typeModelMap:Map<string, TypedModel[]>) {
   const classes = useStyles();
   const borderClasses = borderStyle();
-
-  const typeVersionId = node.getConfig()?.typeVersionId as string;
+  const typeId = node.getConfig()?.typeId as string;
+  const typedModels = typeModelMap.get(typeId);
+  
   const { modelStore } = useStores();
-  const typedModels = modelStore.getModelsByTypeId(typeVersionId);
-
   const createModel = async (name: string) => {
     if (name) {
-      await modelStore.upsertModel({ name: name, typeId: typeVersionId });
+      await modelStore.upsertModel({ name: name, typeId: typeId });
     }
   };
 
@@ -76,7 +76,7 @@ export function ModelList(node: TabNode) {
   const stores = useStores();
   return (
     <Observer>
-      {() => ModelListComponent(node)}
+      {() => ModelListComponent(node, stores.modelStore.typeModelMap)}
     </Observer>
   );
 }
