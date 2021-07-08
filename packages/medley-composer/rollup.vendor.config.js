@@ -7,6 +7,10 @@ import url from "postcss-url";
 
 const vendors = [
   {
+    srcName: "crypto-js.ts",
+    dstName: "crypto-js.4.0.0.js",
+  },  
+  {
     srcName: "material-ui-styles.ts",
     dstName: "material-ui-styles.4.11.4.js",
     external: ["react", "react-dom", "@material-ui/core"],

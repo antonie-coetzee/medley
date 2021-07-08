@@ -1,6 +1,7 @@
 import typescript from "@rollup/plugin-typescript";
 import del from "rollup-plugin-delete";
 import image from "@rollup/plugin-image";
+import json from "@rollup/plugin-json";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import html from "@rollup/plugin-html";
 import commonjs from "@rollup/plugin-commonjs";
@@ -14,6 +15,7 @@ const production = false;
 
 export default [
   {
+    treeshake: false,
     input: ["src/index.tsx"],
     output: [
       {
@@ -44,6 +46,7 @@ export default [
           "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
         },
       }),
+      json(),
       nodeResolve(),
       commonjs(),
       postcss({
@@ -75,6 +78,7 @@ export default [
               <script type="systemjs-importmap">
               {
                 "imports": {
+                  "crypto": "/vendor/crypto-js.4.0.0.js",
                   "react": "/vendor/react.17.0.2.js",
                   "react-dom": "/vendor/react-dom.17.0.2.js",
                   "mobx": "/vendor/mobx.6.1.8.js",

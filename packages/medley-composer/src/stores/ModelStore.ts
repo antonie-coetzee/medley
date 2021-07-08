@@ -19,6 +19,10 @@ export class ModelStore {
     return this.medley.getModelsByTypeId(typeId);
   }
 
+  public getModelById(modelId: string): TypedModel {
+    return this.medley.getTypedModelById(modelId);
+  }
+
   public upsertModel(model: Partial<TypedModel>) {
     return this.medley.upsertTypedModel(model);
   }

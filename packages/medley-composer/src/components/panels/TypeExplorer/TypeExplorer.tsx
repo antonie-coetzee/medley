@@ -27,16 +27,6 @@ const useStyles = makeStyles({
 export function TypeExplorer() {
   const { typeStore, layoutStore } = useStores();
 
-  const clickHandlerFactory = (
-    layoutStore: LayoutStore,
-    type: Type
-  ): React.MouseEventHandler<HTMLLIElement> => {
-    return (e) => {
-      e.preventDefault();
-      layoutStore.addModelList(type);
-    };
-  };
-
   const buildTree = (parentNode: TreeNode, path: string[], type: Type) => {
     if (path == null || path.length === 0) {
       parentNode.types.push(type);

@@ -33,3 +33,14 @@ export async function viewFunction(this: Context) {
   ${viewFuncThreeReturn}
 </moduleOne>`
 }
+
+export const valueSchema = `
+  {
+    "type": "object",
+    "properties": {
+      "text": {
+        "type": "string"
+      }
+    }
+  }
+`

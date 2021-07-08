@@ -1,9 +1,10 @@
-import { Type } from "medley";
+import { Type, TypedModel } from "medley";
 import { Layout } from "flexlayout-react";
 import { TypeStore } from "./TypeStore";
 
 export const MODEL_LIST = "modelList";
 export const TYPE_TREE = "typeTree";
+export const MODEL_EDIT = "modelEdit";
 
 const tempConfig = {
   global: {},
@@ -47,6 +48,15 @@ export class LayoutStore {
 			component: MODEL_LIST,
 			name: `${type.name} - ${type.version}`,
       config: {typeId: type.id}
+		})
+	}
+
+  public addModelEdit(model: TypedModel){
+		if(this.layout == null) return;
+		this.layout.addTabToActiveTabSet({
+			component: MODEL_EDIT,
+			name: `${model.name} - ${model.id}`,
+      config: {modelId: model.id}
 		})
 	}
 }

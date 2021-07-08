@@ -1,12 +1,12 @@
 import React, { Fragment } from "react";
 import { makeStyles } from "@material-ui/core";
-import { TypedModel } from "medley"
-import {Table} from "@material-ui/core";
-import {TableBody} from "@material-ui/core";
-import {TableCell} from "@material-ui/core";
-import {TableContainer} from "@material-ui/core";
-import {TableHead}from "@material-ui/core";
-import {TableRow} from "@material-ui/core";
+import { TypedModel } from "medley";
+import { Table } from "@material-ui/core";
+import { TableBody } from "@material-ui/core";
+import { TableCell } from "@material-ui/core";
+import { TableContainer } from "@material-ui/core";
+import { TableHead } from "@material-ui/core";
+import { TableRow } from "@material-ui/core";
 import Paper from "@material-ui/core/Paper";
 import { TabNode } from "flexlayout-react";
 import { useStores } from "../../../stores/Stores";
@@ -27,13 +27,14 @@ const useStyles = makeStyles({
   },
 });
 
-export function ModelListComponent(node: TabNode, typeModelMap:Map<string, TypedModel[]>) {
+export function ModelList(node: TabNode) {
+  const { layoutStore, modelStore } = useStores();
+
   const classes = useStyles();
   const borderClasses = borderStyle();
   const typeId = node.getConfig()?.typeId as string;
-  const typedModels = typeModelMap.get(typeId);
-  
-  const { modelStore } = useStores();
+  const typedModels = modelStore.typeModelMap.get(typeId);
+
   const createModel = async (name: string) => {
     if (name) {
       await modelStore.upsertModel({ name: name, typeId: typeId });
@@ -41,42 +42,43 @@ export function ModelListComponent(node: TabNode, typeModelMap:Map<string, Typed
   };
 
   return (
-    <Fragment>
-      <AppBar position="static" color="transparent">
-        <Toolbar variant="dense">
-          {NewModelDialog((name) => createModel(name))}
-        </Toolbar>
-      </AppBar>
-      <TableContainer className={borderClasses.table}>
-        <Table stickyHeader className={classes.table} size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Id</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {typedModels &&
-              typedModels.map((row) => (
-                <TableRow key={row.name}>
-                  <TableCell component="th" scope="row">
-                    {row.name}
-                  </TableCell>
-                  <TableCell>{row.id}</TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Fragment>
-  );
-}
-
-export function ModelList(node: TabNode) {
-  const stores = useStores();
-  return (
     <Observer>
-      {() => ModelListComponent(node, stores.modelStore.typeModelMap)}
+      {() => (
+        <Fragment>
+          <AppBar position="static" color="transparent">
+            <Toolbar variant="dense">
+              {NewModelDialog((name) => createModel(name))}
+            </Toolbar>
+          </AppBar>
+          <TableContainer className={borderClasses.table}>
+            <Table stickyHeader className={classes.table} size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Id</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {typedModels &&
+                  typedModels.map((row) => (
+                    <TableRow
+                      key={row.name}
+                      onDoubleClick={(e) => {
+                        e.preventDefault();
+                        layoutStore.addModelEdit(row);
+                      }}
+                    >
+                      <TableCell component="th" scope="row">
+                        {row.name}
+                      </TableCell>
+                      <TableCell>{row.id}</TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Fragment>
+      )}
     </Observer>
   );
 }

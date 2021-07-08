@@ -79,7 +79,7 @@ export class Medley{
     return this.viewEngine.runViewFunction(target, ...args);
   };
 
-  public getTypedModelById = async (modelId: string) => {
+  public getTypedModelById = (modelId: string) => {
     return this.modelRepository.getModelById(modelId);
   };
 
