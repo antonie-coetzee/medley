@@ -117,7 +117,7 @@ export class ViewEngine {
       context
     );
     const boundViewFunction = await viewEngine.getBoundViewFunction(
-      model.typeId,
+      model.typeName,
       cntx
     );
     return boundViewFunction;

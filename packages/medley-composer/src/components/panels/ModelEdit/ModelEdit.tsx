@@ -14,7 +14,7 @@ export function ModelEdit(node: TabNode) {
 
   useEffect(() => {
     (async () => {
-      const valueSchema = await typeStore.getValueSchema(model.typeId);
+      const valueSchema = await typeStore.getValueSchema(model.typeName);
       if (valueSchema) {
         setValueSchema(valueSchema);
       }

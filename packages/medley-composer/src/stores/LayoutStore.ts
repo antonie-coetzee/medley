@@ -1,12 +1,13 @@
 import { Type, TypedModel } from "medley";
 import { Layout } from "flexlayout-react";
 import { TypeStore } from "./TypeStore";
+import { makeObservable, observable } from "mobx";
 
 export const MODEL_LIST = "modelList";
 export const TYPE_TREE = "typeTree";
 export const MODEL_EDIT = "modelEdit";
 
-const tempConfig = {
+const newConfig = {
   global: {},
   borders: [
     {
@@ -27,12 +28,18 @@ const tempConfig = {
   },
 };
 
+const emptyConfig = {
+  global: {},
+  borders: [],
+  layout: {},
+};
+
 export class LayoutStore {
 	private layout: Layout | undefined;
-  public config: any = {};
+  public config: any = null;
 
   constructor(private typeStore:TypeStore) {
-    this.config = tempConfig;
+    makeObservable(this, {config: observable});
   }
 
 	public setLayout(layout:Layout | null){
@@ -42,12 +49,16 @@ export class LayoutStore {
 		this.layout = layout;
 	}
 
+  public newLayout(){
+    this.config = newConfig;
+  }
+
 	public addModelList(type: Type){
 		if(this.layout == null) return;
 		this.layout.addTabToActiveTabSet({
 			component: MODEL_LIST,
 			name: `${type.name} - ${type.version}`,
-      config: {typeId: type.id}
+      config: {typeName: type.name}
 		})
 	}
 

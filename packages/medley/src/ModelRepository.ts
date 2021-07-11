@@ -8,29 +8,29 @@ export class ModelRepository {
 
   public load(parts: Part[]): void {
     this.typedModelIndex.clear();
-    parts.forEach(part => {
+    parts.forEach((part) => {
       const models = part.models;
       models.forEach((model) => {
-        const typedModel = { ...model, typeId: part.type.id };
+        const typedModel = { ...model, typeName: part.type.name };
         this.typedModelIndex.set(model.id, typedModel);
       });
     });
   }
 
-  public getModelById = (id: string): TypedModel => {
+  public getModel = (id: string): TypedModel => {
     const model = this.typedModelIndex.get(id);
     if (model == null) throw new Error(`model with id: ${id}, not found`);
     return model;
   };
 
-  public getTypeIdFromModelId(id: string) {
+  public getTypeNameFromModelId(id: string) {
     const model = this.typedModelIndex.get(id);
-    return model?.typeId;
+    return model?.typeName;
   }
 
-  public getModelsByTypeId(typeId: string): TypedModel[] {
+  public getModelsByType(typeName: string): TypedModel[] {
     return Array.from(this.typedModelIndex.values()).filter(
-      (el) => el.typeId === typeId
+      (el) => el.typeName === typeName
     );
   }
 
@@ -38,19 +38,19 @@ export class ModelRepository {
     return Array.from(this.typedModelIndex.values());
   }
 
-  public getUsedTypeIds(): string[] {
+  public getUsedTypes(): string[] {
     const typeMap = new Map();
-    this.typedModelIndex.forEach((el) => typeMap.set(el.typeId, el.typeId));
+    this.typedModelIndex.forEach((el) => typeMap.set(el.typeName, el.typeName));
     return Array.from(typeMap.keys());
   }
 
   public upsertModel(model: Partial<TypedModel>) {
-    if (model.typeId == null) {
-      throw new Error(`model requires typeId to be defined`);
+    if (model.typeName == null) {
+      throw new Error(`model requires typeName to be defined`);
     }
     if (model.id == null) {
       // new model
-      const modelCpy = { ...model, typeId: model.typeId, id: uuidv4() };
+      const modelCpy = { ...model, typeName: model.typeName, id: uuidv4() };
       this.typedModelIndex.set(modelCpy.id, modelCpy);
       return { isNew: true, model: modelCpy };
     } else {
@@ -58,22 +58,22 @@ export class ModelRepository {
       if (this.typedModelIndex.has(model.id) === false) {
         throw new Error(`model with id: '${model.id}' does not exist`);
       }
-      const modelCpy = { ...model, typeId: model.typeId, id: model.id };
+      const modelCpy = { ...model, typeName: model.typeName, id: model.id };
       this.typedModelIndex.set(modelCpy.id, modelCpy);
       return { isNew: false, model: modelCpy };
     }
   }
 
-  public deleteModelById(id: string): boolean {
+  public deleteModel(id: string): boolean {
     return this.typedModelIndex.delete(id);
   }
 
-  public deleteModelsByTypeId(typeId: string) {
+  public deleteModelsByType(typeName: string) {
     const modelsToDelete = Array.from(this.typedModelIndex.values()).filter(
-      (el) => (el.typeId = typeId)
+      (el) => el.typeName === typeName
     );
     for (const model of modelsToDelete) {
-      this.deleteModelById(model.id);
+      this.deleteModel(model.id);
     }
     return modelsToDelete?.length > 0 ? true : false;
   }

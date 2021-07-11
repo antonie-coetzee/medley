@@ -31,9 +31,8 @@ export default [
       "mobx-react",
       "medley",
       "@material-ui/core",
-      //"@material-ui/styles",
-      //"@material-ui/core/CssBaseline",
-      //"@material-ui/core/utils",
+      "@material-ui/styles",
+      "@material-ui/core/CssBaseline",
       "@material-ui/icons",
       "@material-ui/lab"
     ],
@@ -74,6 +73,9 @@ export default [
                 content="Medley composer application" 
               />
               <title>Medley Composer</title>
+              <link rel="preconnect" href="https://fonts.googleapis.com">
+              <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+              <link href="https://fonts.googleapis.com/css2?family=Arima+Madurai:wght@700&display=swap" rel="stylesheet">             
               <link rel="stylesheet" href="index.css">
               <script type="systemjs-importmap">
               {

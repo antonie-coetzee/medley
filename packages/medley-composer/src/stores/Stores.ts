@@ -26,7 +26,7 @@ export class Stores {
     const medley = new Medley(options)
     this.typeStore = new TypeStore(medley);
     this.modelStore = new ModelStore(medley);
-    this.compositionStore = new CompositionStore(medley);
     this.layoutStore = new LayoutStore(this.typeStore);
+    this.compositionStore = new CompositionStore(medley, this.layoutStore); 
   }
 }

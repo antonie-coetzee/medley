@@ -9,7 +9,6 @@ import {
 import { TypeRepository } from "./TypeRepository";
 import { ModelRepository } from "./ModelRepository";
 import { ViewEngine, ReturnedPromiseType } from "./ViewEngine";
-import { Migration } from "./Migration";
 
 export interface MedleyOptions {
   loader: LoaderOptions;
@@ -20,20 +19,18 @@ export interface MedleyOptions {
   };
 }
 
-export class Medley{
+export class Medley {
   private loadedComposition?: Composition;
   private modelRepository: ModelRepository;
   private typeRepository: TypeRepository;
-  private migration: Migration;
   private viewEngine: ViewEngine;
 
   public constructor(private options: MedleyOptions) {
     const loader = new Loader(options.loader);
     this.typeRepository = new TypeRepository(loader);
     this.modelRepository = new ModelRepository();
-    this.migration = new Migration(this.modelRepository, this.typeRepository);
     const getViewFunctionFromType = this.typeRepository.getViewFunction;
-    const getModel = this.modelRepository.getModelById;
+    const getModel = this.modelRepository.getModel;
     this.viewEngine = new ViewEngine(this, getModel, getViewFunctionFromType);
   }
 
@@ -49,19 +46,16 @@ export class Medley{
     this.loadedComposition = composition;
     this.typeRepository.load(composition.parts, baseUrl);
     const loadedTypes = this.typeRepository.getTypes();
-    this.options?.eventHooks?.typesUpdate?.call(
-      null,
-      loadedTypes
-    );
+    this.options?.eventHooks?.typesUpdate?.call(null, loadedTypes);
     this.modelRepository.load(composition.parts);
-    if(this.options?.eventHooks?.modelsOfTypeUpdate){
+    if (this.options?.eventHooks?.modelsOfTypeUpdate) {
       const modelsOfTypeUpdate = this.options.eventHooks.modelsOfTypeUpdate;
-      loadedTypes.forEach(type=>{
+      loadedTypes.forEach((type) => {
         modelsOfTypeUpdate(
           type,
-          this.modelRepository.getModelsByTypeId(type.id)
+          this.modelRepository.getModelsByType(type.name)
         );
-      })
+      });
     }
   };
 
@@ -79,20 +73,20 @@ export class Medley{
     return this.viewEngine.runViewFunction(target, ...args);
   };
 
-  public getTypedModelById = (modelId: string) => {
-    return this.modelRepository.getModelById(modelId);
+  public getTypedModel = (modelId: string) => {
+    return this.modelRepository.getModel(modelId);
   };
 
   public upsertTypedModel = (typedModel: Partial<TypedModel>) => {
-    if (typedModel.typeId == null) {
+    if (typedModel.typeName == null) {
       throw new Error("typedModel requires typeId to be defined");
     }
-    const type = this.typeRepository.getTypeById(typedModel.typeId);
+    const type = this.typeRepository.getType(typedModel.typeName);
     return this.upsertModel(type, typedModel);
   };
 
   public upsertModel = (type: Type, model: Partial<Model>) => {
-    const hasType = this.typeRepository.hasTypeById(type.id);
+    const hasType = this.typeRepository.hasType(type.name);
     if (hasType === false) {
       this.typeRepository.addType(type);
       this.options?.eventHooks?.typesUpdate?.call(
@@ -102,31 +96,31 @@ export class Medley{
     }
     const { isNew, model: typedModel } = this.modelRepository.upsertModel({
       ...model,
-      typeId: type.id,
+      typeName: type.name,
     });
     if (isNew) {
       this.options?.eventHooks?.modelsOfTypeUpdate?.call(
         null,
         type,
-        this.modelRepository.getModelsByTypeId(type.id)
+        this.modelRepository.getModelsByType(type.name)
       );
     }
     this.options?.eventHooks?.modelUpdate?.call(null, type, typedModel);
     return typedModel;
   };
 
-  public getModelsByTypeId = (typeId: string) => {
-    return this.modelRepository.getModelsByTypeId(typeId);
+  public getModelsByType = (typeName: string) => {
+    return this.modelRepository.getModelsByType(typeName);
   };
 
   public deleteModelById = (modelId: string) => {
-    const typeId = this.modelRepository.getTypeIdFromModelId(modelId);
-    this.modelRepository.deleteModelById(modelId);
+    const typeName = this.modelRepository.getTypeNameFromModelId(modelId);
+    this.modelRepository.deleteModel(modelId);
     // delete type if not referenced
-    if (typeId) {
-      const models = this.modelRepository.getModelsByTypeId(typeId);
+    if (typeName) {
+      const models = this.modelRepository.getModelsByType(typeName);
       if (models?.length == null || models?.length === 0) {
-        this.typeRepository.deleteType(typeId);
+        this.typeRepository.deleteType(typeName);
         this.options?.eventHooks?.typesUpdate?.call(
           null,
           this.typeRepository.getTypes()
@@ -135,47 +129,39 @@ export class Medley{
     }
   };
 
-  public getTypeById = (typeId: string) => {
-    return this.typeRepository.getTypeById(typeId);
+  public getType = (typeName: string) => {
+    return this.typeRepository.getType(typeName);
   };
 
   public getTypes = () => {
     return this.typeRepository.getTypes();
   };
 
-  public getViewFunctionFromTypeId = async (typeId: string) => {
-    return this.typeRepository.getViewFunction(typeId);
+  public getViewFunctionFromType = async (typeName: string) => {
+    return this.typeRepository.getViewFunction(typeName);
   };
 
-  public getExportFromTypeId = async <T>(
-    typeId: string,
+  public getExportFromType = async <T>(
+    typeName: string,
     exportName: string
   ) => {
-    return this.typeRepository.getExport(typeId, exportName) as Promise<T>;
+    return this.typeRepository.getExport(typeName, exportName) as Promise<T>;
   };
 
-  public deleteTypeById = (typeId: string) => {
-    if (this.modelRepository.deleteModelsByTypeId(typeId)) {
+  public deleteType = (typeName: string) => {
+    if (this.modelRepository.deleteModelsByType(typeName)) {
       this.options?.eventHooks?.modelsOfTypeUpdate?.call(
         null,
-        this.typeRepository.getTypeById(typeId),
+        this.typeRepository.getType(typeName),
         []
       );
     }
-    if (this.typeRepository.deleteType(typeId)) {
+    if (this.typeRepository.deleteType(typeName)) {
       this.options?.eventHooks?.typesUpdate?.call(
         null,
         this.typeRepository.getTypes()
       );
     }
-  };
-
-  public migrateTypeUp = async (type: Type) => {
-    return this.migration.up(type);
-  };
-
-  public migrateTypeDown = async (type: Type) => {
-    return this.migration.down(type);
   };
 
   public getComposition = <T extends Composition = Composition>() => {
@@ -184,38 +170,36 @@ export class Medley{
       return {
         type: type,
         models: this.modelRepository
-          .getModelsByTypeId(type.id)
+          .getModelsByType(type.name)
           // remove redundant typeId
           .map((tm) => ({ ...tm, typeId: undefined })),
       };
     });
-    if(this.loadedComposition){
-      return {       
-         ...this.loadedComposition as T,   
-         parts: modelsWithType 
+    if (this.loadedComposition) {
+      return {
+        ...(this.loadedComposition as T),
+        parts: modelsWithType,
       };
-    }   
+    }
   };
 
-  private mergeDeep(...objects:any[]) {
-    const isObject = (obj:any) => obj && typeof obj === 'object';
-    
+  private mergeDeep(...objects: any[]) {
+    const isObject = (obj: any) => obj && typeof obj === "object";
+
     return objects.reduce((prev, obj) => {
-      Object.keys(obj).forEach(key => {
+      Object.keys(obj).forEach((key) => {
         const pVal = prev[key];
         const oVal = obj[key];
-        
+
         if (Array.isArray(pVal) && Array.isArray(oVal)) {
           prev[key] = pVal.concat(...oVal);
-        }
-        else if (isObject(pVal) && isObject(oVal)) {
+        } else if (isObject(pVal) && isObject(oVal)) {
           prev[key] = this.mergeDeep(pVal, oVal);
-        }
-        else {
+        } else {
           prev[key] = oVal;
         }
       });
-      
+
       return prev;
     }, {});
   }

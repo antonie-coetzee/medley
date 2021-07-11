@@ -9,18 +9,18 @@ export class ModelStore {
     medley.updateOptions({
       eventHooks: { modelsOfTypeUpdate: (type,models) => {
         runInAction(()=>{
-          this.typeModelMap.set(type.id, models);
+          this.typeModelMap.set(type.name, models);
         })       
       }},
     });
   }
 
-  public getModelsByTypeId(typeId: string): TypedModel[] {
-    return this.medley.getModelsByTypeId(typeId);
+  public getModelsByTypeId(typeName: string): TypedModel[] {
+    return this.medley.getModelsByType(typeName);
   }
 
   public getModelById(modelId: string): TypedModel {
-    return this.medley.getTypedModelById(modelId);
+    return this.medley.getTypedModel(modelId);
   }
 
   public upsertModel(model: Partial<TypedModel>) {

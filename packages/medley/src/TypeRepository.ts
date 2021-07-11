@@ -12,10 +12,10 @@ export class TypeRepository {
     this.typeIndex = new Map();
     const types = parts.map(part=>part.type);
     for (const type of types) {
-      if (this.typeIndex.has(type.id)) {
-        throw new Error(`type with id: '${type.id}', already indexed`);
+      if (this.typeIndex.has(type.name)) {
+        throw new Error(`type with id: '${type.name}', already indexed`);
       }
-      this.typeIndex.set(type.id, type);
+      this.typeIndex.set(type.name, type);
     }
   }
 
@@ -44,16 +44,16 @@ export class TypeRepository {
     return Array.from(this.typeIndex.values());
   }
 
-  public getTypeById(typeId: string): Type {
-    const type = this.typeIndex.get(typeId);
+  public getType(typeName: string): Type {
+    const type = this.typeIndex.get(typeName);
     if (type == null) {
-      throw new Error(`type with id: '${typeId}', not found`);
+      throw new Error(`type with id: '${typeName}', not found`);
     }
     return type;
   }
 
-  public hasTypeById(typeId: string): boolean {
-    const type = this.typeIndex.get(typeId);
+  public hasType(typeName: string): boolean {
+    const type = this.typeIndex.get(typeName);
     if (type == null) {
       return false;
     } else {
@@ -61,14 +61,14 @@ export class TypeRepository {
     }
   }
 
-  public deleteType(typeId: string) {
-    return this.typeIndex.delete(typeId);
+  public deleteType(typeName: string) {
+    return this.typeIndex.delete(typeName);
   }
 
   public addType(type: Type) {
-    if(this.typeIndex.has(type.id)){
-      throw new Error(`type with id: '${type.id}' exists`);
+    if(this.typeIndex.has(type.name)){
+      throw new Error(`type with id: '${type.name}' exists`);
     }
-    this.typeIndex.set(type.id, type);
+    this.typeIndex.set(type.name, type);
   }
 }

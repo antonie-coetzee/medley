@@ -71,9 +71,9 @@ export function TypeExplorer() {
           treeNode.types.map((type) => {
             return (
               <TreeItem
-                nodeId={type.id}
-                key={type.id}
-                label={type.name}
+                nodeId={type.name}
+                key={type.name}
+                label={type.displayName || type.name}
                 onMouseDown={(e) => {
                   e.preventDefault();
                 }}

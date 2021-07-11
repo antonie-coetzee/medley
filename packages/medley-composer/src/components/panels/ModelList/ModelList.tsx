@@ -32,12 +32,12 @@ export function ModelList(node: TabNode) {
 
   const classes = useStyles();
   const borderClasses = borderStyle();
-  const typeId = node.getConfig()?.typeId as string;
-  const typedModels = modelStore.typeModelMap.get(typeId);
+  const typeName = node.getConfig()?.typeName as string;
+  const typedModels = modelStore.typeModelMap.get(typeName);
 
   const createModel = async (name: string) => {
     if (name) {
-      await modelStore.upsertModel({ name: name, typeId: typeId });
+      await modelStore.upsertModel({ name: name, typeName: typeName });
     }
   };
 

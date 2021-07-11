@@ -18,7 +18,7 @@ export class TypeStore {
     this.typesActive = medley.getTypes();
   }
 
-  getValueSchema(typeId:string){
-    return this.medley.getExportFromTypeId<string>(typeId, VALUE_SCHEMA);
+  getValueSchema(typeName:string){
+    return this.medley.getExportFromType<string>(typeName, VALUE_SCHEMA);
   }
 }

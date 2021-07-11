@@ -4,7 +4,6 @@
       "type": {
         "name": "typeOne",
         "version": "1.0.0",
-        "id": "bf96ada6-aab4-49b4-b42a-0d9ae82dc9de",
         "module": {
           "base": "../modules/moduleOne/",
           "system": "moduleOne-system.js",
@@ -30,7 +29,6 @@
       "type": {
         "name": "typeTwo",
         "version": "1.0.0",
-        "id": "ce8512f1-b8fa-4bf7-8b9c-89d15f8b748c",
         "module": {
           "base": "../modules/moduleTwo/",
           "system": "moduleTwo-system.js",
@@ -52,7 +50,6 @@
       "type": {
         "name": "typeTwoOther",
         "version": "1.0.0",
-        "id": "ce8512f1-b8fa-4bf7-8b9c-89d15f8b748d",
         "module": {
           "base": "../modules/moduleTwo/",
           "system": "moduleTwo-system.js",
@@ -76,7 +73,6 @@
       "type": {
         "name": "typeThree",
         "version": "1.0.0",
-        "id": "bf96ada6-aab4-49b4-b42a-0d9ae82dc9df",
         "module": {
           "base": "../modules/moduleThree/",
           "system": "moduleThree-system.js",
@@ -95,7 +91,6 @@
       "type": {
         "name": "typeFour",
         "version": "1.0.0",
-        "id": "bf96ada6-aab4-49b4-b42a-0d9be82dc9df",
         "module": {
           "base": "../modules/moduleFour/",
           "system": "moduleFour-system.js",
