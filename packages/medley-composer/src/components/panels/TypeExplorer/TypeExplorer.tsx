@@ -101,12 +101,15 @@ export function TypeExplorer() {
     <Observer>
       {() => (
         <TreeView
-          defaultCollapseIcon={<FolderOpen />}
-          defaultExpandIcon={<Folder />}
+          // defaultCollapseIcon={<FolderOpen />}
+          // defaultExpandIcon={<Folder />}
           defaultEndIcon={<span>-</span>}
           className={classes.root}
         >
-          {treeItemFromTreeNode(buildTreeNodeFromTypes(typeStore.typesActive))}
+              <TreeItem nodeId={"tn.name"} key={"tn.name"} label={"tn.name"}>
+                {/* {treeItemFromTreeNode(tn)} */}
+              </TreeItem>
+          {/* {treeItemFromTreeNode(buildTreeNodeFromTypes(typeStore.typesActive))} */}
         </TreeView>
       )}
     </Observer>

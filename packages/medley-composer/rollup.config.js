@@ -10,12 +10,21 @@ import serve from "rollup-plugin-serve";
 import livereload from "rollup-plugin-livereload";
 import replace from "@rollup/plugin-replace";
 import url from "postcss-url";
+import wildcardExternal from "@oat-sa/rollup-plugin-wildcard-external";
 
 const production = false;
 
+const externals = [
+"react-is",
+"react-dom",
+"react",
+"mobx",
+"mobx-react",
+"medley"]
+
 export default [
   {
-    treeshake: false,
+    treeshake: true,
     input: ["src/index.tsx"],
     output: [
       {
@@ -24,19 +33,9 @@ export default [
         sourcemap: true,
       },
     ],
-    external: [
-      "react",
-      "react-dom",
-      "mobx",
-      "mobx-react",
-      "medley",
-      "@material-ui/core",
-      "@material-ui/styles",
-      "@material-ui/core/CssBaseline",
-      "@material-ui/icons",
-      "@material-ui/lab"
-    ],
+    externals,
     plugins: [
+      wildcardExternal(externals),
       image(),
       typescript({ sourceMap: !production, inlineSources: !production }),
       replace({
@@ -80,17 +79,13 @@ export default [
               <script type="systemjs-importmap">
               {
                 "imports": {
-                  "crypto": "/vendor/crypto-js.4.0.0.js",
                   "react": "/vendor/react.17.0.2.js",
+                  "react-is": "/vendor/react-is.17.0.2.js",
                   "react-dom": "/vendor/react-dom.17.0.2.js",
                   "mobx": "/vendor/mobx.6.1.8.js",
                   "mobx-react": "/vendor/mobx-react.7.1.0.js",
-                  "medley": "/vendor/medley.1.0.0.js",
-                  "@material-ui/core": "/vendor/material-core.4.11.4.js",
-                  "@material-ui/icons": "/vendor/material-ui-icon-4.11.2.js",
-                  "@material-ui/lab": "/vendor/material-ui-lab.4.0.0-alpha.57.js",
-                  "@material-ui/styles": "/vendor/material-ui-styles.4.11.4.js"
-                }
+                  "medley": "/vendor/medley.1.0.0.js"
+                 }          
               }
             </script>
             <script src="https://cdn.jsdelivr.net/npm/systemjs/dist/system.js"></script>   

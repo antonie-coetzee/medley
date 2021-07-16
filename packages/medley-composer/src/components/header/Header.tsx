@@ -18,7 +18,7 @@ import {
   Toolbar,
   Typography,
 } from "@material-ui/core";
-import MenuIcon from "@material-ui/icons/Menu";
+import {Menu} from "@material-ui/icons";
 import { Composition } from "medley";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -120,7 +120,7 @@ export const HeaderComponent: React.FC<HeaderProps> = () => {
       >
        <Toolbar className={classes.toolbar}>
         <IconButton color="inherit" aria-label="open drawer" edge="start" onClick={toggleDrawer(true)}>
-            <MenuIcon />
+            <Menu />
           </IconButton>
           <Typography variant="h4" className={classes.title}>
             Medley

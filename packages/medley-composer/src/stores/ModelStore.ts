@@ -2,10 +2,11 @@ import { Medley, TypedModel } from "medley"
 import { makeObservable, observable, runInAction } from "mobx";
 
 export class ModelStore {
-  typeModelMap:Map<string, TypedModel[]>  = new Map();
+  typeModelMap:Map<string, TypedModel[]> = new Map();
+  modelUpdates:Map<string, TypedModel> = new Map();
 
   constructor(private medley: Medley) {
-    makeObservable(this, {typeModelMap: observable});
+    makeObservable(this, {typeModelMap: observable, modelUpdates: observable});
     medley.updateOptions({
       eventHooks: { modelsOfTypeUpdate: (type,models) => {
         runInAction(()=>{
@@ -13,6 +14,13 @@ export class ModelStore {
         })       
       }},
     });
+    medley.updateOptions({
+      eventHooks: { modelUpdate: (type,model) => {
+        runInAction(()=>{
+          this.modelUpdates.set(model.id, model);
+        })       
+      }},
+    });    
   }
 
   public getModelsByTypeId(typeName: string): TypedModel[] {
@@ -20,7 +28,7 @@ export class ModelStore {
   }
 
   public getModelById(modelId: string): TypedModel {
-    return this.medley.getTypedModel(modelId);
+    return this.modelUpdates.get(modelId) || this.medley.getTypedModel(modelId);
   }
 
   public upsertModel(model: Partial<TypedModel>) {

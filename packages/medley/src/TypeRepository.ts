@@ -19,22 +19,22 @@ export class TypeRepository {
     }
   }
 
-  public getViewFunction = async (typeId: string): Promise<Function> => {
-    return this.getExportFunction(typeId, VIEW_FUNCTION);
+  public getViewFunction = async (typeName: string): Promise<Function> => {
+    return this.getExportFunction(typeName, VIEW_FUNCTION);
   }
 
-  public async getExportFunction(typeId: string, functionName:string){
-    const moduleFunction = await this.getExport(typeId, functionName);   
+  public async getExportFunction(typeName: string, functionName:string){
+    const moduleFunction = await this.getExport(typeName, functionName);   
     if(typeof moduleFunction !== 'function'){
-      throw new Error(`export for ${typeId}.${functionName} not a function`);
+      throw new Error(`export for ${typeName}.${functionName} not a function`);
     }
     return moduleFunction as Function;
   }
 
-  public async getExport(typeId: string, name:string){
-    const type = this.typeIndex.get(typeId);
+  public async getExport(typeName: string, name:string){
+    const type = this.typeIndex.get(typeName);
     if (type == null) {
-      throw new Error(`type with id: '${typeId}' not found`);
+      throw new Error(`type with name: '${typeName}' not found`);
     }
     const module = await this.loader.importModule(type.module, this.baseUrl, `version=${type.version}`);
     return module[type.exportMap?.[name] || name];   
@@ -47,7 +47,7 @@ export class TypeRepository {
   public getType(typeName: string): Type {
     const type = this.typeIndex.get(typeName);
     if (type == null) {
-      throw new Error(`type with id: '${typeName}', not found`);
+      throw new Error(`type with name: '${typeName}', not found`);
     }
     return type;
   }
@@ -67,7 +67,7 @@ export class TypeRepository {
 
   public addType(type: Type) {
     if(this.typeIndex.has(type.name)){
-      throw new Error(`type with id: '${type.name}' exists`);
+      throw new Error(`type with name: '${type.name}' exists`);
     }
     this.typeIndex.set(type.name, type);
   }

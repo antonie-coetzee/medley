@@ -79,7 +79,7 @@ export class Medley {
 
   public upsertTypedModel = (typedModel: Partial<TypedModel>) => {
     if (typedModel.typeName == null) {
-      throw new Error("typedModel requires typeId to be defined");
+      throw new Error("typedModel requires typeName to be defined");
     }
     const type = this.typeRepository.getType(typedModel.typeName);
     return this.upsertModel(type, typedModel);

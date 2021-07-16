@@ -5,6 +5,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  IconButton,
   TextField,
 } from "@material-ui/core";
 import { AddCircleOutline } from "@material-ui/icons";
@@ -38,16 +39,9 @@ export const NewModelDialog = (doCreate: (name: string) => void) => {
 
   return (
     <Fragment>
-      <Button
-        type="button"
-        color="default"
-        size="small"
-        variant="outlined"
-        startIcon={<AddCircleOutline />}
-        onClick={handleClickOpen}
-      >
-        New
-      </Button>
+      <IconButton aria-label="upload picture" component="span" onClick={handleClickOpen}>
+        <AddCircleOutline />
+      </IconButton>
       <Dialog
         open={open}
         onClose={handleClose}
@@ -67,7 +61,7 @@ export const NewModelDialog = (doCreate: (name: string) => void) => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
+          <Button onClick={handleClose}>
             Cancel
           </Button>
           <Button onClick={handleCreate} color="primary">

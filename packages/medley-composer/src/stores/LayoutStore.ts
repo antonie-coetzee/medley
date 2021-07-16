@@ -1,7 +1,7 @@
 import { Type, TypedModel } from "medley";
 import { Layout } from "flexlayout-react";
 import { TypeStore } from "./TypeStore";
-import { makeObservable, observable } from "mobx";
+import { action, makeObservable, observable } from "mobx";
 
 export const MODEL_LIST = "modelList";
 export const TYPE_TREE = "typeTree";
@@ -39,7 +39,7 @@ export class LayoutStore {
   public config: any = null;
 
   constructor(private typeStore:TypeStore) {
-    makeObservable(this, {config: observable});
+    makeObservable(this, {config: observable, newLayout: action});
   }
 
 	public setLayout(layout:Layout | null){
@@ -66,7 +66,7 @@ export class LayoutStore {
 		if(this.layout == null) return;
 		this.layout.addTabToActiveTabSet({
 			component: MODEL_EDIT,
-			name: `${model.name} - ${model.id}`,
+			name: `${model.name}`,
       config: {modelId: model.id}
 		})
 	}
