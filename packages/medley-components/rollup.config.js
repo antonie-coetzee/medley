@@ -1,54 +1,39 @@
 import typescript from "@rollup/plugin-typescript";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
+import postcss from "rollup-plugin-postcss";
 import dts from "rollup-plugin-dts";
 import del from "rollup-plugin-delete";
 
 export default [
   {
-    input: "src/index.ts",
+    input: "src/components/tester.tsx",
     output: [
       {
-        file: "dist/medley-esm.js",
+        file: "dist/tester-esm.js",
         format: "es",
         sourcemap: true,
       },
       {
-        file: "dist/medley-cjs.js",
+        file: "dist/tester-cjs.js",
         format: "cjs",
         sourcemap: true,
       },
     ],
-    plugins: [nodeResolve(), commonjs(), typescript()],
-  },
-  {
-    input: "src/index.ts",
-    output: [
-      {
-        dir: "dist/dts",
-        format: "es",
-      },
-    ],
     plugins: [
-      nodeResolve(),
-      commonjs(),
-      typescript({
-        outDir: "dist/dts",
-        declarationDir: "dist/dts",
-        emitDeclarationOnly: true,
-        declaration:true
+      nodeResolve(), 
+      commonjs(), 
+      typescript(),
+      postcss({
+        extract: true,
+        minimize: true,
+        extensions: [".css"],
       }),
-    ],
-  },
-  {
-    input: "dist/dts/index.d.ts",
-    output: [{ file: "dist/medley.d.ts", format: "es" }],
-    plugins: [
-      dts(),
-      del({
-        targets: "dist/dts",
-        hook: "buildEnd",
-      }),
-    ],
-  },
+      replace({
+        preventAssignment: true,
+        values: {
+          "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
+        },
+      }),],
+  }
 ];

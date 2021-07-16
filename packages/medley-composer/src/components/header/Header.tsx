@@ -5,6 +5,7 @@ import { AddCircle, Category, CloudDownload } from "@material-ui/icons";
 import { CloudUpload } from "@material-ui/icons";
 import {
   AppBar,
+  Button,
   createStyles,
   Divider,
   Drawer,
@@ -125,6 +126,8 @@ export const HeaderComponent: React.FC<HeaderProps> = () => {
           <Typography variant="h4" className={classes.title}>
             Medley
           </Typography>
+          <Button variant="contained" color="secondary">TestButton</Button>
+
        </Toolbar>
       </AppBar>
       <Drawer open={drawerOpen} onClose={toggleDrawer(false)}>

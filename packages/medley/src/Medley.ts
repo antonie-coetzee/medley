@@ -42,7 +42,7 @@ export class Medley {
     this.options = this.mergeDeep(this.options, options);
   };
 
-  public load = (composition: Composition, baseUrl: URL) => {
+  public import = (composition: Composition, baseUrl: URL) => {
     this.loadedComposition = composition;
     this.typeRepository.load(composition.parts, baseUrl);
     const loadedTypes = this.typeRepository.getTypes();
@@ -59,6 +59,19 @@ export class Medley {
     }
   };
 
+  public runMainViewFunction = async <T extends (...args: any) => any>(
+    context: {},
+    ...args: Parameters<T>
+  ): Promise<ReturnedPromiseType<T>> => {
+    if (this.loadedComposition?.mainModelId == null) {
+      throw new Error("mainModelId not defined on loaded composition");
+    }
+    return this.viewEngine.runViewFunction(
+      { modelId: this.loadedComposition.mainModelId, context },
+      ...args
+    );
+  };
+
   public getViewFunction = async <T extends Function>(
     modelId: string,
     context?: {}
@@ -71,6 +84,26 @@ export class Medley {
     ...args: Parameters<T>
   ): Promise<ReturnedPromiseType<T>> => {
     return this.viewEngine.runViewFunction(target, ...args);
+  };
+
+  public getComposition = () => {
+    return this.loadedComposition;
+  }
+
+  public updateComposition = (updator:<T extends Composition>(composition:T)=>T) => {
+    if(this.loadedComposition && updator){
+      this.loadedComposition = updator(this.loadedComposition);
+    }
+  }
+
+  public getMainModelId = () => {
+    return this.loadedComposition?.mainModelId;
+  };
+
+  public setMainModelId = (modelId: string) => {
+    if (this.loadedComposition) {
+      this.loadedComposition.mainModelId = modelId;
+    }
   };
 
   public getTypedModel = (modelId: string) => {
@@ -164,7 +197,7 @@ export class Medley {
     }
   };
 
-  public getComposition = <T extends Composition = Composition>() => {
+  public export = <T extends Composition = Composition>() => {
     const types = this.typeRepository.getTypes();
     const modelsWithType = types.map((type) => {
       return {
