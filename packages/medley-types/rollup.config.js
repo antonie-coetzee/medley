@@ -13,7 +13,9 @@ const external = [
   "medley",
   "@material-ui/core",
   "@material-ui/core/styles",
-  "@material-ui/styles"];
+  "@material-ui/styles",
+  "@material-ui/icons",
+  "@material-ui/lab"];
 
 export default [
   {

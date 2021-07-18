@@ -1,1 +1,1 @@
-import "crypto-js"
+import "crypto";

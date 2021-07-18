@@ -24,6 +24,7 @@ export class Medley {
   private modelRepository: ModelRepository;
   private typeRepository: TypeRepository;
   private viewEngine: ViewEngine;
+  private mainModelId?: string;
 
   public constructor(private options: MedleyOptions) {
     const loader = new Loader(options.loader);
@@ -57,17 +58,18 @@ export class Medley {
         );
       });
     }
+    this.mainModelId = this.modelRepository.getMainModel()?.id;
   };
 
   public runMainViewFunction = async <T extends (...args: any) => any>(
     context: {},
     ...args: Parameters<T>
   ): Promise<ReturnedPromiseType<T>> => {
-    if (this.loadedComposition?.mainModelId == null) {
+    if (this.mainModelId == null) {
       throw new Error("mainModelId not defined on loaded composition");
     }
     return this.viewEngine.runViewFunction(
-      { modelId: this.loadedComposition.mainModelId, context },
+      { modelId: this.mainModelId, context },
       ...args
     );
   };
@@ -97,12 +99,13 @@ export class Medley {
   }
 
   public getMainModelId = () => {
-    return this.loadedComposition?.mainModelId;
+    return this.mainModelId;
   };
 
-  public setMainModelId = (modelId: string) => {
+  public setMainModel = (model:Model) => {
     if (this.loadedComposition) {
-      this.loadedComposition.mainModelId = modelId;
+      model.main = true;
+      this.mainModelId = model.id;
     }
   };
 

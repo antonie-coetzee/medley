@@ -126,8 +126,6 @@ export const HeaderComponent: React.FC<HeaderProps> = () => {
           <Typography variant="h4" className={classes.title}>
             Medley
           </Typography>
-          <Button variant="contained" color="secondary">TestButton</Button>
-
        </Toolbar>
       </AppBar>
       <Drawer open={drawerOpen} onClose={toggleDrawer(false)}>

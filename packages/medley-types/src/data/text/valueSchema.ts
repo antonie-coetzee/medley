@@ -1,10 +1,8 @@
-import { JSONSchema7 } from "json-schema";
-
-export const valueSchema:JSONSchema7 = {
+export const valueSchema = `{
   "type": "object",
   "properties": {
     "text": {
       "type": "string"
     }
   }
-};
+}`;

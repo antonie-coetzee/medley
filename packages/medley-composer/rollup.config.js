@@ -1,6 +1,7 @@
 import typescript from "@rollup/plugin-typescript";
 import del from "rollup-plugin-delete";
 import image from "@rollup/plugin-image";
+import nodePolyfills from 'rollup-plugin-polyfill-node';
 import json from "@rollup/plugin-json";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import html from "@rollup/plugin-html";
@@ -22,7 +23,12 @@ const external = [
 "medley",
 "@material-ui/core",
 "@material-ui/core/styles",
-"@material-ui/styles"]
+"@material-ui/styles",
+"@material-ui/icons",
+"@material-ui/lab",
+"@rjsf/material-ui",
+//"nanoid",
+"@rjsf/core"];
 
 export default [
   {
@@ -46,7 +52,9 @@ export default [
         },
       }),
       json(),
-      nodeResolve(),
+      nodeResolve({
+        browser: true
+      }),
       commonjs(),
       postcss({
         extract: true,
@@ -89,7 +97,10 @@ export default [
                   "@material-ui/core": "/vendor/material-ui-core.4.11.4.js",
                   "@material-ui/core/styles": "/vendor/material-ui-core-styles.4.11.4.js",
                   "@material-ui/styles": "/vendor/material-ui-styles.4.11.4.js",
-                  "crypto":"/vendor/crypto-js.4.0.0.js"
+                  "@material-ui/icons": "/vendor/material-ui-icons.4.11.4.js",
+                  "@material-ui/lab": "/vendor/material-ui-lab.4.0.0-alpha.57.js",
+                  "@rjsf/material-ui": "/vendor/rjsf-material-ui.3.0.0.js",
+                  "@rjsf/core": "/vendor/rjsf-core.3.0.0.js"
                  }          
               }
             </script>

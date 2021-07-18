@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Model, Part, Type, TypedModel } from "./core";
 
 export class ModelRepository {
+  public mainModelId?:string;
   public typedModelIndex: Map<string, TypedModel> = new Map();
 
   constructor() {}
@@ -13,6 +14,12 @@ export class ModelRepository {
       models.forEach((model) => {
         const typedModel = { ...model, typeName: part.type.name };
         this.typedModelIndex.set(model.id, typedModel);
+        if(model.main === true){
+          if(this.mainModelId){
+            throw new Error("multiple main models defined");
+          }
+          this.mainModelId = model.id;
+        }
       });
     });
   }
@@ -36,6 +43,22 @@ export class ModelRepository {
 
   public getModels(): TypedModel[] {
     return Array.from(this.typedModelIndex.values());
+  }
+
+  public getMainModel(): Model | undefined {
+    if(this.mainModelId){
+      return this.typedModelIndex.get(this.mainModelId);
+    }
+  }
+
+  public setMainModel(id: string) {
+    const model = this.getModel(id);
+    const currentMainModel = this.getMainModel();
+    if(currentMainModel){
+      delete currentMainModel.main;
+    }
+    this.mainModelId = model.id;
+    model.main = true;
   }
 
   public getUsedTypes(): string[] {

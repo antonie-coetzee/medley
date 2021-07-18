@@ -6,22 +6,16 @@ import { TabNode } from "flexlayout-react";
 import { Observer } from "mobx-react";
 import React, { useEffect, useState, FC } from "react";
 import { useStores } from "../../../stores/Stores";
-import {
-  createGenerateClassName,
-  createMuiTheme,
-  StylesProvider,
-  ThemeProvider,
-} from "@material-ui/core/styles";
 
 const Form = (withTheme(MaterialUITheme) as unknown) as {
   new (): DefaultForm<{}>;
 };
 
-export function ModelEdit(node: TabNode) {
+function ModelEditComponent(props:{node:TabNode}) {
   const [valueSchema, setValueSchema] = useState("");
   const [EditComponent, setEditComponent] = useState<React.FC>();
   const { modelStore, typeStore } = useStores();
-  const modelId = node.getConfig()?.modelId as string;
+  const modelId = props.node.getConfig()?.modelId as string;
   const model = modelStore.getModelById(modelId);
 
   let myForm: DefaultForm<{}> | null = null;
@@ -32,7 +26,7 @@ export function ModelEdit(node: TabNode) {
       if (EditComponent == null) {
         const valueSchema = await typeStore.getValueSchema(model.typeName);
         if (valueSchema) {
-          //setValueSchema(valueSchema);
+          setValueSchema(valueSchema);
         }
       } else {
         setEditComponent(EditComponent);
@@ -68,4 +62,16 @@ export function ModelEdit(node: TabNode) {
   {
     return <div>Value schema not defined...</div>;
   }
+}
+
+const ModelEditMemo =  React.memo(ModelEditComponent, (props, nextProps)=>{
+  if(props.node.getConfig()?.modelId === nextProps.node.getConfig()?.modelId){
+    return true;
+  }else{
+    return false;
+  }
+})
+
+export const ModelEdit = (node: TabNode) => {
+  return <ModelEditMemo node={node} />
 }

@@ -28,12 +28,12 @@ const useStyles = makeStyles({
   },
 });
 
-export function ModelList(node: TabNode) {
+export function ModelListComponent(props:{node:TabNode}) {
   const { layoutStore, modelStore } = useStores();
 
   const classes = useStyles();
   const borderClasses = borderStyle();
-  const typeName = node.getConfig()?.typeName as string;
+  const typeName = props.node.getConfig()?.typeName as string;
   const modelMap = modelStore.typeModelMap;
 
   const createModel = (name: string) => {
@@ -77,4 +77,16 @@ export function ModelList(node: TabNode) {
       )}
     </Observer>
   );
+}
+
+const ModelListMemo =  React.memo(ModelListComponent, (props, nextProps)=>{
+  if(props.node.getConfig()?.typeName === nextProps.node.getConfig()?.typeName){
+    return true;
+  }else{
+    return false;
+  }
+})
+
+export const ModelList = (node: TabNode) => {
+  return <ModelListMemo node={node} />
 }
