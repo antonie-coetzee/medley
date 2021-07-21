@@ -6,15 +6,29 @@ import { TabNode } from "flexlayout-react";
 import { Observer } from "mobx-react";
 import React, { useEffect, useState, FC } from "react";
 import { useStores } from "../../../stores/Stores";
+import { stringifyKey } from "mobx/dist/internal";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    rsfContainer: {
+      padding:"0px 16px 16px 16px"
+    },
+    editComponentContainer: {
+      padding:"10px 16px 10px 16px"
+    }
+  })
+);
 
 const Form = (withTheme(MaterialUITheme) as unknown) as {
   new (): DefaultForm<{}>;
 };
 
 function ModelEditComponent(props:{node:TabNode}) {
-  const [valueSchema, setValueSchema] = useState("");
+  const [schemas, setSchemas] = useState<{valueSchema:string|null, uiSchema:string|null}>({valueSchema:null,uiSchema:null});
   const [EditComponent, setEditComponent] = useState<React.FC>();
   const { modelStore, typeStore } = useStores();
+  const classes = useStyles();
   const modelId = props.node.getConfig()?.modelId as string;
   const model = modelStore.getModelById(modelId);
 
@@ -25,23 +39,24 @@ function ModelEditComponent(props:{node:TabNode}) {
       const EditComponent = await typeStore.getEditComponent(model.typeName);
       if (EditComponent == null) {
         const valueSchema = await typeStore.getValueSchema(model.typeName);
-        if (valueSchema) {
-          setValueSchema(valueSchema);
-        }
-      } else {
+        const uiSchema = await typeStore.getUiSchema(model.typeName);
+        setSchemas({valueSchema,uiSchema});
+      } else {      
         setEditComponent(EditComponent);
       }
     })();
   }, []);
 
-  if (valueSchema) {
-    const schema = JSON.parse(valueSchema) as JSONSchema7;
+  if (schemas.valueSchema) {
+    const schema = JSON.parse(schemas.valueSchema) as JSONSchema7;
+    const ui = JSON.parse(schemas.uiSchema || "{}");
     return (
       <Observer>
         {() => {
           const model = modelStore.getModelById(modelId);
           return (
-            <Form
+            <Form className={classes.rsfContainer}
+              uiSchema={ui}
               schema={schema}
               formData={model.value}
               ref={(ref) => (myForm = ref)}
@@ -58,7 +73,9 @@ function ModelEditComponent(props:{node:TabNode}) {
       </Observer>
     );
   } else if (EditComponent)
-    return <React.Fragment>{EditComponent}</React.Fragment>;
+    return <div className={classes.editComponentContainer}>
+      {EditComponent}
+      </div>;
   {
     return <div>Value schema not defined...</div>;
   }

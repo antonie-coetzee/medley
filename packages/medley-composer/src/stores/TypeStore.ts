@@ -4,6 +4,7 @@ import React from "react";
 
 const VALUE_SCHEMA = "valueSchema";
 const EDIT_COMPONENT = "EditComponent";
+const UI_SCHEMA = "uiSchema";
 
 export class TypeStore {
   typesActive: Type[] = [];
@@ -17,7 +18,6 @@ export class TypeStore {
         })       
       }},
     });
-    this.typesActive = medley.getTypes();
   }
 
   getValueSchema(typeName:string){
@@ -26,5 +26,9 @@ export class TypeStore {
 
   getEditComponent(typeName:string){
     return this.medley.getExportFromType<React.FC>(typeName, EDIT_COMPONENT);
+  }
+
+  getUiSchema(typeName:string){
+    return this.medley.getExportFromType<string>(typeName, UI_SCHEMA);
   }
 }

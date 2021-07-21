@@ -1,7 +1,8 @@
 import React, { useRef } from "react";
+import { fade, styled } from '@material-ui/core/styles';
 import { useStores } from "../../stores/Stores";
-
-import { AddCircle, Category, CloudDownload } from "@material-ui/icons";
+import { AddCircle, Category, CloudDownload, Search } from "@material-ui/icons";
+import SearchIcon from '@material-ui/icons/Search';
 import { CloudUpload } from "@material-ui/icons";
 import {
   AppBar,
@@ -10,6 +11,7 @@ import {
   Divider,
   Drawer,
   IconButton,
+  InputBase,
   List,
   ListItem,
   ListItemIcon,
@@ -20,12 +22,12 @@ import {
   Typography,
 } from "@material-ui/core";
 import {Menu} from "@material-ui/icons";
-import { Composition } from "medley";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       display: "flex",
+      flexGrow: 1,
       "& > *": {
         margin: theme.spacing(1),
       },
@@ -38,11 +40,50 @@ const useStyles = makeStyles((theme: Theme) =>
       borderBottomWidth: "8px",
     },
     toolbar:{
-      paddingLeft: "14px"
+      paddingLeft: "16px",
+      paddingRight: "16px"
     },
     title: {
+      flexGrow: 1,
       fontFamily: "'Arima Madurai', cursive",
-    }
+    },
+    search: {
+      position: 'relative',
+      borderRadius: theme.shape.borderRadius,
+      backgroundColor: fade(theme.palette.common.black, 0.05),
+      '&:hover': {
+        backgroundColor: fade(theme.palette.common.black, 0.10),
+      },
+      paddingRight:0,
+      marginLeft: 0,
+      width: '100%',
+      [theme.breakpoints.up('sm')]: {
+        marginLeft: theme.spacing(3),
+        width: 'auto',
+      },
+    },
+    searchIcon: {
+      padding: theme.spacing(0, 2),
+      height: '100%',
+      position: 'absolute',
+      pointerEvents: 'none',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    inputRoot: {
+      color: 'inherit',
+    },
+    inputInput: {
+      padding: theme.spacing(1, 1, 1, 0),
+      // vertical padding + font size from searchIcon
+      paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
+      transition: theme.transitions.create('width'),
+      width: '100%',
+      [theme.breakpoints.up('md')]: {
+        width: '20ch',
+      },
+    },
   })
 );
 
@@ -63,7 +104,7 @@ export const HeaderComponent: React.FC<HeaderProps> = () => {
     reader.onload = async (e) => {
       const text = e?.target?.result as string;
       if (text == null) return;
-      await compositionStore.load(JSON.parse(text));
+      await compositionStore.import(JSON.parse(text));
     };
 
     reader.readAsText(e.target.files[0]);
@@ -125,7 +166,20 @@ export const HeaderComponent: React.FC<HeaderProps> = () => {
           </IconButton>
           <Typography variant="h4" className={classes.title}>
             Medley
-          </Typography>
+          </Typography>   
+          <div className={classes.search}>
+            <div className={classes.searchIcon}>
+              <SearchIcon />
+            </div>
+            <InputBase
+              placeholder="Search…"
+              classes={{
+                root: classes.inputRoot,
+                input: classes.inputInput,
+              }}
+              inputProps={{ 'aria-label': 'search' }}
+            />
+          </div>            
        </Toolbar>
       </AppBar>
       <Drawer open={drawerOpen} onClose={toggleDrawer(false)}>
@@ -135,3 +189,5 @@ export const HeaderComponent: React.FC<HeaderProps> = () => {
   );
 };
 export const Header = HeaderComponent;
+
+

@@ -3,5 +3,15 @@
   "explorer.autoReveal": false,
   "debug.javascript.terminalOptions": {
     "skipFiles": ["<node_internals>/**"]
-  }
+  },
+  "todo-tree.highlights.defaultHighlight": {
+    "icon": "note",
+    "type": "text-and-comment",
+    "foreground": "black",
+    "background": "white",
+    "opacity": 75,
+    "iconColour": "white",
+    "gutterIcon": true,
+  },  
+  "todo-tree.regex.regex": "(//|#|<!--|;|/\\*|^|^\\s*(-|\\d+.))\\s*($TAGS).*(\\n\\s*//\\s{1,}.*)*",
 }

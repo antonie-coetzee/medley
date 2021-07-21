@@ -27,7 +27,6 @@ const external = [
 "@material-ui/icons",
 "@material-ui/lab",
 "@rjsf/material-ui",
-//"nanoid",
 "@rjsf/core"];
 
 export default [

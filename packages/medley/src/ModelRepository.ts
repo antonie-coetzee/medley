@@ -78,12 +78,13 @@ export class ModelRepository {
       return { isNew: true, model: modelCpy };
     } else {
       // existing model
-      if (this.typedModelIndex.has(model.id) === false) {
+      const existingModel = this.typedModelIndex.get(model.id);
+      if (existingModel == null) {
         throw new Error(`model with id: '${model.id}' does not exist`);
       }
-      const modelCpy = { ...model, typeName: model.typeName, id: model.id };
-      this.typedModelIndex.set(modelCpy.id, modelCpy);
-      return { isNew: false, model: modelCpy };
+      const updatedModel = {...existingModel, ...model};
+      this.typedModelIndex.set(updatedModel.id, updatedModel);
+      return { isNew: false, model: updatedModel };
     }
   }
 

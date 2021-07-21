@@ -1,4 +1,4 @@
-import { Type, Loader, Part } from "./core";
+import { Type, Loader, Part, Module, esmModule, systemModule, isModule } from "./core";
 import { MIGRATE_DOWN, MIGRATE_UP, VIEW_FUNCTION } from "./core/Constants";
 
 export class TypeRepository {
@@ -25,7 +25,7 @@ export class TypeRepository {
 
   public async getExportFunction(typeName: string, functionName:string){
     const moduleFunction = await this.getExport(typeName, functionName);   
-    if(typeof moduleFunction !== 'function'){
+    if(typeof moduleFunction !== "function"){
       throw new Error(`export for ${typeName}.${functionName} not a function`);
     }
     return moduleFunction as Function;
@@ -36,8 +36,21 @@ export class TypeRepository {
     if (type == null) {
       throw new Error(`type with name: '${typeName}' not found`);
     }
-    const module = await this.loader.importModule(type.module, this.baseUrl, `version=${type.version}`);
-    return module[type.exportMap?.[name] || name];   
+    let moduleInfo = type.module;
+    let exportName = name;
+    const redirect = type.exportMap?.[name];
+    if(redirect){
+      if(typeof redirect === "string"){    
+        exportName = redirect;
+      }else if ((redirect as { name: string }).name && isModule(redirect)){
+        exportName = (redirect as { name: string }).name;
+        moduleInfo = redirect;
+      }else if (isModule(redirect)){
+        moduleInfo = redirect;
+      }
+    }
+    const module = await this.loader.importModule(moduleInfo, this.baseUrl, `version=${type.version}`);   
+    return module[exportName];   
   }
 
   public getTypes(): Type[] {
@@ -72,3 +85,5 @@ export class TypeRepository {
     this.typeIndex.set(type.name, type);
   }
 }
+
+

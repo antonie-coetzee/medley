@@ -14,8 +14,16 @@ export interface TypeMeta {
 export interface TypeVersion {
   version: string;
   module: Module;
+  // undefined: (standard export name)
+  // string: (standard export name) -> (different export name)
+  // Module: (standard export name) -> (different module).(standard export name)
+  // { name: string } & Module: (standard export name) -> (different module).(different export name)
   exportMap?: {
-    [name: string]: string | undefined;
+    [name: string]:
+      | string
+      | Module
+      | { name: string } & Module
+      | undefined;
   };
 }
 

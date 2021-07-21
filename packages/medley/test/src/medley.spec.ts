@@ -24,7 +24,7 @@ describe("Medley", function () {
       { encoding: "utf-8" }
     );
     const composition = JSON.parse(compositionJson);
-    await medley.load(composition, baseUrl);
+    await medley.import(composition, baseUrl);
     const res = await medley.runViewFunction<() => Promise<string>>(
       "e0754165-d127-48be-92c5-85fc25dbca19"
     );
@@ -55,6 +55,6 @@ describe("Medley", function () {
       { encoding: "utf-8" }
     );
     const composition = JSON.parse(compositionJson);
-    await medley.load(composition, baseUrl);
+    await medley.import(composition, baseUrl);
   });
 });

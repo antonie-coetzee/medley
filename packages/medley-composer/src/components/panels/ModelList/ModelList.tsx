@@ -59,7 +59,7 @@ export function ModelListComponent(props:{node:TabNode}) {
             <TableBody>
               {(modelMap.get(typeName) || []).map((row) => (
                 <TableRow
-                  key={row.name}
+                  key={row.id}
                   onDoubleClick={(e) => {
                     e.preventDefault();
                     layoutStore.addModelEdit(row);

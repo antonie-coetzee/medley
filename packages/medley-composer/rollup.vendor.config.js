@@ -33,20 +33,10 @@ const vendors = [
     dstName: "mobx-react.7.1.0.js",
     name: "mobx-react"
   },
-  // {
-  //   srcName: "nanoid.ts",
-  //   dstName: "nanoid.3.1.23.js",
-  //   name: "nanoid"
-  // },
   {
     srcName: "medley.ts",
     dstName: "medley.1.0.0.js",
     name: "medley"
-  },
-  {
-    srcName: "crypto-js.ts",
-    dstName: "crypto-js.4.0.0.js",
-    name: "crypto"
   },
   {
     srcName: "material-ui-core.ts",

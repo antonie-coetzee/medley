@@ -20,11 +20,10 @@ export interface MedleyOptions {
 }
 
 export class Medley {
-  private loadedComposition?: Composition;
+  private composition?: Composition;
   private modelRepository: ModelRepository;
   private typeRepository: TypeRepository;
   private viewEngine: ViewEngine;
-  private mainModelId?: string;
 
   public constructor(private options: MedleyOptions) {
     const loader = new Loader(options.loader);
@@ -44,7 +43,7 @@ export class Medley {
   };
 
   public import = (composition: Composition, baseUrl: URL) => {
-    this.loadedComposition = composition;
+    this.composition = composition;
     this.typeRepository.load(composition.parts, baseUrl);
     const loadedTypes = this.typeRepository.getTypes();
     this.options?.eventHooks?.typesUpdate?.call(null, loadedTypes);
@@ -58,18 +57,19 @@ export class Medley {
         );
       });
     }
-    this.mainModelId = this.modelRepository.getMainModel()?.id;
   };
 
   public runMainViewFunction = async <T extends (...args: any) => any>(
     context: {},
     ...args: Parameters<T>
   ): Promise<ReturnedPromiseType<T>> => {
-    if (this.mainModelId == null) {
-      throw new Error("mainModelId not defined on loaded composition");
+    this.checkComposition();
+    const mainModel = this.modelRepository.getMainModel();
+    if (mainModel == null) {
+      throw new Error("main model not found");
     }
     return this.viewEngine.runViewFunction(
-      { modelId: this.mainModelId, context },
+      { modelId: mainModel.id, context },
       ...args
     );
   };
@@ -78,6 +78,7 @@ export class Medley {
     modelId: string,
     context?: {}
   ): Promise<T> => {
+    this.checkComposition();
     return this.viewEngine.getViewFunction(modelId, context);
   };
 
@@ -85,35 +86,38 @@ export class Medley {
     target: string | { modelId: string; context: {} },
     ...args: Parameters<T>
   ): Promise<ReturnedPromiseType<T>> => {
+    this.checkComposition();
     return this.viewEngine.runViewFunction(target, ...args);
   };
 
   public getComposition = () => {
-    return this.loadedComposition;
+    return this.composition;
   }
 
   public updateComposition = (updator:<T extends Composition>(composition:T)=>T) => {
-    if(this.loadedComposition && updator){
-      this.loadedComposition = updator(this.loadedComposition);
+    this.checkComposition();
+    if(this.composition && updator){
+      this.composition = updator(this.composition);
     }
   }
 
-  public getMainModelId = () => {
-    return this.mainModelId;
+  public getMainModel = () => {
+    this.checkComposition();
+    return this.modelRepository.getMainModel();
   };
 
-  public setMainModel = (model:Model) => {
-    if (this.loadedComposition) {
-      model.main = true;
-      this.mainModelId = model.id;
-    }
+  public setMainModel = (modelId:string) => {
+    this.checkComposition();
+    this.modelRepository.setMainModel(modelId);
   };
 
   public getTypedModel = (modelId: string) => {
+    this.checkComposition();
     return this.modelRepository.getModel(modelId);
   };
 
   public upsertTypedModel = (typedModel: Partial<TypedModel>) => {
+    this.checkComposition();
     if (typedModel.typeName == null) {
       throw new Error("typedModel requires typeName to be defined");
     }
@@ -122,6 +126,7 @@ export class Medley {
   };
 
   public upsertModel = (type: Type, model: Partial<Model>) => {
+    this.checkComposition();
     const hasType = this.typeRepository.hasType(type.name);
     if (hasType === false) {
       this.typeRepository.addType(type);
@@ -146,10 +151,12 @@ export class Medley {
   };
 
   public getModelsByType = (typeName: string) => {
+    this.checkComposition();
     return this.modelRepository.getModelsByType(typeName);
   };
 
   public deleteModelById = (modelId: string) => {
+    this.checkComposition();
     const typeName = this.modelRepository.getTypeNameFromModelId(modelId);
     this.modelRepository.deleteModel(modelId);
     // delete type if not referenced
@@ -166,14 +173,17 @@ export class Medley {
   };
 
   public getType = (typeName: string) => {
+    this.checkComposition();
     return this.typeRepository.getType(typeName);
   };
 
   public getTypes = () => {
+    this.checkComposition();
     return this.typeRepository.getTypes();
   };
 
   public getViewFunctionFromType = async (typeName: string) => {
+    this.checkComposition();
     return this.typeRepository.getViewFunction(typeName);
   };
 
@@ -181,10 +191,12 @@ export class Medley {
     typeName: string,
     exportName: string
   ) => {
+    this.checkComposition();
     return this.typeRepository.getExport(typeName, exportName) as Promise<T>;
   };
 
   public deleteType = (typeName: string) => {
+    this.checkComposition();
     if (this.modelRepository.deleteModelsByType(typeName)) {
       this.options?.eventHooks?.modelsOfTypeUpdate?.call(
         null,
@@ -201,6 +213,7 @@ export class Medley {
   };
 
   public export = <T extends Composition = Composition>() => {
+    this.checkComposition();
     const types = this.typeRepository.getTypes();
     const modelsWithType = types.map((type) => {
       return {
@@ -211,13 +224,19 @@ export class Medley {
           .map((tm) => ({ ...tm, typeId: undefined })),
       };
     });
-    if (this.loadedComposition) {
+    if (this.composition) {
       return {
-        ...(this.loadedComposition as T),
+        ...(this.composition as T),
         parts: modelsWithType,
       };
     }
   };
+
+  private checkComposition(){
+    if(this.composition == null){
+      throw new Error("composition not present");
+    }
+  }
 
   private mergeDeep(...objects: any[]) {
     const isObject = (obj: any) => obj && typeof obj === "object";
