@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
 import { Model, Part, Type, TypedModel } from "./core";
 
 export class ModelRepository {
@@ -73,7 +72,11 @@ export class ModelRepository {
     }
     if (model.id == null) {
       // new model
-      const modelCpy = { ...model, typeName: model.typeName, id: uuidv4() };
+      let newId:string;
+      do {        
+        newId = this.generateId();
+      } while (this.typedModelIndex.has(newId));
+      const modelCpy = { ...model, typeName: model.typeName, id: newId };
       this.typedModelIndex.set(modelCpy.id, modelCpy);
       return { isNew: true, model: modelCpy };
     } else {
@@ -101,4 +104,15 @@ export class ModelRepository {
     }
     return modelsToDelete?.length > 0 ? true : false;
   }
+
+  // 8,361,453,672 possible combinations, at a 1000 IDs per hour/second, ~87 days needed, in order to have a 1% probability of at least one collision
+  private generateId() {
+    const alphanumeric = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    const length = 8;
+    var result = '';
+    for (var i = 0; i < length; ++i) {
+      result += alphanumeric[Math.floor(Math.random() * alphanumeric.length)];
+    }
+    return result;
+  };
 }

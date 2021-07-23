@@ -1,5 +1,5 @@
 import { Medley } from "./Medley";
-import { TypedModel } from "./core";
+import { Logger, nullLogger, TypedModel } from "./core";
 import { Context } from "./Context";
 
 export type ReturnedPromiseType<T> = T extends (...args: any[]) => Promise<infer R> ? R : never;
@@ -141,11 +141,18 @@ export class ViewEngine {
       parentContext == null
         ? [model.id]
         : parentContext?.medley.callStack.concat(model.id);
+    
+    const logger = medley.getLogger().child({
+      typeName:model.typeName,
+      modelId:model.id
+    });
+
     const medleyContext = Object.assign({}, medley, {
       model,
       getModelValue: <P>() => {
         return model.value as P;
       },
+      logger,
       callStack,
     });
     const cntx: Context = {
@@ -153,6 +160,7 @@ export class ViewEngine {
       ...context,
       medley: medleyContext,
     };
+    // rebind recursive functions with new context
     cntx.medley.getViewFunction = getViewFunction.bind(cntx);
     cntx.medley.runViewFunction = runViewFunction.bind(cntx);
     return cntx;

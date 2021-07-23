@@ -5,6 +5,8 @@ import {
   Type,
   Composition,
   TypedModel,
+  Logger,
+  nullLogger,
 } from "./core";
 import { TypeRepository } from "./TypeRepository";
 import { ModelRepository } from "./ModelRepository";
@@ -12,6 +14,7 @@ import { ViewEngine, ReturnedPromiseType } from "./ViewEngine";
 
 export interface MedleyOptions {
   loader: LoaderOptions;
+  logger?: Logger;
   eventHooks?: {
     typesUpdate?: (types: Type[]) => void;
     modelsOfTypeUpdate?: (type: Type, models: TypedModel[]) => void;
@@ -19,11 +22,12 @@ export interface MedleyOptions {
   };
 }
 
-export class Medley {
+export class Medley { 
   private composition?: Composition;
   private modelRepository: ModelRepository;
   private typeRepository: TypeRepository;
   private viewEngine: ViewEngine;
+  private baseLogger: Logger;
 
   public constructor(private options: MedleyOptions) {
     const loader = new Loader(options.loader);
@@ -32,6 +36,7 @@ export class Medley {
     const getViewFunctionFromType = this.typeRepository.getViewFunction;
     const getModel = this.modelRepository.getModel;
     this.viewEngine = new ViewEngine(this, getModel, getViewFunctionFromType);
+    this.baseLogger = options.logger || nullLogger;
   }
 
   public new = () => {
@@ -220,17 +225,23 @@ export class Medley {
         type: type,
         models: this.modelRepository
           .getModelsByType(type.name)
-          // remove redundant typeId
-          .map((tm) => ({ ...tm, typeId: undefined })),
+          // remove redundant typeName
+          .map((tm) => ({ ...tm, typeName: undefined })),
       };
     });
     if (this.composition) {
-      return {
+      const currentState = {
         ...(this.composition as T),
         parts: modelsWithType,
       };
+      // return clone to avoid externally introduced side-effects
+      return JSON.parse(JSON.stringify(currentState)) as T
     }
   };
+
+  public getLogger = () => {
+    return this.baseLogger;
+  }
 
   private checkComposition(){
     if(this.composition == null){
@@ -239,6 +250,10 @@ export class Medley {
   }
 
   private mergeDeep(...objects: any[]) {
+    if(objects == null){
+      return;
+    }
+    
     const isObject = (obj: any) => obj && typeof obj === "object";
 
     return objects.reduce((prev, obj) => {

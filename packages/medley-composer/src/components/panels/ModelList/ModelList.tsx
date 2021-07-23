@@ -46,7 +46,7 @@ export function ModelListComponent(props:{node:TabNode}) {
     <Observer>
       {() => (
         <TableContainer className={borderClasses.table}>
-          <Table stickyHeader className={classes.table} size="small">
+          <Table stickyHeader className={classes.table} size="small" >
             <TableHead>
               <TableRow>
                 <TableCell>

@@ -4,11 +4,8 @@ export interface Typed {
   typeName: string;
 }
 
-export interface TypeMeta {
+export interface TypeName {
   name: string;
-  displayName?: string;
-  category?: string[];
-  icon?: URL;
 }
 
 export interface TypeVersion {
@@ -25,12 +22,16 @@ export interface TypeVersion {
       | { name: string } & Module
       | undefined;
   };
+  displayName?: string;
+  category?: string[];
+  icon?: URL;
+  helpUrl?:URL;
 }
 
-export interface Type extends TypeMeta, TypeVersion {}
+export interface Type extends TypeName, TypeVersion {}
 
 export type TypeCollection = [
-  TypeMeta & {
+  TypeName & {
     versions: URL | TypeVersion[];
   }
 ];

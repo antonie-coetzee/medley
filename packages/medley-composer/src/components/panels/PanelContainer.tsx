@@ -15,6 +15,7 @@ export const PanelContainer = () => {
           return null;
         }
         return <FlexLayout.Layout
+        
         model={FlexLayout.Model.fromJson(layoutStore.config)}
         factory={panelFactory}
         ref={(ref) => layoutStore.setLayout(ref)}

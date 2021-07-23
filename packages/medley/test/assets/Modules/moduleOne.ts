@@ -18,7 +18,7 @@ export async function viewFunction(this: Context) {
   if (config == null) {
     return;
   }
-
+  this.medley.logger.info("log from ModuleOne.viewFunction");
   const modelTwoReturn = await this.medley.runViewFunction<ChildModuleViewFunction>(
     {modelId: config.childModelTwoId,
       context: { customContextProp: "custom value" }}

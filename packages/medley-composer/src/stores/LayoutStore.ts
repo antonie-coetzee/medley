@@ -8,7 +8,7 @@ export const TYPE_TREE = "typeTree";
 export const MODEL_EDIT = "modelEdit";
 
 const newConfig = {
-  global: {},
+  global: {splitterSize: 3},
   borders: [
     {
       type: "border",
@@ -29,7 +29,7 @@ const newConfig = {
 };
 
 const emptyConfig = {
-  global: {},
+  global: {splitterSize: 3},
   borders: [],
   layout: {},
 };

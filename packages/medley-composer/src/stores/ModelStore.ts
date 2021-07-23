@@ -34,4 +34,11 @@ export class ModelStore {
   public upsertModel(model: Partial<TypedModel>) {
     return this.medley.upsertTypedModel(model);
   }
+
+  public copyModel(newName:string, model: TypedModel) {
+    const modelCopy =  JSON.parse(JSON.stringify(model)) as Partial<TypedModel>;
+    modelCopy.name = newName;
+    delete modelCopy.id
+    this.medley.upsertTypedModel(modelCopy);
+  }
 }

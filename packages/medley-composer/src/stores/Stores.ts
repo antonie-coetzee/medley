@@ -1,7 +1,9 @@
+import { Dialog } from "@material-ui/core";
 import { Medley, MedleyOptions, ModuleType } from "medley";
 import { MobXProviderContext } from "mobx-react";
 import React from "react";
 import { CompositionStore } from "./CompositionStore";
+import { DialogStore } from "./DialogStore";
 import { LayoutStore } from "./LayoutStore";
 import { ModelStore } from "./ModelStore";
 import { TypeStore } from "./TypeStore";
@@ -15,6 +17,7 @@ export class Stores {
   public compositionStore: CompositionStore;
   public typeStore: TypeStore;
   public modelStore: ModelStore;
+  public dialogStore: DialogStore;
 
   constructor() {
     const options: MedleyOptions = {
@@ -28,5 +31,6 @@ export class Stores {
     this.modelStore = new ModelStore(medley);
     this.layoutStore = new LayoutStore(this.typeStore);
     this.compositionStore = new CompositionStore(medley, this.layoutStore); 
+    this.dialogStore = new DialogStore();
   }
 }

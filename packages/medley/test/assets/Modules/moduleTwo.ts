@@ -9,6 +9,7 @@ type extendedContext = Context & {
 }
 
 export async function viewFunction(this:Context){
+  this.medley.logger.info("log from ModuleTwo.viewFunction");
   const config = this.medley.getModelValue<config>();
   if(config){
     const res = await this.medley.runViewFunction<()=>Promise<string>>(config.childModelId);

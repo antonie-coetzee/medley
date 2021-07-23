@@ -36,8 +36,8 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     header: {
       borderBottom: "solid",
-      borderBottomColor: "#f7f7f7",
-      borderBottomWidth: "8px",
+      borderBottomColor: "#e9e9e9",
+      borderBottomWidth: "3px",
     },
     toolbar:{
       paddingLeft: "16px",

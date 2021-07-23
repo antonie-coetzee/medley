@@ -5,7 +5,6 @@ export interface Model {
   name?: string;
   refs?: string[];
   value?: {};
-  main?:boolean;
 }
 
 export interface TypedModel extends Model, Typed {}

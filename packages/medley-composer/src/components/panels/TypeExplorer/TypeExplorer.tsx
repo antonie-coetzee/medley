@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import { makeStyles } from "@material-ui/core";
+import { makeStyles, styled } from "@material-ui/core";
 import { TreeView, TreeItem } from "@material-ui/lab";
 import {
   CategorySharp,
@@ -22,10 +22,16 @@ const useStyles = makeStyles({
   root: {
     padding: "8px",
   },
+  treeviewRoot: {
+    "& :focus > .MuiTreeItem-content .MuiTreeItem-label": {
+      backgroundColor: "#e9e9e9",
+    },
+  },
 });
 
 export function TypeExplorer() {
   const { typeStore, layoutStore } = useStores();
+  const classes = useStyles();
 
   const buildTree = (parentNode: TreeNode, path: string[], type: Type) => {
     if (path == null || path.length === 0) {
@@ -63,7 +69,6 @@ export function TypeExplorer() {
     });
     return rootNode;
   };
-
   const treeItemFromTreeNode = (treeNode: TreeNode) => {
     return (
       <Fragment>
@@ -87,7 +92,17 @@ export function TypeExplorer() {
         {treeNode.childNodes.length > 0 &&
           treeNode.childNodes.map((tn) => {
             return (
-              <TreeItem nodeId={tn.name} key={tn.name} label={tn.name}>
+              <TreeItem
+                nodeId={tn.name}
+                key={tn.name}
+                label={tn.name}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                }}
+                onDoubleClick={(e) => {
+                  e.preventDefault();
+                }}
+              >
                 {treeItemFromTreeNode(tn)}
               </TreeItem>
             );
@@ -96,7 +111,6 @@ export function TypeExplorer() {
     );
   };
 
-  const classes = useStyles();
   return (
     <Observer>
       {() => (
@@ -105,6 +119,8 @@ export function TypeExplorer() {
           defaultExpandIcon={<Folder />}
           defaultEndIcon={<span>-</span>}
           className={classes.root}
+          disableSelection={true}
+          classes={{ root: classes.treeviewRoot }}
         >
           {treeItemFromTreeNode(buildTreeNodeFromTypes(typeStore.typesActive))}
         </TreeView>

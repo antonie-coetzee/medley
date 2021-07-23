@@ -3,6 +3,7 @@ import path from "path";
 import { URL } from "url";
 import { Medley, MedleyOptions, ModuleType } from "../../src/index";
 import "systemjs";
+import winston from "winston";
 
 const rootPath = path.resolve(__dirname + "/..");
 
@@ -18,6 +19,12 @@ describe("Medley", function () {
       },
     };
     const medley = new Medley(options);
+    const logger = winston.createLogger({
+      transports: [
+        new winston.transports.Console(),
+      ]
+    });
+    medley.setLogger(logger);
     const baseUrl = new URL(`file:///${rootPath}/fixtures/compositions/`);
     const compositionJson = await fs.readFile(
       new URL("composition.json", baseUrl),
