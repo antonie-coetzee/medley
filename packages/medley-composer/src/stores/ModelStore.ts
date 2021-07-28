@@ -1,5 +1,6 @@
 import { Medley, TypedModel } from "medley"
 import { makeObservable, observable, runInAction } from "mobx";
+import {debounce} from "@material-ui/core"
 
 export class ModelStore {
   typeModelMap:Map<string, TypedModel[]> = new Map();
@@ -33,6 +34,18 @@ export class ModelStore {
 
   public upsertModel(model: Partial<TypedModel>) {
     return this.medley.upsertTypedModel(model);
+  }
+
+  public deleteModels(modelIds:string[]) {
+    for (const id in modelIds) {
+      if(this.medley.getReferences(id)){
+        return false;
+      }    
+    }
+    modelIds.forEach(id=>{
+      this.medley.deleteModelById(id);
+    })
+    return true;
   }
 
   public copyModel(newName:string, model: TypedModel) {

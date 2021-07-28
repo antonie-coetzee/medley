@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { fade, styled } from '@material-ui/core/styles';
 import { useStores } from "../../stores/Stores";
-import { AddCircle, Category, CloudDownload, Search } from "@material-ui/icons";
+import { AddCircle, Category, CloudDownload, Save, Search } from "@material-ui/icons";
 import SearchIcon from '@material-ui/icons/Search';
 import { CloudUpload } from "@material-ui/icons";
 import {
@@ -22,6 +22,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import {Menu} from "@material-ui/icons";
+import { useSnackbar } from "notistack";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -90,11 +91,12 @@ const useStyles = makeStyles((theme: Theme) =>
 type HeaderProps = {};
 
 export const HeaderComponent: React.FC<HeaderProps> = () => {
+  const { enqueueSnackbar } = useSnackbar();
   const { compositionStore } = useStores();
   const classes = useStyles();
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
-  const loadConfig = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const importComposition = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e == null || e.target.files == null || e.target.files[0] == null)
       return;
     e.preventDefault();
@@ -105,10 +107,33 @@ export const HeaderComponent: React.FC<HeaderProps> = () => {
       const text = e?.target?.result as string;
       if (text == null) return;
       await compositionStore.import(JSON.parse(text));
+      enqueueSnackbar("Composition imported", { variant: "success" });
     };
 
     reader.readAsText(e.target.files[0]);
   };
+
+  const saveActiveComposition = ()=>{
+    compositionStore.saveActiveComposition();
+    enqueueSnackbar("Composition saved", { variant: "success" });
+    setDrawerOpen(false);
+    toggleDrawer(false);
+  }
+
+  const exportActiveComposition = ()=>{
+    try{
+      const composition = compositionStore.getComposition();
+      const blob = new Blob([JSON.stringify(composition, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = "composition.json";
+      a.click();
+      a.remove();
+    }finally{
+      toggleDrawer(false);
+    }
+  }
 
   const toggleDrawer = (open: boolean) => (
     event: React.KeyboardEvent | React.MouseEvent,
@@ -129,18 +154,21 @@ export const HeaderComponent: React.FC<HeaderProps> = () => {
       <List>
         <ListItem button onClick={toggleDrawer(false)} >
           <ListItemIcon><AddCircle /></ListItemIcon>
-          <ListItemText primary={"New"} />
-          
-        </ListItem>
-        <ListItem button onClick={toggleDrawer(false)}>
-          <ListItemIcon><CloudDownload /></ListItemIcon>
-          <ListItemText primary={"Download"} />
+          <ListItemText primary={"New"} />        
         </ListItem>
         <ListItem button component="label" >
           <ListItemIcon><CloudUpload /></ListItemIcon>
-          <ListItemText primary={"Upload"} />
-          <input accept="*.json" hidden type="file" onChange={loadConfig} />
-        </ListItem>                   
+          <ListItemText primary={"Import"} />
+          <input accept="*.json" hidden type="file" onChange={importComposition} />
+        </ListItem>
+        <ListItem button onClick={exportActiveComposition}>
+          <ListItemIcon><CloudDownload /></ListItemIcon>
+          <ListItemText primary={"Export"} />
+        </ListItem>
+        <ListItem button onClick={saveActiveComposition}>
+          <ListItemIcon><Save /></ListItemIcon>
+          <ListItemText primary={"Save"} />
+        </ListItem>                           
       </List>
       <Divider />
       <List>

@@ -9,7 +9,7 @@ import {
 } from "@material-ui/icons";
 import { useStores } from "../../../stores/Stores";
 import { Type } from "medley";
-import { Observer } from "mobx-react";
+import { observer, Observer } from "mobx-react";
 import { LayoutStore } from "../../../stores/LayoutStore";
 
 type TreeNode = {
@@ -29,7 +29,7 @@ const useStyles = makeStyles({
   },
 });
 
-export function TypeExplorer() {
+export const TypeExplorerComponent = observer(() => {
   const { typeStore, layoutStore } = useStores();
   const classes = useStyles();
 
@@ -112,19 +112,19 @@ export function TypeExplorer() {
   };
 
   return (
-    <Observer>
-      {() => (
-        <TreeView
-          defaultCollapseIcon={<FolderOpen />}
-          defaultExpandIcon={<Folder />}
-          defaultEndIcon={<span>-</span>}
-          className={classes.root}
-          disableSelection={true}
-          classes={{ root: classes.treeviewRoot }}
-        >
-          {treeItemFromTreeNode(buildTreeNodeFromTypes(typeStore.typesActive))}
-        </TreeView>
-      )}
-    </Observer>
+    <TreeView
+      defaultCollapseIcon={<FolderOpen />}
+      defaultExpandIcon={<Folder />}
+      defaultEndIcon={<span>-</span>}
+      className={classes.root}
+      disableSelection={true}
+      classes={{ root: classes.treeviewRoot }}
+    >
+      {treeItemFromTreeNode(buildTreeNodeFromTypes(typeStore.types))}
+    </TreeView>
   );
-}
+});
+
+export const TypeExplorer = () => {
+  return <TypeExplorerComponent />;
+};

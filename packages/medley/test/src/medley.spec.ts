@@ -24,7 +24,6 @@ describe("Medley", function () {
         new winston.transports.Console(),
       ]
     });
-    medley.setLogger(logger);
     const baseUrl = new URL(`file:///${rootPath}/fixtures/compositions/`);
     const compositionJson = await fs.readFile(
       new URL("composition.json", baseUrl),

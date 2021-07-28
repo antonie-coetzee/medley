@@ -10,28 +10,28 @@ export interface TypeName {
 
 export interface TypeVersion {
   version: string;
+  tag?: string;
   module: Module;
-  // undefined: (standard export name)
-  // string: (standard export name) -> (different export name)
-  // Module: (standard export name) -> (different module).(standard export name)
-  // { name: string } & Module: (standard export name) -> (different module).(different export name)
+  /*
+   ** string: (standard export name) -> (different export name)
+   ** Module: (standard export name) -> (different module).(standard export name)
+   ** { name: string } & Module: (standard export name) -> (different module).(different export name)
+   ** undefined: (standard export name)
+   */
   exportMap?: {
-    [name: string]:
-      | string
-      | Module
-      | { name: string } & Module
-      | undefined;
+    [name: string]: string | Module | ({ name: string } & Module) | undefined;
   };
   displayName?: string;
   category?: string[];
   icon?: URL;
-  helpUrl?:URL;
+  url?: URL;
 }
 
 export interface Type extends TypeName, TypeVersion {}
 
 export type TypeCollection = [
   TypeName & {
-    versions: URL | TypeVersion[];
+    current: TypeVersion;
+    history?: URL | TypeVersion[];
   }
 ];

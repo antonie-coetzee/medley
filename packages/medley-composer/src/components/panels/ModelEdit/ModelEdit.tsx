@@ -3,12 +3,8 @@ import { withTheme } from "@rjsf/core";
 import { Theme as MaterialUITheme } from "@rjsf/material-ui";
 import { JSONSchema7 } from "json-schema";
 import { TabNode } from "flexlayout-react";
-import { Observer } from "mobx-react";
-import React, {
-  useEffect,
-  useState,
-  useRef,
-} from "react";
+import { observer, Observer } from "mobx-react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSnackbar } from "notistack";
 import { useStores } from "../../../stores/Stores";
 import {
@@ -87,7 +83,7 @@ const EditPanel = styled("div")({
   overflowY: "auto",
 });
 
-function ModelEditComponent(props: { node: TabNode }) {
+const ModelEditComponent = observer((props: { node: TabNode }) => {
   const [schemas, setSchemas] = useState<{
     valueSchema: string | null;
     uiSchema: string | null;
@@ -118,66 +114,60 @@ function ModelEditComponent(props: { node: TabNode }) {
     }
   };
 
+  const doCopy = () => {
+    dialogStore.openStringDialog({
+      title: `Copy ${model.name}`,
+      inputLabel: "New name",
+      successMessage: `Copy successful`,
+      onOk: (name) => {
+        modelStore.copyModel(name, model);
+      },
+    });
+  };
+
   if (schemas.valueSchema) {
     const schema = JSON.parse(schemas.valueSchema) as JSONSchema7;
     const ui = JSON.parse(schemas.uiSchema || "{}");
     return (
-      <Observer>
-        {() => {
-          const model = modelStore.getModelById(modelId);
-          const doCopy = () => {
-            dialogStore.openStringDialog({
-              title: `Copy ${model.name}`,
-              inputLabel: "New name",
-              successMessage: `Copy successful`,
-              onOk: (name) => {
-                modelStore.copyModel(name, model);
-              },
-            });
-          };
-          return (
-            <EditContainer>
-              <ToolBar doSave={doSave} doCopy={doCopy} />
-              <EditPanel>
-                <Form
-                  className={classes.rsfContainer}
-                  uiSchema={ui}
-                  schema={schema}
-                  formData={model.value}
-                  onSubmit={(e, nativeEvent) => {
-                    nativeEvent.preventDefault();
-                    modelStore.upsertModel({
-                      id: model.id,
-                      typeName: model.typeName,
-                      value: e.formData,
-                    });
-                    enqueueSnackbar("Save successful",  { variant: "success" });
-                  }}
-                >
-                  <button
-                    type={"submit"}
-                    style={{ display: "none" }}
-                    ref={submitRef}
-                  />
-                </Form>
-                );
-              </EditPanel>
-            </EditContainer>
+      <EditContainer>
+        <ToolBar doSave={doSave} doCopy={doCopy} />
+        <EditPanel>
+          <Form
+            className={classes.rsfContainer}
+            uiSchema={ui}
+            schema={schema}
+            formData={model.value}
+            onSubmit={(e, nativeEvent) => {
+              nativeEvent.preventDefault();
+              modelStore.upsertModel({
+                id: model.id,
+                typeName: model.typeName,
+                value: e.formData,
+              });
+              enqueueSnackbar("Save successful", { variant: "success" });
+            }}
+          >
+            <button
+              type={"submit"}
+              style={{ display: "none" }}
+              ref={submitRef}
+            />
+          </Form>
           );
-        }}
-      </Observer>
+        </EditPanel>
+      </EditContainer>
     );
   } else if (EditComponent)
     return (
       <React.Fragment>
-        <ToolBar />
+        <ToolBar doSave={doSave} doCopy={doCopy} />
         <div className={classes.editComponentContainer}>{EditComponent}</div>
       </React.Fragment>
     );
   {
     return null;
   }
-}
+});
 
 const ModelEditMemo = React.memo(ModelEditComponent, (props, nextProps) => {
   if (props.node.getConfig()?.modelId === nextProps.node.getConfig()?.modelId) {

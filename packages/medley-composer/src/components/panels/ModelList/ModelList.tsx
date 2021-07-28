@@ -1,38 +1,45 @@
-import React, { Fragment } from "react";
-import { IconButton, makeStyles } from "@material-ui/core";
-import { TypedModel } from "medley";
-import { Table } from "@material-ui/core";
-import { TableBody } from "@material-ui/core";
-import { TableCell } from "@material-ui/core";
-import { TableContainer } from "@material-ui/core";
-import { TableHead } from "@material-ui/core";
-import { TableRow } from "@material-ui/core";
-import Paper from "@material-ui/core/Paper";
+import React, { Fragment, useState } from "react";
+
+import {
+  DataGrid,
+  GridColDef,
+} from "@material-ui/data-grid";
 import { TabNode } from "flexlayout-react";
 import { useStores } from "../../../stores/Stores";
-import { AppBar, Button, Toolbar } from "@material-ui/core";
-import { AddCircleOutline, Business } from "@material-ui/icons";
-import { NewModelDialog } from "./NewModelDialog";
-import { Observer } from "mobx-react";
-import { computed } from "mobx";
-
-const borderStyle = makeStyles({
-  table: {
-    minWidth: 650,
-  },
-});
+import { observer } from "mobx-react";
+import {
+  createGenerateClassName,
+  IconButton,
+  makeStyles,
+} from "@material-ui/core";
+import { WithToolBar } from "../../util/Toolbar";
+import { AddBox, Delete } from "@material-ui/icons";
 
 const useStyles = makeStyles({
   table: {
-    minWidth: 650,
+    border: 0,
+  },
+  tableContainer: {
+    height: "100%",
+    width: "100%",
   },
 });
 
-export function ModelListComponent(props:{node:TabNode}) {
-  const { layoutStore, modelStore } = useStores();
+const columns: GridColDef[] = [
+  {
+    field: "name",
+    headerName: "Name",
+    flex: 1,
+    editable: false,
+  },
+  { field: "id", headerName: "ID", width: 200 },
+];
 
+const ModelListComponent = observer((props: { node: TabNode }) => {
   const classes = useStyles();
-  const borderClasses = borderStyle();
+  const [selected, setSelected] = useState<string[]>([]);
+  const { layoutStore, modelStore, dialogStore } = useStores();
+
   const typeName = props.node.getConfig()?.typeName as string;
   const modelMap = modelStore.typeModelMap;
 
@@ -42,51 +49,89 @@ export function ModelListComponent(props:{node:TabNode}) {
     }
   };
 
-  return (
-    <Observer>
-      {() => (
-        <TableContainer className={borderClasses.table}>
-          <Table stickyHeader className={classes.table} size="small" >
-            <TableHead>
-              <TableRow>
-                <TableCell>
-                  <span>Name</span>
-                  {NewModelDialog((name) => createModel(name))}
-                </TableCell>
-                <TableCell>Id</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {(modelMap.get(typeName) || []).map((row) => (
-                <TableRow
-                  key={row.id}
-                  onDoubleClick={(e) => {
-                    e.preventDefault();
-                    layoutStore.addModelEdit(row);
-                  }}
-                >
-                  <TableCell component="th" scope="row">
-                    {row.name}
-                  </TableCell>
-                  <TableCell>{row.id}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
-    </Observer>
-  );
-}
+  const deleteModels = (modelIds: string[]) => {
+    if (modelIds) {
+      dialogStore.openConfirmDialog({
+        okButton: "Delete",
+        title: "Confirm delete",
+        content: "Sure you want to delete the selected models?",
+        onOk: () => {
+          const res = modelStore.deleteModels(modelIds);
+          if (res) {
+          } else {
+          }
+        },
+      });
+    }
+  };
 
-const ModelListMemo =  React.memo(ModelListComponent, (props, nextProps)=>{
-  if(props.node.getConfig()?.typeName === nextProps.node.getConfig()?.typeName){
+  return (
+    <WithToolBar
+      actions={[
+        <IconButton
+          key={"create"}
+          onClick={() => {
+            dialogStore.openStringDialog({
+              inputLabel: "Name",
+              title: "New Model",
+              okButton: "Create",
+              successMessage: "New model created successfully",
+              onOk: createModel,
+            });
+          }}
+        >
+          <AddBox />
+        </IconButton>,
+        <IconButton
+          key={"delete"}
+          disabled={!(selected && selected.length > 0)}
+          onClick={() => {
+            deleteModels(selected);
+          }}
+        >
+          <Delete />
+        </IconButton>,
+      ]}
+    >
+      <div className={classes.tableContainer}>
+        <DataGrid
+          rows={modelMap.get(typeName)?.map((row) => {
+            return {       
+              name: row.name,
+              id: row.id,
+              model: row,
+            };
+          }) || []}
+          columns={columns}
+          pageSize={5}
+          checkboxSelection
+          disableSelectionOnClick
+          className={classes.table}
+          onSelectionModelChange={(selection) => {
+            if (selection) {
+              setSelected(selection.map((el) => el.toString()));
+            }
+          }}
+          onRowDoubleClick={(row, e) => {
+            e.preventDefault();
+            layoutStore.addModelEdit(row.row["model"]);
+          }}
+        />
+      </div>
+    </WithToolBar>
+  );
+});
+
+const ModelListMemo = React.memo(ModelListComponent, (props, nextProps) => {
+  if (
+    props.node.getConfig()?.typeName === nextProps.node.getConfig()?.typeName
+  ) {
     return true;
-  }else{
+  } else {
     return false;
   }
-})
+});
 
 export const ModelList = (node: TabNode) => {
-  return <ModelListMemo node={node} />
-}
+  return <ModelListMemo node={node} />;
+};

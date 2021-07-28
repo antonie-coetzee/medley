@@ -1,10 +1,12 @@
-import { observer } from "mobx-react";
 import React from "react";
-import { useStores } from "../../stores/Stores"
+import { ConfirmDialog } from "./ConfirmDialog";
 import { StringInputDialog } from "./StringInputDialog";
 
 const DialogsComponent:React.FC = ()=>{
-  return (<StringInputDialog/>)
+  return (<React.Fragment>
+    <StringInputDialog/>
+    <ConfirmDialog/>
+  </React.Fragment>)
 }
 
 export const Dialogs = DialogsComponent;

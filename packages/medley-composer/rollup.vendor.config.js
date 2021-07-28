@@ -9,6 +9,11 @@ import url from "postcss-url";
 
 const vendors = [
   {
+    srcName: "material-ui-data-grid.ts",
+    dstName: "material-ui-data-grid.4.0.0-alpha.34.js",
+    name: "@material-ui/data-grid"
+  },  
+  {
     srcName: "react-is.ts",
     dstName: "react-is.17.0.2.js",
     name: "react-is"
@@ -90,6 +95,19 @@ function fixRjsfMaterialUiImports(){
   }
 }
 
+function fixDataGridMuiImports(){
+  return {
+    name: "replacor",
+    transform(code,id){
+      if(id.includes("@material-ui") && id.includes("data-grid")){
+        console.log(id);
+        return code
+          .replace(/import (\w*) from"@material-ui\/core\/(\w*)";/g, "import {$2 as $1} from '@material-ui/core';")
+      }
+    }
+  }
+}
+
 const configs = vendors.map((v) => {
   return {
     input: [`src/vendor/${v.srcName}`],
@@ -109,6 +127,7 @@ const configs = vendors.map((v) => {
           "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
         },
       }),
+      fixDataGridMuiImports(),
       fixRjsfMaterialUiImports(),
       typescript(),
       json(),

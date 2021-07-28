@@ -64,21 +64,6 @@ export class Medley {
     }
   };
 
-  public runMainViewFunction = async <T extends (...args: any) => any>(
-    context: {},
-    ...args: Parameters<T>
-  ): Promise<ReturnedPromiseType<T>> => {
-    this.checkComposition();
-    const mainModel = this.modelRepository.getMainModel();
-    if (mainModel == null) {
-      throw new Error("main model not found");
-    }
-    return this.viewEngine.runViewFunction(
-      { modelId: mainModel.id, context },
-      ...args
-    );
-  };
-
   public getViewFunction = async <T extends Function>(
     modelId: string,
     context?: {}
@@ -106,15 +91,12 @@ export class Medley {
     }
   }
 
-  public getMainModel = () => {
-    this.checkComposition();
-    return this.modelRepository.getMainModel();
-  };
-
-  public setMainModel = (modelId:string) => {
-    this.checkComposition();
-    this.modelRepository.setMainModel(modelId);
-  };
+  public getReferences = (modelId:string) =>{
+    const references = this.modelRepository.getReferences(modelId);
+    if(references){
+      return references.map(ref=>this.modelRepository.getModel(ref));
+    }
+  }
 
   public getTypedModel = (modelId: string) => {
     this.checkComposition();
@@ -163,10 +145,20 @@ export class Medley {
   public deleteModelById = (modelId: string) => {
     this.checkComposition();
     const typeName = this.modelRepository.getTypeNameFromModelId(modelId);
-    this.modelRepository.deleteModel(modelId);
-    // delete type if not referenced
-    if (typeName) {
+    if(typeName == null){
+      throw new Error(`type name for model with id: '${modelId}', not found`);
+    }
+    const type = this.typeRepository.getType(typeName);
+    const deleted = this.modelRepository.deleteModel(modelId);
+    
+    if(deleted){
+      this.options?.eventHooks?.modelsOfTypeUpdate?.call(
+        null,
+        type,
+        this.modelRepository.getModelsByType(type.name)
+      );
       const models = this.modelRepository.getModelsByType(typeName);
+      // delete type if not referenced
       if (models?.length == null || models?.length === 0) {
         this.typeRepository.deleteType(typeName);
         this.options?.eventHooks?.typesUpdate?.call(

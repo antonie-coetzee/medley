@@ -27,7 +27,8 @@ const external = [
 "@material-ui/icons",
 "@material-ui/lab",
 "@rjsf/material-ui",
-"@rjsf/core"];
+"@rjsf/core",
+"@material-ui/data-grid"];
 
 export default [
   {
@@ -99,7 +100,8 @@ export default [
                   "@material-ui/icons": "/vendor/material-ui-icons.4.11.4.js",
                   "@material-ui/lab": "/vendor/material-ui-lab.4.0.0-alpha.57.js",
                   "@rjsf/material-ui": "/vendor/rjsf-material-ui.3.0.0.js",
-                  "@rjsf/core": "/vendor/rjsf-core.3.0.0.js"
+                  "@rjsf/core": "/vendor/rjsf-core.3.0.0.js",
+                  "@material-ui/data-grid": "/vendor/material-ui-data-grid.4.0.0-alpha.34.js"
                  }          
               }
             </script>

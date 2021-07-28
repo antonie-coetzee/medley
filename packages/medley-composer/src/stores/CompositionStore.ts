@@ -4,16 +4,38 @@ import {
 import { makeAutoObservable, runInAction } from "mobx";
 import { LayoutStore } from "./LayoutStore";
 
-export class CompositionStore {
+const compositionNameSpace = "composition";
+const activeCompositionKey = `${compositionNameSpace}-active`;
 
-  constructor(private medley:Medley, private layoutStore:LayoutStore) {}
+export class CompositionStore { 
 
-  public async import(composition: Composition) {
+  constructor(private medley:Medley, private layoutStore:LayoutStore) {
+    this.loadActiveComposition();
+  }
+
+  public async import(composition: Composition, persist?:boolean) {
+    if(persist){
+      this.saveActiveComposition(composition);
+    }
     this.medley.import(composition, new URL(window.location.toString() + "assets/Compositions/"));
     this.layoutStore.newLayout();
   }
 
   public getComposition(): Composition | undefined {
-    return this.medley.getComposition();
+    return this.medley.export();
+  }
+
+  public loadActiveComposition(): void {
+    const prevActiveComposition = localStorage.getItem(activeCompositionKey);
+    if(prevActiveComposition){
+      this.import(JSON.parse(prevActiveComposition), false);
+    }
+  }
+
+  public saveActiveComposition(composition?: Composition): void {
+    const activeComposition = composition ?? this.getComposition();
+    if(activeComposition){
+      localStorage.setItem(activeCompositionKey, JSON.stringify(activeComposition));
+    }
   }
 }
