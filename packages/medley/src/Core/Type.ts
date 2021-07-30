@@ -1,4 +1,5 @@
 import { Module } from "./Module";
+import { Port } from "./Port";
 
 export interface Typed {
   typeName: string;
@@ -12,6 +13,7 @@ export interface TypeVersion {
   version: string;
   tag?: string;
   module: Module;
+  ports?: Port[];
   /*
    ** string: (standard export name) -> (different export name)
    ** Module: (standard export name) -> (different module).(standard export name)

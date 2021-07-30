@@ -1,10 +1,11 @@
-import {Model, Type} from ".";
+import { Node, Type, Link } from ".";
 
 export interface Composition {
+  links: Link[];
   parts: Part[];
 }
 
-export interface Part{
+export interface Part {
   type: Type;
-  models: Model[];
+  nodes: Node[];
 }

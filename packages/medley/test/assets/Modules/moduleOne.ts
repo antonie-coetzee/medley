@@ -13,6 +13,8 @@ type config = {
   childModelThreeId: string;
 };
 
+export default function something(){};
+
 export async function viewFunction(this: Context) {
   const config = this.medley.getModelValue<config>();
   if (config == null) {

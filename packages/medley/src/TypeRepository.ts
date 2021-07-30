@@ -1,5 +1,4 @@
 import { Type, Loader, Part, isModule } from "./core";
-import { VIEW_FUNCTION } from "./core/Constants";
 
 export class TypeRepository {
   private typeIndex: Map<string, Type> = new Map();
@@ -19,11 +18,11 @@ export class TypeRepository {
     }
   }
 
-  public getViewFunction = async (typeName: string): Promise<Function> => {
-    return this.getExportFunction(typeName, VIEW_FUNCTION);
+  public getNodeFunction = async (typeName: string): Promise<Function> => {
+    return this.getExportFunction(typeName);
   };
 
-  public async getExportFunction(typeName: string, functionName: string) {
+  public async getExportFunction(typeName: string, functionName?: string) {
     const moduleFunction = await this.getExport(typeName, functionName);
     if (typeof moduleFunction !== "function") {
       throw new Error(`export for ${typeName}.${functionName} not a function`);
@@ -31,7 +30,7 @@ export class TypeRepository {
     return moduleFunction as Function;
   }
 
-  public async getExport(typeName: string, name: string) {
+  public async getExport(typeName: string, name: string = "default") {
     const type = this.typeIndex.get(typeName);
     if (type == null) {
       throw new Error(`type with name: '${typeName}' not found`);
@@ -67,6 +66,14 @@ export class TypeRepository {
       throw new Error(`type with name: '${typeName}', not found`);
     }
     return type;
+  }
+
+  public getPortsFromType(typeName: string) {
+    const type = this.typeIndex.get(typeName);
+    if (type == null) {
+      throw new Error(`type with name: '${typeName}', not found`);
+    }
+    return type.ports;
   }
 
   public hasType(typeName: string): boolean {
