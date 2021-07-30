@@ -13,12 +13,12 @@ export type ReturnedPromiseTypeArray<T> = T extends (
   ? R[]
   : never;
 
-export type PortInputFunction = <T extends (...args: any) => any>(
+export type PortInput = <T extends (...args: any) => any>(
   portName: string,
   ...args: Parameters<T>
 ) => Promise<ReturnedPromiseType<T> | undefined>;
 
-export type PortInputMultipleFunction = <T extends (...args: any) => any>(
+export type PortInputMultiple = <T extends (...args: any) => any>(
   portName: string,
   ...args: Parameters<T>
 ) => Promise<ReturnedPromiseType<T>[] | undefined>;
@@ -27,7 +27,7 @@ export type Context = {
   medley: Medley & {
     logger: Logger;
     node: TypedNode;
-    portInput: PortInputFunction;
-    portInputMultiple: PortInputMultipleFunction;
+    portInput: PortInput;
+    portInputMultiple: PortInputMultiple;
   };
 };

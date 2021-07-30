@@ -2,8 +2,8 @@ import { Medley } from "./Medley";
 import { TypedNode } from "./core";
 import {
   Context,
-  PortInputFunction,
-  PortInputMultipleFunction,
+  PortInput,
+  PortInputMultiple,
   ReturnedPromiseType,
 } from "./Context";
 
@@ -33,11 +33,11 @@ export class FlowEngine {
     flowEngine: FlowEngine,
     nodeId: string
   ) {
-    const runNodeFunction = async function <P extends (...args: any) => any>(
+    const runNodeFunction = async function <T extends (...args: any) => any>(
       this: Context | undefined,
       nodeId: string,
-      ...args: Parameters<P>
-    ): Promise<ReturnedPromiseType<P>> {
+      ...args: Parameters<T>
+    ): Promise<ReturnedPromiseType<T>> {
       const nodeFuction = await FlowEngine.buildNodeFunction(
         this,
         flowEngine,
@@ -52,6 +52,7 @@ export class FlowEngine {
       node,
       runNodeFunction
     );
+
     const portInputMultiple = flowEngine.buildPortInputMultipleFunction(
       flowEngine.medley,
       node,
@@ -75,8 +76,8 @@ export class FlowEngine {
     parentContext: Context | void,
     medley: Medley,
     node: TypedNode,
-    portInput: PortInputFunction,
-    portInputMultiple: PortInputMultipleFunction
+    portInput: PortInput,
+    portInputMultiple: PortInputMultiple
   ): Context {
     const logger = medley.getLogger().child({
       typeName: node.typeName,
