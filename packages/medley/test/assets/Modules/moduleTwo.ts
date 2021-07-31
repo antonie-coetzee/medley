@@ -1,28 +1,30 @@
 import { Context } from "medley";
 
-type extendedContext = Context & {
-  customContextProp:string;
+const typeTwoPortOne: { name: string; shape?: () => Promise<string> } = {
+  name: "typeTwoPortOne",
+};
+
+const typeFivePortOne: {
+  name: string;
+  shape?: (arg01: String) => Promise<string>;
+} = {
+  name: "typeFivePortOne",
+};
+
+export async function typeTwoNodeFunction(
+  this: Context & { customContextProp: string }
+) {
+  this.medley.logger.info("log from ModuleTwo.typeTwo");
+  this.customContextProp = "type two context value";
+  const portOneValue = await this.medley.portInput(typeTwoPortOne);
+  return `<moduleTwo-typeTwo>${portOneValue}</moduleTwo-typeTwo>`;
 }
 
-export default async function nodeFunctionTypeTwo(this:extendedContext){
-  // this.medley.logger.info("log from ModuleTwo.nodeFunctionTypeTwo");
-  // const config = this.medley.getModelValue<config>();
-  // if(config){
-  //   const res = await this.medley.runViewFunction<()=>Promise<string>>(config.childModelId);
-  //   return `<moduleTwo-viewFunction childModelId="${config.childModelId}">
-  //   ${res}
-  // </moduleTwo-viewFunction>`
-  // }
-  return `  <moduleTwo-typeTwo>
-    ${this.customContextProp}
-  </moduleTwo-typeTwo>`  
+export async function typeFiveNodeFunction(this: Context) {
+  this.medley.logger.info("log from ModuleTwo.typeFive");
+  const portOneValue = await this.medley.portInput(
+    typeFivePortOne,
+    "arg from typeFive into port one"
+  );
+  return `<moduleTwo-typeFive>${portOneValue}</moduleTwo-typeFive>`;
 }
-
-// export async function nodeFunctionTypeFive(this:extendedContext){
-//   const config = this.medley.getModelValue<config>();
-//   if(config){
-//     return `<moduleTwo-otherViewFunction childModelId="${config.childModelId}" context="${this.customContextProp}">
-//       ${await this.medley.runViewFunction<(arg01:string)=>Promise<string>>(config.childModelId, "moduleFour argument")}
-//     </moduleTwo-otherViewFunction>`
-//   }
-// }

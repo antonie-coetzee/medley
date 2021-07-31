@@ -2,18 +2,23 @@
   "links": [
     {
       "portName": "typeOnePortOne",
-      "targetNodeId": "e0754165-d127-48be-92c5-85fc25dbca19",
-      "sourceNodeId": "6d49b510-e790-42cf-a16e-01e4c152229a"
+      "targetNodeId": "nodeOne",
+      "sourceNodeId": "nodeTwo"
     },
     {
       "portName": "typeOnePortTwo",
-      "targetNodeId": "e0754165-d127-48be-92c5-85fc25dbca19",
-      "sourceNodeId": "6d49b510-e790-42cf-a16e-01e4c152229b"
+      "targetNodeId": "nodeOne",
+      "sourceNodeId": "nodeThree"
     },
     {
       "portName": "typeTwoPortOne",
-      "targetNodeId": "6d49b510-e790-42cf-a16e-01e4c152229a",
-      "sourceNodeId": "6d49b510-e790-42cf-a16e-01e4c152229e"
+      "targetNodeId": "nodeTwo",
+      "sourceNodeId": "nodeFive"
+    },
+    {
+      "portName": "typeFivePortOne",
+      "targetNodeId": "nodeFive",
+      "sourceNodeId": "nodeFour"
     }
   ],
   "parts": [
@@ -33,7 +38,7 @@
       },
       "nodes": [
         {
-          "id": "e0754165-d127-48be-92c5-85fc25dbca19",
+          "id": "nodeOne",
           "name": "nodeOne",
           "value": {}
         }
@@ -48,19 +53,22 @@
           "system": "moduleTwo-system.js",
           "esm": "moduleTwo-esm.js"
         },
+        "exportMap": {
+          "default": "typeTwoNodeFunction"
+        },
         "ports": [{ "name": "typeTwoPortOne", "required": true, "arity": 1 }]
       },
       "nodes": [
         {
-          "id": "6d49b510-e790-42cf-a16e-01e4c152229a",
-          "name": "nodeTwoViewFunction",
+          "id": "nodeTwo",
+          "name": "nodeTwo",
           "value": {}
         }
       ]
     },
     {
       "type": {
-        "name": "typeTwoOther",
+        "name": "typeFive",
         "version": "1.0.0",
         "module": {
           "base": "../modules/moduleTwo/",
@@ -68,16 +76,15 @@
           "esm": "moduleTwo-esm.js"
         },
         "exportMap": {
-          "viewFunction": "otherViewFunction"
-        }
+          "default": "typeFiveNodeFunction"
+        },
+        "ports": [{ "name": "typeFivePortOne", "required": true, "arity": 1 }]
       },
       "nodes": [
         {
-          "id": "6d49b510-e790-42cf-a16e-01e4c152229e",
-          "name": "nodeTwoOtherViewFunction",
-          "value": {
-            "childNodeId": "6d49b510-f790-42cf-a16e-01e4c152229b"
-          }
+          "id": "nodeFive",
+          "name": "nodeFive",
+          "value": {}
         }
       ]
     },
@@ -93,8 +100,8 @@
       },
       "nodes": [
         {
-          "id": "6d49b510-e790-42cf-a16e-01e4c152229b",
-          "name": "nodeThreeViewFunction",
+          "id": "nodeThree",
+          "name": "nodeThree",
           "value": "nodeThree value"
         }
       ]
@@ -111,7 +118,7 @@
       },
       "nodes": [
         {
-          "id": "6d49b510-f790-42cf-a16e-01e4c152229b",
+          "id": "nodeFour",
           "name": "nodeFour",
           "value": "nodeFour value"
         }

@@ -2,6 +2,7 @@ import { Medley } from "./Medley";
 import { TypedNode } from "./core";
 import {
   Context,
+  PortDefinition,
   PortInput,
   PortInputMultiple,
   ReturnedPromiseType,
@@ -110,15 +111,15 @@ export class FlowEngine {
   ) {
     const portInputFunction = async function<T extends (...args: any) => any>(
       this: Context | undefined,
-      portName: string,
+      portDefinition: PortDefinition<T>,
       ...args: Parameters<T>
     ): Promise<ReturnedPromiseType<T> | undefined> {
-      const links = medley.getNodePortLinks(node.id, portName);
+      const links = medley.getNodePortLinks(node.id, portDefinition.name);
       if (links == null) {
         return;
       }
       if (links.length !== 1) {
-        throw new Error(`multiple links detected for port: '${portName}'`);
+        throw new Error(`multiple links detected for port: '${portDefinition.name}'`);
       }
       const link = links[0];
       return runNodeFunction.call(this, link.sourceNodeId, ...args) as Promise<ReturnedPromiseType<T>>;
@@ -138,10 +139,10 @@ export class FlowEngine {
       T extends (...args: any) => any
     >(
       this: Context | undefined,
-      portName: string,
+      portDefinition: PortDefinition<T>,
       ...args: Parameters<T>
     ): Promise<ReturnedPromiseType<T>[] | undefined>{
-      const links = medley.getNodePortLinks(node.id, portName);
+      const links = medley.getNodePortLinks(node.id, portDefinition.name);
       if (links == null || links.length === 0) {
         return;
       }
