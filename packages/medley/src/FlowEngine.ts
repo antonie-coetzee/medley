@@ -68,8 +68,7 @@ export class FlowEngine {
     const nodeFunction = await flowEngine.medley.getNodeFunctionFromType(
       node.typeName
     );
-    nodeFunction.bind(newContex);
-    return nodeFunction;
+    return nodeFunction.bind(newContex);
   }
 
   private createContext(
@@ -96,6 +95,8 @@ export class FlowEngine {
       medley: medleyContext,
     };
 
+    cntx.medley.portInput = cntx.medley.portInput.bind(cntx);
+    cntx.medley.portInputMultiple = cntx.medley.portInputMultiple.bind(cntx);
     return cntx;
   }
 
@@ -107,7 +108,8 @@ export class FlowEngine {
       ...args: Parameters<T>
     ) => Promise<ReturnedPromiseType<T>>
   ) {
-    const portInputFunction = async function <T extends (...args: any) => any>(
+    const portInputFunction = async function<T extends (...args: any) => any>(
+      this: Context | undefined,
       portName: string,
       ...args: Parameters<T>
     ): Promise<ReturnedPromiseType<T> | undefined> {
@@ -119,9 +121,8 @@ export class FlowEngine {
         throw new Error(`multiple links detected for port: '${portName}'`);
       }
       const link = links[0];
-      return runNodeFunction<T>(link.sourceNodeId, ...args);
+      return runNodeFunction.call(this, link.sourceNodeId, ...args) as Promise<ReturnedPromiseType<T>>;
     };
-
     return portInputFunction;
   }
 
@@ -133,22 +134,22 @@ export class FlowEngine {
       ...args: Parameters<T>
     ) => Promise<ReturnedPromiseType<T>>
   ) {
-    const portInputMultipleFunction = async function <
+    const portInputMultipleFunction = async function<
       T extends (...args: any) => any
     >(
+      this: Context | undefined,
       portName: string,
       ...args: Parameters<T>
-    ): Promise<ReturnedPromiseType<T>[] | undefined> {
+    ): Promise<ReturnedPromiseType<T>[] | undefined>{
       const links = medley.getNodePortLinks(node.id, portName);
       if (links == null || links.length === 0) {
         return;
       }
       const sourcePromises = links.map((l) =>
-        runNodeFunction<T>(l.sourceNodeId, ...args)
+        runNodeFunction.call(this, l.sourceNodeId, ...args) as Promise<ReturnedPromiseType<T>>
       );
       return Promise.all(sourcePromises);
     };
-
     return portInputMultipleFunction;
   }
 }
