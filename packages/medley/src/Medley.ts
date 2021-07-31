@@ -221,12 +221,16 @@ export class Medley {
     }
   };
 
-  public addLink(sourceNodeId: string, targetNodeId: string, portName: string){
-    this.linkRepository.addLink(sourceNodeId, targetNodeId, portName)
+  public addLink(source: string, target: string, port: string){
+    this.linkRepository.addLink(source, target, port)
   }
 
-  public getNodePortLinks(nodeId: string, portName: string){
-    return this.linkRepository.getNodePortLinks(nodeId, portName);
+  public getPortLinks(nodeId: string, portName: string){
+    return this.linkRepository.getPortLinks(nodeId, portName);
+  }
+
+  public getPortInstanceLinks(nodeId: string, portName: string){
+    return this.linkRepository.getPortInstanceLinks(nodeId, portName);
   }
 
   public getPortsFromType(typeName:string){

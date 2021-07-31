@@ -1,24 +1,24 @@
 {
   "links": [
     {
-      "portName": "typeOnePortOne",
-      "targetNodeId": "nodeOne",
-      "sourceNodeId": "nodeTwo"
+      "port": "typeOnePortOne",
+      "target": "nodeOne",
+      "source": "nodeTwo"
     },
     {
-      "portName": "typeOnePortTwo",
-      "targetNodeId": "nodeOne",
-      "sourceNodeId": "nodeThree"
+      "port": "typeOnePortTwo",
+      "target": "nodeOne",
+      "source": "nodeThree"
     },
     {
-      "portName": "typeTwoPortOne",
-      "targetNodeId": "nodeTwo",
-      "sourceNodeId": "nodeFive"
+      "port": "typeTwoPortOne",
+      "target": "nodeTwo",
+      "source": "nodeFive"
     },
     {
-      "portName": "typeFivePortOne",
-      "targetNodeId": "nodeFive",
-      "sourceNodeId": "nodeFour"
+      "port": "typeFivePortOne",
+      "target": "nodeFive",
+      "source": "nodeFour"
     }
   ],
   "parts": [
@@ -31,10 +31,7 @@
           "system": "moduleOne-system.js",
           "esm": "moduleOne-esm.js"
         },
-        "ports": [
-          { "name": "typeOnePortOne", "required": true, "arity": 1 },
-          { "name": "typeOnePortTwo", "required": true, "arity": 1 }
-        ]
+        "ports": [{ "name": "typeOnePortOne" }, { "name": "typeOnePortTwo" }]
       },
       "nodes": [
         {
@@ -56,7 +53,7 @@
         "exportMap": {
           "default": "typeTwoNodeFunction"
         },
-        "ports": [{ "name": "typeTwoPortOne", "required": true, "arity": 1 }]
+        "ports": [{ "name": "typeTwoPortOne" }]
       },
       "nodes": [
         {
@@ -78,7 +75,7 @@
         "exportMap": {
           "default": "typeFiveNodeFunction"
         },
-        "ports": [{ "name": "typeFivePortOne", "required": true, "arity": 1 }]
+        "ports": [{ "name": "typeFivePortOne" }]
       },
       "nodes": [
         {

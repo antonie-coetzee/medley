@@ -1,5 +1,6 @@
 export interface Link {
-  portName: string;
-  targetNodeId: string;
-  sourceNodeId: string;
+  port: string;
+  instance?: string;
+  target: string;
+  source: string;
 }

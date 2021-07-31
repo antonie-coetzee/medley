@@ -1,6 +1,7 @@
 import { Link } from "./core";
 
 export class LinkRepository {
+  private terminalIndex: Map<string, Link[]> = new Map();
   private sourceIndex: Map<string, Link[]> = new Map();
   private targetIndex: Map<string, Link[]> = new Map();
 
@@ -14,22 +15,27 @@ export class LinkRepository {
     }
   }
 
-  public getNodePortLinks(nodeId: string, portName: string) {
+  public getPortLinks(nodeId: string, portName: string) {
     const key = this.keyFromNodeIdPortName(nodeId, portName);
     return this.targetIndex.get(key);
+  }
+
+  public getPortInstanceLinks(nodeId: string, portName: string) {
+    const key = this.keyFromNodeIdPortName(nodeId, portName);
+    return this.targetIndex.get(key)?.filter(l=>l.instance);
   }
 
   public getBelongToLinks(nodeId: string) {
     return this.sourceIndex.get(nodeId);
   }
 
-  public addLink(sourceNodeId: string, targetNodeId: string, portName: string) {
-    const links = this.getNodePortLinks(targetNodeId, portName);
+  public addLink(source: string, target: string, port: string) {
+    const links = this.getPortLinks(target, port);
     const existingLink = links?.find((l) => {
       if (
-        l.targetNodeId === targetNodeId &&
-        l.sourceNodeId === sourceNodeId &&
-        l.portName === portName
+        l.target === target &&
+        l.source === source &&
+        l.port === port
       ) {
         return l;
       }
@@ -38,9 +44,9 @@ export class LinkRepository {
       return;
     }
     const link = {
-      portName,
-      targetNodeId,
-      sourceNodeId,
+      port,
+      target,
+      source,
     };
     this.addToTargetIndex(link);
     this.addToSourceIndex(link);
@@ -49,11 +55,11 @@ export class LinkRepository {
   public getLinks() {
     return Array.from(this.targetIndex.values())
       .flatMap((el) => el)
-      .sort((a, b) => a.targetNodeId.localeCompare(b.targetNodeId));
+      .sort((a, b) => a.target.localeCompare(b.target));
   }
 
   private addToTargetIndex(link: Link) {
-    const key = this.keyFromNodeIdPortName(link.targetNodeId, link.portName);
+    const key = this.keyFromNodeIdPortName(link.target, link.port);
     if (this.targetIndex.has(key)) {
       const nodePortLinks = this.targetIndex.get(key);
       nodePortLinks?.push(link);
@@ -63,7 +69,7 @@ export class LinkRepository {
   }
 
   private addToSourceIndex(link: Link) {
-    const key = link.sourceNodeId;
+    const key = link.source;
     if (this.sourceIndex.has(key)) {
       const belongTo = this.sourceIndex.get(key);
       belongTo?.push(link);

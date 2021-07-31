@@ -16,13 +16,13 @@ export async function typeTwoNodeFunction(
 ) {
   this.medley.logger.info("log from ModuleTwo.typeTwo");
   this.customContextProp = "type two context value";
-  const portOneValue = await this.medley.portInput(typeTwoPortOne);
+  const portOneValue = await this.medley.port.single(typeTwoPortOne);
   return `<moduleTwo-typeTwo>${portOneValue}</moduleTwo-typeTwo>`;
 }
 
 export async function typeFiveNodeFunction(this: Context) {
   this.medley.logger.info("log from ModuleTwo.typeFive");
-  const portOneValue = await this.medley.portInput(
+  const portOneValue = await this.medley.port.single(
     typeFivePortOne,
     "arg from typeFive into port one"
   );

@@ -10,23 +10,18 @@ const rootPath = path.resolve(__dirname + "/..");
 
 describe("Medley", function () {
   it("should load and run basic composition without error", async function () {
-    let alignColorsAndTime = winston.format.combine(
-      winston.format.colorize(),
-      winston.format.timestamp({
-        format: "YY-MM-DD HH:MM:SS",
-      }),
-      winston.format.printf((info) => {
-        const { timestamp, level, message, typeName, nodeId } = info;
-        return ` ${timestamp}  ${level} ${typeName} ${nodeId} : ${message}`;
-      })
-    );
-
     const logger = winston.createLogger({
       transports: [
         new winston.transports.Console({
           format: winston.format.combine(
             winston.format.colorize(),
-            alignColorsAndTime
+            winston.format.timestamp({
+              format: "YY-MM-DD HH:MM:SS",
+            }),
+            winston.format.printf((info) => {
+              const { timestamp, level, message, typeName, nodeId } = info;
+              return ` ${timestamp}  ${level} ${typeName} ${nodeId} : ${message}`;
+            })
           ),
         }),
       ],

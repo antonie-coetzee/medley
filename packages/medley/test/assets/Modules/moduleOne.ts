@@ -11,8 +11,8 @@ const portTwo: { name: string; shape?: (arg01: String) => Promise<string> } = {
 export default async function (this: Context & { customContextProp: string }) {
   this.medley.logger.info("log from ModuleOne.typeOne");
   this.customContextProp = "type one context value";
-  const portOneValue = await this.medley.portInput(portOne);
-  const portTwoValue = await this.medley.portInput(
+  const portOneValue = await this.medley.port.single(portOne);
+  const portTwoValue = await this.medley.port.single(
     portTwo,
     "arg from typeOne into port two"
   );

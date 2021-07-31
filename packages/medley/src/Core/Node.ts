@@ -1,4 +1,4 @@
-import { Type, Typed } from "./Type";
+import { Typed } from "./Type";
 
 export interface Node {
   id: string;
@@ -7,4 +7,3 @@ export interface Node {
 }
 
 export interface TypedNode extends Node, Typed {}
-

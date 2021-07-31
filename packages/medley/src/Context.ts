@@ -26,7 +26,10 @@ export type Context = {
   medley: Medley & {
     logger: Logger;
     node: TypedNode;
-    portInput: PortInput;
-    portInputMultiple: PortInputMultiple;
+    port: {
+      single: PortInput;
+      multiple: PortInputMultiple;
+      instances: {[portName: string]: string[] | undefined}
+    }
   };
 };

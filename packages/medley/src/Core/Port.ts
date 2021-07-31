@@ -1,5 +1,7 @@
 export interface Port {
   name: string;
-  required?:boolean;
-  arity: number;
+  description?: string;
+  required?: boolean;
+  arity?: number;
+  clonable?: boolean;
 }
