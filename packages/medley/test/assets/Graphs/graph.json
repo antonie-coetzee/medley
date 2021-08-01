@@ -1,0 +1,112 @@
+{
+  "types": [
+    {
+      "name": "typeOne",
+      "version": "1.0.0",
+      "module": {
+        "base": "../modules/moduleOne/",
+        "system": "moduleOne-system.js",
+        "esm": "moduleOne-esm.js"
+      },
+      "ports": [{ "name": "typeOnePortOne" }, { "name": "typeOnePortTwo" }]
+    },
+    {
+      "name": "typeTwo",
+      "version": "1.0.0",
+      "module": {
+        "base": "../modules/moduleTwo/",
+        "system": "moduleTwo-system.js",
+        "esm": "moduleTwo-esm.js"
+      },
+      "exportMap": {
+        "default": "typeTwoNodeFunction"
+      },
+      "ports": [{ "name": "typeTwoPortOne" }]
+    },
+    {
+      "name": "typeFive",
+      "version": "1.0.0",
+      "module": {
+        "base": "../modules/moduleTwo/",
+        "system": "moduleTwo-system.js",
+        "esm": "moduleTwo-esm.js"
+      },
+      "exportMap": {
+        "default": "typeFiveNodeFunction"
+      },
+      "ports": [{ "name": "typeFivePortOne" }]
+    },
+    {
+      "name": "typeThree",
+      "version": "1.0.0",
+      "module": {
+        "base": "../modules/moduleThree/",
+        "system": "moduleThree-system.js",
+        "esm": "moduleThree-esm.js"
+      }
+    },
+    {
+      "name": "typeFour",
+      "version": "1.0.0",
+      "module": {
+        "base": "../modules/moduleFour/",
+        "system": "moduleFour-system.js",
+        "esm": "moduleFour-esm.js"
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "type": "typeOne",
+      "id": "nodeOne",
+      "name": "nodeOne",
+      "value": {}
+    },
+    {
+      "type": "typeTwo",
+      "id": "nodeTwo",
+      "name": "nodeTwo",
+      "value": {}
+    },
+    {
+      "type": "typeFive",
+      "id": "nodeFive",
+      "name": "nodeFive",
+      "value": {}
+    },
+    {
+      "type": "typeThree",
+      "id": "nodeThree",
+      "name": "nodeThree",
+      "value": "nodeThree value"
+    },
+    {
+      "type": "typeFour",
+      "id": "nodeFour",
+      "name": "nodeFour",
+      "value": "nodeFour value"
+    }
+  ],
+  "links": [
+    {
+      "port": "typeOnePortOne",
+      "target": "nodeOne",
+      "source": "nodeTwo"
+    },
+    {
+      "port": "typeOnePortTwo",
+      "target": "nodeOne",
+      "source": "nodeThree"
+    },
+    {
+      "port": "typeTwoPortOne",
+      "target": "nodeTwo",
+      "source": "nodeFive"
+    },
+    {
+      "port": "typeFivePortOne",
+      "target": "nodeFive",
+      "source": "nodeFour"
+    }
+  ]
+}

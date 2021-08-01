@@ -1,20 +1,25 @@
-import { Type, Loader, Part, isModule } from "./core";
+import { Type, Loader, isModule, MapFactory, MapType } from "./core";
 
-export class TypeRepository {
-  private typeIndex: Map<string, Type> = new Map();
+export class TypeStore {
+  private typeMap: Map<string, Type>;
   private baseUrl?: URL;
 
-  constructor(private loader: Loader) {}
+  constructor(private loader: Loader, mapFactory?:MapFactory) {
+    if(mapFactory){
+      this.typeMap = mapFactory(MapType.Type);
+    }else{
+      this.typeMap = new Map();
+    }
+  }
 
-  public load(parts: Part[], baseUrl: URL) {
+  public load(types: Type[], baseUrl: URL) {
     this.baseUrl = baseUrl;
-    this.typeIndex = new Map();
-    const types = parts.map((part) => part.type);
+    this.typeMap.clear();
     for (const type of types) {
-      if (this.typeIndex.has(type.name)) {
-        throw new Error(`type with id: '${type.name}', already indexed`);
+      if (this.typeMap.has(type.name)) {
+        throw new Error(`type with name: '${type.name}', already mapped`);
       }
-      this.typeIndex.set(type.name, type);
+      this.typeMap.set(type.name, type);
     }
   }
 
@@ -25,13 +30,13 @@ export class TypeRepository {
   public async getExportFunction(typeName: string, functionName?: string) {
     const moduleFunction = await this.getExport(typeName, functionName);
     if (typeof moduleFunction !== "function") {
-      throw new Error(`export for ${typeName}.${functionName} not a function`);
+      throw new Error(`export ${typeName}[${functionName}] not a function`);
     }
     return moduleFunction as Function;
   }
 
   public async getExport(typeName: string, name: string = "default") {
-    const type = this.typeIndex.get(typeName);
+    const type = this.typeMap.get(typeName);
     if (type == null) {
       throw new Error(`type with name: '${typeName}' not found`);
     }
@@ -57,11 +62,11 @@ export class TypeRepository {
   }
 
   public getTypes(): Type[] {
-    return Array.from(this.typeIndex.values());
+    return Array.from(this.typeMap.values());
   }
 
   public getType(typeName: string): Type {
-    const type = this.typeIndex.get(typeName);
+    const type = this.typeMap.get(typeName);
     if (type == null) {
       throw new Error(`type with name: '${typeName}', not found`);
     }
@@ -69,7 +74,7 @@ export class TypeRepository {
   }
 
   public getPortsFromType(typeName: string) {
-    const type = this.typeIndex.get(typeName);
+    const type = this.typeMap.get(typeName);
     if (type == null) {
       throw new Error(`type with name: '${typeName}', not found`);
     }
@@ -77,7 +82,7 @@ export class TypeRepository {
   }
 
   public hasType(typeName: string): boolean {
-    const type = this.typeIndex.get(typeName);
+    const type = this.typeMap.get(typeName);
     if (type == null) {
       return false;
     } else {
@@ -86,13 +91,13 @@ export class TypeRepository {
   }
 
   public deleteType(typeName: string) {
-    return this.typeIndex.delete(typeName);
+    return this.typeMap.delete(typeName);
   }
 
   public addType(type: Type) {
-    if (this.typeIndex.has(type.name)) {
+    if (this.typeMap.has(type.name)) {
       throw new Error(`type with name: '${type.name}' exists`);
     }
-    this.typeIndex.set(type.name, type);
+    this.typeMap.set(type.name, type);
   }
 }

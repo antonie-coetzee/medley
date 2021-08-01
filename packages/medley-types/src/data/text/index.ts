@@ -1,4 +1,4 @@
-export { EditComponent } from "./EditComponent"
+//export { EditComponent } from "./EditComponent"
 export { valueSchema } from "./valueSchema"
-export { viewFunction } from "./viewFunction"
 export { uiSchema } from "./uiSchema"
+export * as default from "./viewFunction"

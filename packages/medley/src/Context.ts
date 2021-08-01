@@ -1,4 +1,4 @@
-import { Logger, TypedNode } from "./core";
+import { Logger, Node } from "./core";
 import { Medley } from "./Medley";
 
 export type ReturnedPromiseType<T> = T extends (
@@ -9,6 +9,7 @@ export type ReturnedPromiseType<T> = T extends (
 
 export type PortDefinition<T extends (...args: any) => any> = {
   name: string;
+  instance?: string;
   shape?: T;
 };
 
@@ -25,11 +26,11 @@ export type PortInputMultiple = <T extends (...args: any) => any>(
 export type Context = {
   medley: Medley & {
     logger: Logger;
-    node: TypedNode;
+    node: Node;
     port: {
       single: PortInput;
       multiple: PortInputMultiple;
-      instances: {[portName: string]: string[] | undefined}
-    }
+      instances: { [portName: string]: string[] | undefined };
+    };
   };
 };

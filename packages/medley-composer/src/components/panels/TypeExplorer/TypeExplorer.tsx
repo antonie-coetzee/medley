@@ -84,7 +84,7 @@ export const TypeExplorerComponent = observer(() => {
                 }}
                 onDoubleClick={(e) => {
                   e.preventDefault();
-                  layoutStore.addModelList(type);
+                  layoutStore.addNodeList(type);
                 }}
               ></TreeItem>
             );

@@ -2,7 +2,7 @@ import { Module } from "./Module";
 import { Port } from "./Port";
 
 export interface Typed {
-  typeName: string;
+  type: string;
 }
 
 export interface TypeName {

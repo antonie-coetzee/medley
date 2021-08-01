@@ -100,7 +100,6 @@ function fixDataGridMuiImports(){
     name: "replacor",
     transform(code,id){
       if(id.includes("@material-ui") && id.includes("data-grid")){
-        console.log(id);
         return code
           .replace(/import (\w*) from"@material-ui\/core\/(\w*)";/g, "import {$2 as $1} from '@material-ui/core';")
       }
@@ -129,7 +128,9 @@ const configs = vendors.map((v) => {
       }),
       fixDataGridMuiImports(),
       fixRjsfMaterialUiImports(),
-      typescript(),
+      typescript({
+        "include": ["./src/vendor/**/*.ts"]
+      }),
       json(),
       nodeResolve({
         browser: true

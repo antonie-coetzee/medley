@@ -90,18 +90,18 @@ const ModelEditComponent = observer((props: { node: TabNode }) => {
   }>({ valueSchema: null, uiSchema: null });
   const { enqueueSnackbar } = useSnackbar();
   const [EditComponent, setEditComponent] = useState<React.FC>();
-  const { modelStore, typeStore, dialogStore } = useStores();
+  const { modelStore: nodeStore, typeStore, dialogStore } = useStores();
   const classes = useStyles();
-  const modelId = props.node.getConfig()?.modelId as string;
-  const model = modelStore.getModelById(modelId);
+  const nodeId = props.node.getConfig()?.modelId as string;
+  const model = nodeStore.getNodeById(nodeId);
   const submitRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     (async () => {
-      const EditComponent = await typeStore.getEditComponent(model.typeName);
+      const EditComponent = await typeStore.getEditComponent(model.type);
       if (EditComponent == null) {
-        const valueSchema = await typeStore.getValueSchema(model.typeName);
-        const uiSchema = await typeStore.getUiSchema(model.typeName);
+        const valueSchema = await typeStore.getValueSchema(model.type);
+        const uiSchema = await typeStore.getUiSchema(model.type);
         setSchemas({ valueSchema, uiSchema });
       } else {
         setEditComponent(EditComponent);
@@ -120,7 +120,7 @@ const ModelEditComponent = observer((props: { node: TabNode }) => {
       inputLabel: "New name",
       successMessage: `Copy successful`,
       onOk: (name) => {
-        modelStore.copyModel(name, model);
+        nodeStore.copyNode(name, model);
       },
     });
   };
@@ -139,9 +139,9 @@ const ModelEditComponent = observer((props: { node: TabNode }) => {
             formData={model.value}
             onSubmit={(e, nativeEvent) => {
               nativeEvent.preventDefault();
-              modelStore.upsertModel({
+              nodeStore.upsertNode({
                 id: model.id,
-                typeName: model.typeName,
+                type: model.type,
                 value: e.formData,
               });
               enqueueSnackbar("Save successful", { variant: "success" });

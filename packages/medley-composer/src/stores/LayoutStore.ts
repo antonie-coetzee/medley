@@ -1,4 +1,4 @@
-import { Type, TypedModel } from "medley";
+import { Type, Node } from "medley";
 import { Layout } from "flexlayout-react";
 import { TypeStore } from "./TypeStore";
 import { action, makeObservable, observable } from "mobx";
@@ -53,7 +53,7 @@ export class LayoutStore {
     this.config = newConfig;
   }
 
-	public addModelList(type: Type){
+	public addNodeList(type: Type){
 		if(this.layout == null) return;
 		this.layout.addTabToActiveTabSet({
 			component: MODEL_LIST,
@@ -62,7 +62,7 @@ export class LayoutStore {
 		})
 	}
 
-  public addModelEdit(model: TypedModel){
+  public addNodeEdit(model: Node){
 		if(this.layout == null) return;
 		this.layout.addTabToActiveTabSet({
 			component: MODEL_EDIT,

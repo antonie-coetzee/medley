@@ -1,6 +1,7 @@
 import typescript from "@rollup/plugin-typescript";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
+import { terser } from "rollup-plugin-terser";
 import dts from "rollup-plugin-dts";
 import del from "rollup-plugin-delete";
 
@@ -9,20 +10,38 @@ export default [
     input: "src/index.ts",
     output: [
       {
-        file: "dist/medley-esm.js",
+        file: "dist/medley.esm.js",
         format: "es",
         sourcemap: true,
       },
       {
-        file: "dist/medley-cjs.js",
+        file: "dist/medley.esm.min.js",
+        format: "es",
+        sourcemap: true,
+        plugins: [terser()]
+      },      
+      {
+        file: "dist/medley.cjs.js",
         format: "cjs",
         sourcemap: true,
       },
       {
-        file: "dist/medley-sjs.js",
+        file: "dist/medley.cjs.min.js",
+        format: "cjs",
+        sourcemap: true,
+        plugins: [terser()]
+      },      
+      {
+        file: "dist/medley.sjs.js",
         format: "system",
         sourcemap: true,
-      }      
+      },
+      {
+        file: "dist/medley.sjs.min.js",
+        format: "system",
+        sourcemap: true,
+        plugins: [terser()]
+      }           
     ],
     plugins: [nodeResolve(), commonjs(), typescript()],
   },

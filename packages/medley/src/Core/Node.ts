@@ -1,9 +1,7 @@
 import { Typed } from "./Type";
 
-export interface Node {
+export interface Node extends Typed {
   id: string;
   name?: string;
   value?: any;
 }
-
-export interface TypedNode extends Node, Typed {}

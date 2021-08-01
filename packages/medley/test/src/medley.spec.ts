@@ -38,13 +38,13 @@ describe("Medley", function () {
     };
     const medley = new Medley(options);
 
-    const baseUrl = new URL(`file:///${rootPath}/fixtures/compositions/`);
-    const compositionJson = await fs.readFile(
-      new URL("composition.json", baseUrl),
+    const baseUrl = new URL(`file:///${rootPath}/fixtures/graphs/`);
+    const graphJson = await fs.readFile(
+      new URL("graph.json", baseUrl),
       { encoding: "utf-8" }
     );
-    const composition = JSON.parse(compositionJson);
-    await medley.import(composition, baseUrl);
+    const graph = JSON.parse(graphJson);
+    await medley.import(graph, baseUrl);
     const res = await medley.runNodeFunction<() => Promise<string>>("nodeOne");
     const formattedRes = xml(res, { indentation: "  " });
     expect(formattedRes).toEqual(
@@ -63,12 +63,12 @@ describe("Medley", function () {
     };
     const medley = new Medley(options);
 
-    const baseUrl = new URL(`file:///${rootPath}/fixtures/compositions/`);
-    const compositionJson = await fs.readFile(
-      new URL("composition.json", baseUrl),
+    const baseUrl = new URL(`file:///${rootPath}/fixtures/graphs/`);
+    const graphJson = await fs.readFile(
+      new URL("graph.json", baseUrl),
       { encoding: "utf-8" }
     );
-    const composition = JSON.parse(compositionJson);
-    await medley.import(composition, baseUrl);
+    const graph = JSON.parse(graphJson);
+    await medley.import(graph, baseUrl);
   });
 });

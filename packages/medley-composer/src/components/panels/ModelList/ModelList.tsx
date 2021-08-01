@@ -41,11 +41,11 @@ const ModelListComponent = observer((props: { node: TabNode }) => {
   const { layoutStore, modelStore, dialogStore } = useStores();
 
   const typeName = props.node.getConfig()?.typeName as string;
-  const modelMap = modelStore.typeModelMap;
+  const modelMap = modelStore.nodeMap;
 
   const createModel = (name: string) => {
     if (name) {
-      modelStore.upsertModel({ name: name, typeName: typeName });
+      modelStore.upsertNode({ name: name, type: typeName });
     }
   };
 
@@ -56,10 +56,10 @@ const ModelListComponent = observer((props: { node: TabNode }) => {
         title: "Confirm delete",
         content: "Sure you want to delete the selected models?",
         onOk: () => {
-          const res = modelStore.deleteModels(modelIds);
-          if (res) {
-          } else {
-          }
+          const res = modelStore.deleteNodes(modelIds);
+          // if (res) {
+          // } else {
+          // }
         },
       });
     }
@@ -95,7 +95,7 @@ const ModelListComponent = observer((props: { node: TabNode }) => {
     >
       <div className={classes.tableContainer}>
         <DataGrid
-          rows={modelMap.get(typeName)?.map((row) => {
+          rows={Array.from(modelStore.nodeMap.values()).filter(n=>n.type === typeName)?.map((row) => {
             return {       
               name: row.name,
               id: row.id,
@@ -114,7 +114,7 @@ const ModelListComponent = observer((props: { node: TabNode }) => {
           }}
           onRowDoubleClick={(row, e) => {
             e.preventDefault();
-            layoutStore.addModelEdit(row.row["model"]);
+            layoutStore.addNodeEdit(row.row["model"]);
           }}
         />
       </div>

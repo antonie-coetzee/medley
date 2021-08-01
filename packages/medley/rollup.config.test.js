@@ -84,8 +84,7 @@ export default [
       typescript({ module: "esnext", target: "esnext", tsconfig:"./test/assets/tsconfig.modules.json" }),
       copy({
         targets: [
-          { src: "test/assets/Compositions/**", dest: "test/fixtures/compositions/" },
-          { src: "test/assets/TypeMaps/**", dest: "test/fixtures/typemaps/" },
+          { src: "test/assets/Graphs/**", dest: "test/fixtures/graphs/" },
         ],
       }),
     ],

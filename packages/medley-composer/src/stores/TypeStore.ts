@@ -19,22 +19,11 @@ type typeCollectionEntry = { url?: string } & TypeCollection;
 
 export class TypeStore {
   typeCollections: Map<string, typeCollectionEntry> = new Map();
-  typesActive: Type[] = [];
 
-  constructor(private medley: Medley) {
+  constructor(private medley: Medley, private typeMap: Map<string, Type>) {
     makeObservable(this, {
-      typesActive: observable.shallow,
       typeCollections: observable.shallow,
       types: computed,
-    });
-    medley.updateOptions({
-      eventHooks: {
-        typesUpdate: (types: Type[]) => {
-          runInAction(() => {
-            this.typesActive = types;
-          });
-        },
-      },
     });
     this.loadTypeCollections();
   }
@@ -72,7 +61,7 @@ export class TypeStore {
   get types(): Type[] {
     return this.dedupeAndSortTypes([
       ...this.getTypesFromCollections(),
-      ...this.typesActive,
+      ...this.typeMap.values(),
     ]);
   }
 

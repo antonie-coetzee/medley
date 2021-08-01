@@ -92,7 +92,7 @@ type HeaderProps = {};
 
 export const HeaderComponent: React.FC<HeaderProps> = () => {
   const { enqueueSnackbar } = useSnackbar();
-  const { compositionStore } = useStores();
+  const { graphStore: compositionStore } = useStores();
   const classes = useStyles();
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
@@ -114,7 +114,7 @@ export const HeaderComponent: React.FC<HeaderProps> = () => {
   };
 
   const saveActiveComposition = ()=>{
-    compositionStore.saveActiveComposition();
+    compositionStore.saveActiveGraph();
     enqueueSnackbar("Composition saved", { variant: "success" });
     setDrawerOpen(false);
     toggleDrawer(false);
@@ -122,7 +122,7 @@ export const HeaderComponent: React.FC<HeaderProps> = () => {
 
   const exportActiveComposition = ()=>{
     try{
-      const composition = compositionStore.getComposition();
+      const composition = compositionStore.getGraph();
       const blob = new Blob([JSON.stringify(composition, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');

@@ -1,8 +1,8 @@
-import { Medley, TypedModel } from "medley";
+import { Medley, Node } from "medley";
 
 export type EditComponentProps = {
   medley:Medley;
-  model:TypedModel;
+  model:Node;
   host:{
     delegates:{
       getValue:(getValue:()=>{})=>void;

@@ -3,42 +3,38 @@ import {
   Node,
   LoaderOptions,
   Type,
-  Composition,
-  TypedNode,
+  Graph,
   Logger,
   nullLogger,
+  MapFactory,
 } from "./core";
-import { TypeRepository } from "./TypeRepository";
-import { NodeRepository } from "./NodeRepository";
+import { TypeStore } from "./TypeStore";
+import { NodeStore } from "./NodeStore";
 import { FlowEngine } from "./FlowEngine";
-import { LinkRepository } from "./LinkRepository";
+import { LinkStore } from "./LinkStore";
 import { ReturnedPromiseType } from "./Context";
 
 export interface MedleyOptions {
   loader: LoaderOptions;
   logger?: Logger;
-  eventHooks?: {
-    typesUpdate?: (types: Type[]) => void;
-    nodesOfTypeUpdate?: (type: Type, nodes: TypedNode[]) => void;
-    nodeUpdate?: (type: Type, node: TypedNode) => void;
-  };
+  mapFactory?: MapFactory;
 }
 
-export class Medley { 
-  private composition?: Composition;
-  private nodeRepository: NodeRepository;
-  private typeRepository: TypeRepository;
-  private linkRepository: LinkRepository;
+export class Medley {
+  private graph?: Graph;
+  private nodeStore: NodeStore;
+  private typeStore: TypeStore;
+  private linkStore: LinkStore;
   private flowEngine: FlowEngine;
   private baseLogger: Logger;
 
   public constructor(private options: MedleyOptions) {
-    const loader = new Loader(options.loader);
-    this.typeRepository = new TypeRepository(loader);
-    this.nodeRepository = new NodeRepository();
-    this.linkRepository = new LinkRepository();
-    this.flowEngine = new FlowEngine(this);
     this.baseLogger = options.logger || nullLogger;
+    const loader = new Loader(options.loader);
+    this.typeStore = new TypeStore(loader, options.mapFactory);
+    this.nodeStore = new NodeStore(options.mapFactory);
+    this.linkStore = new LinkStore(options.mapFactory);
+    this.flowEngine = new FlowEngine(this);
   }
 
   public new = () => {
@@ -49,209 +45,156 @@ export class Medley {
     this.options = this.mergeDeep(this.options, options);
   };
 
-  public import = (composition: Composition, baseUrl: URL) => {
-    this.composition = composition;
-    this.typeRepository.load(composition.parts, baseUrl);
-    const loadedTypes = this.typeRepository.getTypes();
-    this.options?.eventHooks?.typesUpdate?.call(null, loadedTypes);
-    this.nodeRepository.load(composition.parts);
-    this.linkRepository.load(composition.links);
-    if (this.options?.eventHooks?.nodesOfTypeUpdate) {
-      const nodesOfTypeUpdate = this.options.eventHooks.nodesOfTypeUpdate;
-      loadedTypes.forEach((type) => {
-        nodesOfTypeUpdate(
-          type,
-          this.nodeRepository.getNodesByType(type.name)
-        );
-      });
-    }
+  public import = (graph: Graph, baseUrl: URL) => {
+    this.typeStore.load(graph.types, baseUrl);
+    this.nodeStore.load(graph.nodes);
+    this.linkStore.load(graph.links);
+    this.graph = graph;
   };
 
   public runNodeFunction = async <T extends (...args: any) => any>(
     nodeId: string,
     ...args: Parameters<T>
   ): Promise<ReturnedPromiseType<T>> => {
-    this.checkComposition();
+    this.checkGraph();
     return this.flowEngine.runNodeFunction(nodeId, ...args);
   };
 
-  public getComposition = () => {
-    return this.composition;
-  }
-
-  public updateComposition = (updator:<T extends Composition>(composition:T)=>T) => {
-    this.checkComposition();
-    if(this.composition && updator){
-      this.composition = updator(this.composition);
-    }
-  }
-
-  public getTypedNode = (nodeId: string) => {
-    this.checkComposition();
-    return this.nodeRepository.getNode(nodeId);
+  public getGraph = () => {
+    return this.graph;
   };
 
-  public upsertTypedNode = (typedNode: Partial<TypedNode>) => {
-    this.checkComposition();
-    if (typedNode.typeName == null) {
+  public updateGraph = (updator: <T extends Graph>(composition: T) => T) => {
+    this.checkGraph();
+    if (this.graph && updator) {
+      this.graph = updator(this.graph);
+    }
+  };
+
+  public getNode = (nodeId: string) => {
+    this.checkGraph();
+    return this.nodeStore.getNode(nodeId);
+  };
+
+  public upsertTypedNode = (typedNode: Partial<Node>) => {
+    this.checkGraph();
+    if (typedNode.type == null) {
       throw new Error("typedNode requires typeName to be defined");
     }
-    const type = this.typeRepository.getType(typedNode.typeName);
+    const type = this.typeStore.getType(typedNode.type);
     return this.upsertNode(type, typedNode);
   };
 
   public upsertNode = (type: Type, node: Partial<Node>) => {
-    this.checkComposition();
-    const hasType = this.typeRepository.hasType(type.name);
+    this.checkGraph();
+    const hasType = this.typeStore.hasType(type.name);
     if (hasType === false) {
-      this.typeRepository.addType(type);
-      this.options?.eventHooks?.typesUpdate?.call(
-        null,
-        this.typeRepository.getTypes()
-      );
+      this.typeStore.addType(type);
     }
-    const { isNew, node: typedNode } = this.nodeRepository.upsertNode({
+    const outNode = this.nodeStore.upsertNode({
       ...node,
-      typeName: type.name,
+      type: type.name,
     });
-    if (isNew) {
-      this.options?.eventHooks?.nodesOfTypeUpdate?.call(
-        null,
-        type,
-        this.nodeRepository.getNodesByType(type.name)
-      );
-    }
-    this.options?.eventHooks?.nodeUpdate?.call(null, type, typedNode);
-    return typedNode;
+    return outNode;
   };
 
   public getNodesByType = (typeName: string) => {
-    this.checkComposition();
-    return this.nodeRepository.getNodesByType(typeName);
+    this.checkGraph();
+    return this.nodeStore.getNodesByType(typeName);
   };
 
   public deleteNodeById = (nodeId: string) => {
-    this.checkComposition();
-    const typeName = this.nodeRepository.getTypeNameFromNodeId(nodeId);
-    if(typeName == null){
+    this.checkGraph();
+    const typeName = this.nodeStore.getTypeNameFromNodeId(nodeId);
+    if (typeName == null) {
       throw new Error(`type name for node with id: '${nodeId}', not found`);
     }
-    const type = this.typeRepository.getType(typeName);
-    const deleted = this.nodeRepository.deleteNode(nodeId);
-    
-    if(deleted){
-      this.options?.eventHooks?.nodesOfTypeUpdate?.call(
-        null,
-        type,
-        this.nodeRepository.getNodesByType(type.name)
-      );
-      const nodes = this.nodeRepository.getNodesByType(typeName);
+    const type = this.typeStore.getType(typeName);
+    const deleted = this.nodeStore.deleteNode(nodeId);
+
+    if (deleted) {
+      const nodes = this.nodeStore.getNodesByType(typeName);
       // delete type if not referenced
       if (nodes?.length == null || nodes?.length === 0) {
-        this.typeRepository.deleteType(typeName);
-        this.options?.eventHooks?.typesUpdate?.call(
-          null,
-          this.typeRepository.getTypes()
-        );
+        this.typeStore.deleteType(typeName);
       }
     }
   };
 
   public getType = (typeName: string) => {
-    this.checkComposition();
-    return this.typeRepository.getType(typeName);
+    this.checkGraph();
+    return this.typeStore.getType(typeName);
   };
 
   public getTypes = () => {
-    this.checkComposition();
-    return this.typeRepository.getTypes();
+    this.checkGraph();
+    return this.typeStore.getTypes();
   };
 
   public getNodeFunctionFromType = async (typeName: string) => {
-    this.checkComposition();
-    return this.typeRepository.getNodeFunction(typeName);
+    this.checkGraph();
+    return this.typeStore.getNodeFunction(typeName);
   };
 
   public getExportFromType = async <T>(
     typeName: string,
     exportName: string
   ) => {
-    this.checkComposition();
-    return this.typeRepository.getExport(typeName, exportName) as Promise<T>;
+    this.checkGraph();
+    return this.typeStore.getExport(typeName, exportName) as Promise<T>;
   };
 
   public deleteType = (typeName: string) => {
-    this.checkComposition();
-    if (this.nodeRepository.deleteNodesByType(typeName)) {
-      this.options?.eventHooks?.nodesOfTypeUpdate?.call(
-        null,
-        this.typeRepository.getType(typeName),
-        []
-      );
-    }
-    if (this.typeRepository.deleteType(typeName)) {
-      this.options?.eventHooks?.typesUpdate?.call(
-        null,
-        this.typeRepository.getTypes()
-      );
-    }
+    this.checkGraph();
+    this.nodeStore.deleteNodesByType(typeName);
+    this.typeStore.deleteType(typeName);
   };
 
-  public export = <T extends Composition = Composition>() => {
-    this.checkComposition();
-    const types = this.typeRepository.getTypes();
-    const links = this.linkRepository.getLinks();
-    const nodesWithType = types.map((type) => {
-      return {
-        type: type,
-        nodes: this.nodeRepository
-          .getNodesByType(type.name)
-          // remove redundant typeName
-          .map((tm) => ({ ...tm, typeName: undefined })),
-      };
-    });
-    if (this.composition) {
-      const currentState = {
-        ...(this.composition as T),
-        parts: nodesWithType,
-        links: links,
-      };
-      // return clone to avoid externally introduced side-effects
-      return JSON.parse(JSON.stringify(currentState)) as T
-    }
+  public export = <T extends Graph = Graph>() => {
+    this.checkGraph();
+    const types = this.typeStore.getTypes();
+    const links = this.linkStore.getLinks();
+    const nodes = this.nodeStore.getNodes();
+    return {
+      ...(this.graph as T),
+      types,
+      nodes,
+      links,
+    };
   };
 
-  public addLink(source: string, target: string, port: string){
-    this.linkRepository.addLink(source, target, port)
+  public addLink(
+    source: string,
+    target: string,
+    port: string,
+    instance?: string
+  ) {
+    this.linkStore.addLink(source, target, port, instance);
   }
 
-  public getPortLinks(nodeId: string, portName: string){
-    return this.linkRepository.getPortLinks(nodeId, portName);
+  public getPortLinks(nodeId: string, portName: string) {
+    return this.linkStore.getPortLinks(nodeId, portName);
   }
 
-  public getPortInstanceLinks(nodeId: string, portName: string){
-    return this.linkRepository.getPortInstanceLinks(nodeId, portName);
-  }
-
-  public getPortsFromType(typeName:string){
-    return this.typeRepository.getPortsFromType(typeName);
+  public getPortsFromType(typeName: string) {
+    return this.typeStore.getPortsFromType(typeName);
   }
 
   public getLogger = () => {
     return this.baseLogger;
-  }
+  };
 
-  private checkComposition(){
-    if(this.composition == null){
-      throw new Error("composition not present");
+  private checkGraph() {
+    if (this.graph == null) {
+      throw new Error("graph not loaded");
     }
   }
 
   private mergeDeep(...objects: any[]) {
-    if(objects == null){
+    if (objects == null) {
       return;
     }
-    
+
     const isObject = (obj: any) => obj && typeof obj === "object";
 
     return objects.reduce((prev, obj) => {
