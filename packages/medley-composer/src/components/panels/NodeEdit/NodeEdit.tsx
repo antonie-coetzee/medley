@@ -3,7 +3,7 @@ import { withTheme } from "@rjsf/core";
 import { Theme as MaterialUITheme } from "@rjsf/material-ui";
 import { JSONSchema7 } from "json-schema";
 import { TabNode } from "flexlayout-react";
-import { observer, Observer } from "mobx-react";
+import { observer } from "mobx-react";
 import React, { useEffect, useState, useRef } from "react";
 import { useSnackbar } from "notistack";
 import { useStores } from "../../../stores/Stores";
@@ -14,7 +14,8 @@ import {
   Theme,
 } from "@material-ui/core/styles";
 import { IconButton, Toolbar } from "@material-ui/core";
-import { FileCopy, Save } from "@material-ui/icons";
+import { AccountTree, FileCopy, Link, Save } from "@material-ui/icons";
+import { Medley, Node } from "../../../vendor/medley";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -68,6 +69,12 @@ const ToolBar: React.FC<{ doSave?: () => void; doCopy?: () => void }> = (
       >
         <FileCopy />
       </IconButton>
+      <IconButton>
+        <Link />
+      </IconButton>
+      <IconButton>
+        <AccountTree />
+      </IconButton>
     </Toolbar>
   );
 };
@@ -83,25 +90,27 @@ const EditPanel = styled("div")({
   overflowY: "auto",
 });
 
-const ModelEditComponent = observer((props: { node: TabNode }) => {
+const NodeEditComponent = observer((props: { node: TabNode }) => {
   const [schemas, setSchemas] = useState<{
     valueSchema: string | null;
     uiSchema: string | null;
   }>({ valueSchema: null, uiSchema: null });
   const { enqueueSnackbar } = useSnackbar();
-  const [EditComponent, setEditComponent] = useState<React.FC>();
-  const { modelStore: nodeStore, typeStore, dialogStore } = useStores();
+  const [EditComponent, setEditComponent] = useState<
+    React.FC<{ node: Node; medley: Medley }>
+  >();
+  const { medley, typeStore, dialogStore } = useStores();
   const classes = useStyles();
   const nodeId = props.node.getConfig()?.modelId as string;
-  const model = nodeStore.getNodeById(nodeId);
+  const node = medley.getNode(nodeId);
   const submitRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     (async () => {
-      const EditComponent = await typeStore.getEditComponent(model.type);
+      const EditComponent = await typeStore.getEditComponent(node.type);
       if (EditComponent == null) {
-        const valueSchema = await typeStore.getValueSchema(model.type);
-        const uiSchema = await typeStore.getUiSchema(model.type);
+        const valueSchema = await typeStore.getValueSchema(node.type);
+        const uiSchema = await typeStore.getUiSchema(node.type);
         setSchemas({ valueSchema, uiSchema });
       } else {
         setEditComponent(EditComponent);
@@ -116,11 +125,11 @@ const ModelEditComponent = observer((props: { node: TabNode }) => {
 
   const doCopy = () => {
     dialogStore.openStringDialog({
-      title: `Copy ${model.name}`,
+      title: `Copy ${node.name}`,
       inputLabel: "New name",
       successMessage: `Copy successful`,
       onOk: (name) => {
-        nodeStore.copyNode(name, model);
+        medley.copyNode(node, name);
       },
     });
   };
@@ -136,12 +145,12 @@ const ModelEditComponent = observer((props: { node: TabNode }) => {
             className={classes.rsfContainer}
             uiSchema={ui}
             schema={schema}
-            formData={model.value}
+            formData={node.value}
             onSubmit={(e, nativeEvent) => {
               nativeEvent.preventDefault();
-              nodeStore.upsertNode({
-                id: model.id,
-                type: model.type,
+              medley.upsertTypedNode({
+                id: node.id,
+                type: node.type,
                 value: e.formData,
               });
               enqueueSnackbar("Save successful", { variant: "success" });
@@ -169,7 +178,7 @@ const ModelEditComponent = observer((props: { node: TabNode }) => {
   }
 });
 
-const ModelEditMemo = React.memo(ModelEditComponent, (props, nextProps) => {
+const NodeEditMemo = React.memo(NodeEditComponent, (props, nextProps) => {
   if (props.node.getConfig()?.modelId === nextProps.node.getConfig()?.modelId) {
     return true;
   } else {
@@ -177,6 +186,6 @@ const ModelEditMemo = React.memo(ModelEditComponent, (props, nextProps) => {
   }
 });
 
-export const ModelEdit = (node: TabNode) => {
-  return <ModelEditMemo node={node} />;
+export const NodeEdit = (node: TabNode) => {
+  return <NodeEditMemo node={node} />;
 };

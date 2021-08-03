@@ -1,18 +1,18 @@
 import { TabNode } from "flexlayout-react";
-import { MODEL_EDIT, MODEL_LIST, TYPE_TREE } from "../../stores/LayoutStore";
-import {ModelEdit} from "./ModelEdit/ModelEdit";
-import { ModelList } from "./ModelList/ModelList";
+import { NODE_EDIT, NODE_LIST, TYPE_TREE } from "../../stores/LayoutStore";
+import {NodeEdit} from "./NodeEdit/NodeEdit";
+import { NodeList } from "./NodeList/NodeList";
 import { TypeExplorer } from "./TypeExplorer/TypeExplorer";
 
 export const panelFactory = (node: TabNode) => {
   var component = node.getComponent();
   switch (component) {
-    case MODEL_LIST:
-      return ModelList(node);
+    case NODE_LIST:
+      return NodeList(node);
     case TYPE_TREE:
       return TypeExplorer();
-    case MODEL_EDIT:
-        return ModelEdit(node);      
+    case NODE_EDIT:
+        return NodeEdit(node);      
     default:
       break;
   }

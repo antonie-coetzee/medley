@@ -8,7 +8,10 @@ const portTwo: { name: string; shape?: (arg01: String) => Promise<string> } = {
   name: "typeOnePortTwo",
 };
 
-export default async function (this: Context & { customContextProp: string }) {
+export default async function (this: Context & { 
+  customContextProp: string,
+  xmlFormatter?: (xmlString:string)=>string;
+}) {
   this.medley.logger.info("log from ModuleOne.typeOne");
   this.customContextProp = "type one context value";
   const portOneValue = await this.medley.port.single(portOne);
@@ -16,5 +19,14 @@ export default async function (this: Context & { customContextProp: string }) {
     portTwo,
     "arg from typeOne into port two"
   );
-  return `<moduleOne-typeOne>${portOneValue}${portTwoValue}</moduleOne-typeOne>`;
+
+  const xml = `<moduleOne-typeOne>${portOneValue}${portTwoValue}</moduleOne-typeOne>`;
+
+  if(this.xmlFormatter){
+    const formattedXml = this.xmlFormatter(xml);
+    this.medley.logger.info(`\n${formattedXml}`);
+    return formattedXml;
+  }else{
+    return xml
+  }
 }

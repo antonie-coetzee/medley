@@ -3,9 +3,9 @@ import { Layout } from "flexlayout-react";
 import { TypeStore } from "./TypeStore";
 import { action, makeObservable, observable } from "mobx";
 
-export const MODEL_LIST = "modelList";
+export const NODE_LIST = "modelList";
 export const TYPE_TREE = "typeTree";
-export const MODEL_EDIT = "modelEdit";
+export const NODE_EDIT = "modelEdit";
 
 const newConfig = {
   global: {splitterSize: 3},
@@ -56,7 +56,7 @@ export class LayoutStore {
 	public addNodeList(type: Type){
 		if(this.layout == null) return;
 		this.layout.addTabToActiveTabSet({
-			component: MODEL_LIST,
+			component: NODE_LIST,
 			name: `${type.name} - ${type.version}`,
       config: {typeName: type.name}
 		})
@@ -65,7 +65,7 @@ export class LayoutStore {
   public addNodeEdit(model: Node){
 		if(this.layout == null) return;
 		this.layout.addTabToActiveTabSet({
-			component: MODEL_EDIT,
+			component: NODE_EDIT,
 			name: `${model.name}`,
       config: {modelId: model.id}
 		})

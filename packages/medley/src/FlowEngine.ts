@@ -12,6 +12,7 @@ export class FlowEngine {
   constructor(private medley: Medley) {}
 
   public runNodeFunction = async <T extends (...args: any) => any>(
+    context: {} | null,
     nodeId: string,
     ...args: Parameters<T>
   ): Promise<ReturnedPromiseType<T>> => {
@@ -25,7 +26,8 @@ export class FlowEngine {
       );
       return nodeFuction;
     };
-    const nodeFunction = await getNodeFunction();
+
+    const nodeFunction = await getNodeFunction.call(context as Context);
     return nodeFunction(args);
   };
 
@@ -182,7 +184,7 @@ export class FlowEngine {
       if (links.length === 0) {
         return;
       }
-      return Promise.all(
+      const results = await Promise.all(
         links.map(
           (l) =>
             runNodeFunction.call(this, l.source, ...args) as Promise<
@@ -190,6 +192,9 @@ export class FlowEngine {
             >
         )
       );
+      if(results){
+        return results.filter(e => e !== undefined);
+      }
     };
     return portInputMultipleFunction;
   }

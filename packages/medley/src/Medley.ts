@@ -6,7 +6,7 @@ import {
   Graph,
   Logger,
   nullLogger,
-  MapFactory,
+  Link,
 } from "./core";
 import { TypeStore } from "./TypeStore";
 import { NodeStore } from "./NodeStore";
@@ -17,7 +17,12 @@ import { ReturnedPromiseType } from "./Context";
 export interface MedleyOptions {
   loader: LoaderOptions;
   logger?: Logger;
-  mapFactory?: MapFactory;
+  decorate?: {
+    medley?: (medley: Medley) => void;
+    typeStore?: (typeStore: TypeStore) => void;
+    nodeStore?: (nodeStore: NodeStore) => void;
+    linkStore?: (linkStore: LinkStore) => void;
+  };
 }
 
 export class Medley {
@@ -28,22 +33,15 @@ export class Medley {
   private flowEngine: FlowEngine;
   private baseLogger: Logger;
 
-  public constructor(private options: MedleyOptions) {
+  public constructor(public options: MedleyOptions) {
     this.baseLogger = options.logger || nullLogger;
     const loader = new Loader(options.loader);
-    this.typeStore = new TypeStore(loader, options.mapFactory);
-    this.nodeStore = new NodeStore(options.mapFactory);
-    this.linkStore = new LinkStore(options.mapFactory);
+    this.typeStore = new TypeStore(loader, options.decorate?.typeStore);
+    this.nodeStore = new NodeStore(options.decorate?.nodeStore);
+    this.linkStore = new LinkStore(options.decorate?.linkStore);
     this.flowEngine = new FlowEngine(this);
+    options.decorate?.medley?.call(null, this);
   }
-
-  public new = () => {
-    return new Medley(this.options);
-  };
-
-  public updateOptions = (options: Partial<MedleyOptions>) => {
-    this.options = this.mergeDeep(this.options, options);
-  };
 
   public import = (graph: Graph, baseUrl: URL) => {
     this.typeStore.load(graph.types, baseUrl);
@@ -53,18 +51,19 @@ export class Medley {
   };
 
   public runNodeFunction = async <T extends (...args: any) => any>(
+    context: {} | null,
     nodeId: string,
     ...args: Parameters<T>
   ): Promise<ReturnedPromiseType<T>> => {
     this.checkGraph();
-    return this.flowEngine.runNodeFunction(nodeId, ...args);
+    return this.flowEngine.runNodeFunction(context, nodeId, ...args);
   };
 
   public getGraph = () => {
     return this.graph;
   };
 
-  public updateGraph = (updator: <T extends Graph>(composition: T) => T) => {
+  public updateGraph = (updator: <T extends Graph>(graph: T) => T) => {
     this.checkGraph();
     if (this.graph && updator) {
       this.graph = updator(this.graph);
@@ -76,13 +75,13 @@ export class Medley {
     return this.nodeStore.getNode(nodeId);
   };
 
-  public upsertTypedNode = (typedNode: Partial<Node>) => {
+  public upsertTypedNode = (node: Partial<Node>) => {
     this.checkGraph();
-    if (typedNode.type == null) {
-      throw new Error("typedNode requires typeName to be defined");
+    if (node.type == null) {
+      throw new Error("node requires typeName to be defined");
     }
-    const type = this.typeStore.getType(typedNode.type);
-    return this.upsertNode(type, typedNode);
+    const type = this.typeStore.getType(node.type);
+    return this.upsertNode(type, node);
   };
 
   public upsertNode = (type: Type, node: Partial<Node>) => {
@@ -103,19 +102,30 @@ export class Medley {
     return this.nodeStore.getNodesByType(typeName);
   };
 
-  public deleteNodeById = (nodeId: string) => {
+  public copyNode = (node: Node, newName: string) => {
+    const nodeCopy = JSON.parse(JSON.stringify(node)) as Partial<Node>;
+    nodeCopy.name = newName;
+    delete nodeCopy.id;
+    this.upsertTypedNode(nodeCopy);
+  };  
+
+  public deleteNode = (nodeId: string) => {
     this.checkGraph();
     const typeName = this.nodeStore.getTypeNameFromNodeId(nodeId);
     if (typeName == null) {
       throw new Error(`type name for node with id: '${nodeId}', not found`);
     }
-    const type = this.typeStore.getType(typeName);
+
+    const sourceLinks = this.linkStore.getSourceToLinks(nodeId);
+    if(sourceLinks && sourceLinks.length > 0){
+      throw new Error(`node with id: '${nodeId}' is linked and cannot be deleted`);
+    }
     const deleted = this.nodeStore.deleteNode(nodeId);
 
     if (deleted) {
       const nodes = this.nodeStore.getNodesByType(typeName);
       // delete type if not referenced
-      if (nodes?.length == null || nodes?.length === 0) {
+      if (nodes && nodes.length === 0) {
         this.typeStore.deleteType(typeName);
       }
     }
@@ -144,12 +154,6 @@ export class Medley {
     return this.typeStore.getExport(typeName, exportName) as Promise<T>;
   };
 
-  public deleteType = (typeName: string) => {
-    this.checkGraph();
-    this.nodeStore.deleteNodesByType(typeName);
-    this.typeStore.deleteType(typeName);
-  };
-
   public export = <T extends Graph = Graph>() => {
     this.checkGraph();
     const types = this.typeStore.getTypes();
@@ -176,6 +180,10 @@ export class Medley {
     return this.linkStore.getPortLinks(nodeId, portName);
   }
 
+  public deleteLink(link: Link) {
+    return this.linkStore.deleteLink(link);
+  }
+
   public getPortsFromType(typeName: string) {
     return this.typeStore.getPortsFromType(typeName);
   }
@@ -188,30 +196,5 @@ export class Medley {
     if (this.graph == null) {
       throw new Error("graph not loaded");
     }
-  }
-
-  private mergeDeep(...objects: any[]) {
-    if (objects == null) {
-      return;
-    }
-
-    const isObject = (obj: any) => obj && typeof obj === "object";
-
-    return objects.reduce((prev, obj) => {
-      Object.keys(obj).forEach((key) => {
-        const pVal = prev[key];
-        const oVal = obj[key];
-
-        if (Array.isArray(pVal) && Array.isArray(oVal)) {
-          prev[key] = pVal.concat(...oVal);
-        } else if (isObject(pVal) && isObject(oVal)) {
-          prev[key] = this.mergeDeep(pVal, oVal);
-        } else {
-          prev[key] = oVal;
-        }
-      });
-
-      return prev;
-    }, {});
   }
 }

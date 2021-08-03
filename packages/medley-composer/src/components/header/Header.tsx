@@ -92,11 +92,11 @@ type HeaderProps = {};
 
 export const HeaderComponent: React.FC<HeaderProps> = () => {
   const { enqueueSnackbar } = useSnackbar();
-  const { graphStore: compositionStore } = useStores();
+  const { graphStore } = useStores();
   const classes = useStyles();
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
-  const importComposition = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const importGraph = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e == null || e.target.files == null || e.target.files[0] == null)
       return;
     e.preventDefault();
@@ -106,28 +106,28 @@ export const HeaderComponent: React.FC<HeaderProps> = () => {
     reader.onload = async (e) => {
       const text = e?.target?.result as string;
       if (text == null) return;
-      await compositionStore.import(JSON.parse(text));
-      enqueueSnackbar("Composition imported", { variant: "success" });
+      await graphStore.import(JSON.parse(text));
+      enqueueSnackbar("Graph imported", { variant: "success" });
     };
 
     reader.readAsText(e.target.files[0]);
   };
 
-  const saveActiveComposition = ()=>{
-    compositionStore.saveActiveGraph();
-    enqueueSnackbar("Composition saved", { variant: "success" });
+  const saveActiveGraph = ()=>{
+    graphStore.saveActiveGraph();
+    enqueueSnackbar("Graph saved", { variant: "success" });
     setDrawerOpen(false);
     toggleDrawer(false);
   }
 
-  const exportActiveComposition = ()=>{
+  const exportActiveGraph = ()=>{
     try{
-      const composition = compositionStore.getGraph();
-      const blob = new Blob([JSON.stringify(composition, null, 2)], { type: 'application/json' });
+      const graph = graphStore.getGraph();
+      const blob = new Blob([JSON.stringify(graph, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = "composition.json";
+      a.download = "Graph.json";
       a.click();
       a.remove();
     }finally{
@@ -159,13 +159,13 @@ export const HeaderComponent: React.FC<HeaderProps> = () => {
         <ListItem button component="label" >
           <ListItemIcon><CloudUpload /></ListItemIcon>
           <ListItemText primary={"Import"} />
-          <input accept="*.json" hidden type="file" onChange={importComposition} />
+          <input accept="*.json" hidden type="file" onChange={importGraph} />
         </ListItem>
-        <ListItem button onClick={exportActiveComposition}>
+        <ListItem button onClick={exportActiveGraph}>
           <ListItemIcon><CloudDownload /></ListItemIcon>
           <ListItemText primary={"Export"} />
         </ListItem>
-        <ListItem button onClick={saveActiveComposition}>
+        <ListItem button onClick={saveActiveGraph}>
           <ListItemIcon><Save /></ListItemIcon>
           <ListItemText primary={"Save"} />
         </ListItem>                           

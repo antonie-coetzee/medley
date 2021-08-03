@@ -1,4 +1,9 @@
-type LogCallback = (error?: any, level?: string, message?: string, meta?: any) => void;
+type LogCallback = (
+  error?: any,
+  level?: string,
+  message?: string,
+  meta?: any
+) => void;
 
 export interface LogMethod {
   (message: string, callback: LogCallback): Logger;
@@ -8,7 +13,7 @@ export interface LogMethod {
   (infoObject: object): Logger;
 }
 
- export interface Logger {
+export interface Logger {
   error: LogMethod;
   warn: LogMethod;
   help: LogMethod;
@@ -20,10 +25,10 @@ export interface LogMethod {
   verbose: LogMethod;
   input: LogMethod;
   silly: LogMethod;
-  child:(options:object)=>Logger;
+  child: (options: object) => Logger;
 }
 
-const nullLogMethod:LogMethod = (...args:any[])=>nullLogger
+const nullLogMethod: LogMethod = (...args: any[]) => nullLogger;
 
 export const nullLogger: Logger = {
   error: nullLogMethod,
@@ -37,5 +42,5 @@ export const nullLogger: Logger = {
   verbose: nullLogMethod,
   input: nullLogMethod,
   silly: nullLogMethod,
-  child:(options:object = {})=>nullLogger
+  child: (options: object = {}) => nullLogger,
 };

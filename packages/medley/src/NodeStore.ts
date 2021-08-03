@@ -1,14 +1,10 @@
-import { MapFactory, MapType, Node } from "./core";
+import { Node } from "./core";
 
 export class NodeStore {
-  public nodeMap: Map<string, Node>;
+  public nodeMap: Map<string, Node> = new Map();
 
-  constructor(mapFactory?:MapFactory) {
-    if(mapFactory){
-      this.nodeMap = mapFactory(MapType.Node);
-    }else{
-      this.nodeMap = new Map();
-    }
+  constructor(decorator?:(nodeStore:NodeStore)=>void) {
+    decorator?.call(null, this);
   }
 
   public load(nodes: Node[]): void {

@@ -20,7 +20,7 @@ type typeCollectionEntry = { url?: string } & TypeCollection;
 export class TypeStore {
   typeCollections: Map<string, typeCollectionEntry> = new Map();
 
-  constructor(private medley: Medley, private typeMap: Map<string, Type>) {
+  constructor(private medley: Medley) {
     makeObservable(this, {
       typeCollections: observable.shallow,
       types: computed,
@@ -61,7 +61,7 @@ export class TypeStore {
   get types(): Type[] {
     return this.dedupeAndSortTypes([
       ...this.getTypesFromCollections(),
-      ...this.typeMap.values(),
+      ...this.medley.getTypes(),
     ]);
   }
 

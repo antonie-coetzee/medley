@@ -39,15 +39,20 @@ describe("Medley", function () {
     const medley = new Medley(options);
 
     const baseUrl = new URL(`file:///${rootPath}/fixtures/graphs/`);
-    const graphJson = await fs.readFile(
-      new URL("graph.json", baseUrl),
-      { encoding: "utf-8" }
-    );
+    const graphJson = await fs.readFile(new URL("graph.json", baseUrl), {
+      encoding: "utf-8",
+    });
     const graph = JSON.parse(graphJson);
     await medley.import(graph, baseUrl);
-    const res = await medley.runNodeFunction<() => Promise<string>>("nodeOne");
-    const formattedRes = xml(res, { indentation: "  " });
-    expect(formattedRes).toEqual(
+
+    const formatter = (xmlString: string) => {
+      return xml(xmlString, { indentation: "  " });
+    };
+    const res = await medley.runNodeFunction<() => Promise<string>>(
+      { xmlFormatter: formatter }, /* used by typeOne */
+      "nodeOne"
+    );
+    expect(res).toEqual(
       '<moduleOne-typeOne>\r\n  <moduleTwo-typeTwo>\r\n    <moduleTwo-typeFive>\r\n      <moduleFour-typeFour argument="arg from typeFive into port one" context="type two context value"></moduleFour-typeFour>\r\n    </moduleTwo-typeFive>\r\n  </moduleTwo-typeTwo>\r\n  <moduleThree-typeThree argument="arg from typeOne into port two" context="type one context value"></moduleThree-typeThree>\r\n</moduleOne-typeOne>'
     );
   });
@@ -64,10 +69,9 @@ describe("Medley", function () {
     const medley = new Medley(options);
 
     const baseUrl = new URL(`file:///${rootPath}/fixtures/graphs/`);
-    const graphJson = await fs.readFile(
-      new URL("graph.json", baseUrl),
-      { encoding: "utf-8" }
-    );
+    const graphJson = await fs.readFile(new URL("graph.json", baseUrl), {
+      encoding: "utf-8",
+    });
     const graph = JSON.parse(graphJson);
     await medley.import(graph, baseUrl);
   });

@@ -35,31 +35,27 @@ const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 200 },
 ];
 
-const ModelListComponent = observer((props: { node: TabNode }) => {
+const NodeListComponent = observer((props: { node: TabNode }) => {
   const classes = useStyles();
   const [selected, setSelected] = useState<string[]>([]);
-  const { layoutStore, modelStore, dialogStore } = useStores();
+  const { layoutStore, medley, dialogStore } = useStores();
 
   const typeName = props.node.getConfig()?.typeName as string;
-  const modelMap = modelStore.nodeMap;
 
-  const createModel = (name: string) => {
+  const createNode = (name: string) => {
     if (name) {
-      modelStore.upsertNode({ name: name, type: typeName });
+      medley.upsertTypedNode({ name: name, type: typeName });
     }
   };
 
-  const deleteModels = (modelIds: string[]) => {
-    if (modelIds) {
+  const deleteModels = (nodeIds: string[]) => {
+    if (nodeIds) {
       dialogStore.openConfirmDialog({
         okButton: "Delete",
         title: "Confirm delete",
         content: "Sure you want to delete the selected models?",
         onOk: () => {
-          const res = modelStore.deleteNodes(modelIds);
-          // if (res) {
-          // } else {
-          // }
+          nodeIds.forEach(nodeId=>medley.deleteNode(nodeId));
         },
       });
     }
@@ -76,7 +72,7 @@ const ModelListComponent = observer((props: { node: TabNode }) => {
               title: "New Model",
               okButton: "Create",
               successMessage: "New model created successfully",
-              onOk: createModel,
+              onOk: createNode,
             });
           }}
         >
@@ -95,13 +91,13 @@ const ModelListComponent = observer((props: { node: TabNode }) => {
     >
       <div className={classes.tableContainer}>
         <DataGrid
-          rows={Array.from(modelStore.nodeMap.values()).filter(n=>n.type === typeName)?.map((row) => {
+          rows={medley.getNodesByType(typeName).map((row) => {
             return {       
               name: row.name,
               id: row.id,
               model: row,
             };
-          }) || []}
+          })}
           columns={columns}
           pageSize={5}
           checkboxSelection
@@ -122,7 +118,7 @@ const ModelListComponent = observer((props: { node: TabNode }) => {
   );
 });
 
-const ModelListMemo = React.memo(ModelListComponent, (props, nextProps) => {
+const NodeListMemo = React.memo(NodeListComponent, (props, nextProps) => {
   if (
     props.node.getConfig()?.typeName === nextProps.node.getConfig()?.typeName
   ) {
@@ -132,6 +128,6 @@ const ModelListMemo = React.memo(ModelListComponent, (props, nextProps) => {
   }
 });
 
-export const ModelList = (node: TabNode) => {
-  return <ModelListMemo node={node} />;
+export const NodeList = (node: TabNode) => {
+  return <NodeListMemo node={node} />;
 };

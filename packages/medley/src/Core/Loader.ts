@@ -8,7 +8,11 @@ export interface LoaderOptions {
 export class Loader {
   constructor(private loaderOptions: LoaderOptions) {}
 
-  async importModule(module: Module, baseUrl?: URL, search?:string): Promise<any> {
+  async importModule(
+    module: Module,
+    baseUrl?: URL,
+    search?: string
+  ): Promise<any> {
     let resolvedModuleBaseUrl: URL | undefined;
     if (module.base) {
       resolvedModuleBaseUrl = new URL(module.base.toString(), baseUrl);

@@ -1,15 +1,11 @@
-import { Type, Loader, isModule, MapFactory, MapType } from "./core";
+import { Type, Loader, isModule } from "./core";
 
 export class TypeStore {
-  private typeMap: Map<string, Type>;
+  private typeMap: Map<string, Type> = new Map();
   private baseUrl?: URL;
 
-  constructor(private loader: Loader, mapFactory?:MapFactory) {
-    if(mapFactory){
-      this.typeMap = mapFactory(MapType.Type);
-    }else{
-      this.typeMap = new Map();
-    }
+  constructor(private loader: Loader, decorator?:(typeStore:TypeStore)=>void) {
+    decorator?.call(null, this);
   }
 
   public load(types: Type[], baseUrl: URL) {
