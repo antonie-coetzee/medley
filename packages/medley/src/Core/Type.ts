@@ -14,6 +14,7 @@ export interface TypeVersion {
   tag?: string;
   module: Module;
   ports?: Port[];
+  cache?:boolean;
   /*
    ** string: (standard export name) -> (different export name)
    ** Module: (standard export name) -> (different module).(standard export name)
@@ -23,8 +24,8 @@ export interface TypeVersion {
   exportMap?: {
     [name: string]: string | Module | ({ name: string } & Module) | undefined;
   };
-  displayName?: string;
-  category?: string[];
+  label?: string;
+  categories?: string[];
   icon?: URL;
   url?: URL;
 }

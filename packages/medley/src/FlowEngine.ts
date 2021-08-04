@@ -1,5 +1,5 @@
 import { Medley } from "./Medley";
-import { Node } from "./core";
+import { Link, Node, Type } from "./core";
 import {
   Context,
   PortDefinition,
@@ -9,6 +9,7 @@ import {
 } from "./Context";
 
 export class FlowEngine {
+  private resultCache: Map<string, unknown> = new Map();
   constructor(private medley: Medley) {}
 
   public runNodeFunction = async <T extends (...args: any) => any>(
@@ -30,6 +31,10 @@ export class FlowEngine {
     const nodeFunction = await getNodeFunction.call(context as Context);
     return nodeFunction(args);
   };
+
+  public clearCache(){
+    this.resultCache.clear();
+  }
 
   private static async buildNodeFunction(
     context: Context | void,
@@ -131,7 +136,10 @@ export class FlowEngine {
       ...args: Parameters<T>
     ) => Promise<ReturnedPromiseType<T>>
   ) {
-    const portInputSingleFunction = async function <T extends (...args: any) => any>(
+    const flowEngine = this;
+    const portInputSingleFunction = async function <
+      T extends (...args: any) => any
+    >(
       this: Context | undefined,
       portDefinition: PortDefinition<T>,
       ...args: Parameters<T>
@@ -152,9 +160,17 @@ export class FlowEngine {
         );
       }
       const link = links[0];
-      return runNodeFunction.call(this, link.source, ...args) as Promise<
+      const cacheHit = flowEngine.checkCache(link.source, args);
+      if (cacheHit?.result) {
+        return cacheHit.result as any;
+      }
+      const result = runNodeFunction.call(this, link.source, ...args) as Promise<
         ReturnedPromiseType<T>
       >;
+      if (cacheHit?.addToCache && cacheHit?.key) {
+        flowEngine.addToCache(cacheHit.key, result);
+      }  
+      return result;  
     };
     return portInputSingleFunction;
   }
@@ -167,6 +183,7 @@ export class FlowEngine {
       ...args: Parameters<T>
     ) => Promise<ReturnedPromiseType<T>>
   ) {
+    const flowEngine = this;
     const portInputMultipleFunction = async function <
       T extends (...args: any) => any
     >(
@@ -185,17 +202,44 @@ export class FlowEngine {
         return;
       }
       const results = await Promise.all(
-        links.map(
-          (l) =>
-            runNodeFunction.call(this, l.source, ...args) as Promise<
-              ReturnedPromiseType<T>
-            >
-        )
+        links.map((l) => {
+          const cacheHit = flowEngine.checkCache(l.source, args);
+          if (cacheHit?.result) {
+            return cacheHit.result as any;
+          }
+          const result = runNodeFunction.call(
+            this,
+            l.source,
+            ...args
+          ) as Promise<ReturnedPromiseType<T>>;
+          if (cacheHit?.addToCache && cacheHit?.key) {
+            flowEngine.addToCache(cacheHit.key, result);
+          }
+        })
       );
-      if(results){
-        return results.filter(e => e !== undefined);
+      if (results) {
+        return results.filter((e) => e !== undefined);
       }
     };
     return portInputMultipleFunction;
+  }
+
+  private checkCache(sourceId: string, ...args:any[]) {
+    const node = this.medley.getNode(sourceId);
+    if (node.cache == null || node.cache === false) {
+      return null;
+    }
+    const key = `${node.id}${JSON.stringify(args)}`
+    if (this.resultCache.has(key)) {
+      return {
+        addToCache: false,
+        result: this.resultCache.get(key),
+      };
+    }
+    return { addToCache: true, key };
+  }
+
+  private addToCache(key: string, result: any) {
+    this.resultCache.set(key, result);
   }
 }

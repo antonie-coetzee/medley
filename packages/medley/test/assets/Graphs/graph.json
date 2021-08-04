@@ -34,7 +34,7 @@
       "exportMap": {
         "default": "typeFiveNodeFunction"
       },
-      "ports": [{ "name": "typeFivePortOne" }]
+      "ports": [{ "name": "typeFivePortOne" }, {"name": "typeFivePortTwo" }]
     },
     {
       "name": "typeThree",
@@ -84,6 +84,7 @@
       "type": "typeFour",
       "id": "nodeFour",
       "name": "nodeFour",
+      "cache": true,
       "value": "nodeFour value"
     }
   ],
@@ -105,6 +106,11 @@
     },
     {
       "port": "typeFivePortOne",
+      "target": "nodeFive",
+      "source": "nodeFour"
+    },
+    {
+      "port": "typeFivePortTwo",
       "target": "nodeFive",
       "source": "nodeFour"
     }

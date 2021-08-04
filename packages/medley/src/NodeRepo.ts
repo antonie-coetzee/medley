@@ -1,9 +1,9 @@
 import { Node } from "./core";
 
-export class NodeStore {
+export class NodeRepo {
   public nodeMap: Map<string, Node> = new Map();
 
-  constructor(decorator?:(nodeStore:NodeStore)=>void) {
+  constructor(decorator?:(nodeStore:NodeRepo)=>void) {
     decorator?.call(null, this);
   }
 

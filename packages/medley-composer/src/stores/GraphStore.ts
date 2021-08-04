@@ -17,7 +17,7 @@ export class GraphStore {
     if(persist){
       this.saveActiveGraph(graph);
     }
-    this.medley.import(graph, new URL(window.location.toString() + "assets/Compositions/"));
+    this.medley.import(graph, new URL(window.location.toString() + "assets/Graphs/"));
     this.layoutStore.newLayout();
   }
 

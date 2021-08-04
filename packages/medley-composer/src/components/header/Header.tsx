@@ -92,7 +92,7 @@ type HeaderProps = {};
 
 export const HeaderComponent: React.FC<HeaderProps> = () => {
   const { enqueueSnackbar } = useSnackbar();
-  const { graphStore } = useStores();
+  const { graphStore, medley } = useStores();
   const classes = useStyles();
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
@@ -135,6 +135,19 @@ export const HeaderComponent: React.FC<HeaderProps> = () => {
     }
   }
 
+  const runActiveGraph = async ()=>{
+    try{
+      const res = await medley.runNodeFunction(null, "nodeOne");
+      console.log(res);
+      toggleDrawer(false);
+    }catch(e){
+      console.error(e);
+    }
+    finally{
+      toggleDrawer(false);
+    }
+  }
+
   const toggleDrawer = (open: boolean) => (
     event: React.KeyboardEvent | React.MouseEvent,
   ) => {
@@ -172,7 +185,7 @@ export const HeaderComponent: React.FC<HeaderProps> = () => {
       </List>
       <Divider />
       <List>
-        <ListItem button onClick={toggleDrawer(false)}>
+        <ListItem button onClick={runActiveGraph}>
           <ListItemIcon><Category /></ListItemIcon>
           <ListItemText primary={"Types"} />
         </ListItem>          

@@ -11,6 +11,13 @@ const typeFivePortOne: {
   name: "typeFivePortOne",
 };
 
+const typeFivePortTwo: {
+  name: string;
+  shape?: (arg01: String) => Promise<string>;
+} = {
+  name: "typeFivePortTwo",
+};
+
 export async function typeTwoNodeFunction(
   this: Context & { customContextProp: string }
 ) {
@@ -24,7 +31,11 @@ export async function typeFiveNodeFunction(this: Context) {
   this.medley.logger.info("log from ModuleTwo.typeFive");
   const portOneValue = await this.medley.port.single(
     typeFivePortOne,
-    "arg from typeFive into port one"
+    "arg from typeFive"
   );
+  const portTwoValue = await this.medley.port.single(
+    typeFivePortTwo,
+    "arg from typeFive"
+  );  
   return `<moduleTwo-typeFive>${portOneValue}</moduleTwo-typeFive>`;
 }

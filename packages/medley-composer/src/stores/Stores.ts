@@ -20,26 +20,27 @@ export class Stores {
   public medley: Medley;
 
   constructor() {
-    const options:MedleyOptions = {
+    const options: MedleyOptions = {
       loader: {
         import: (url: string) => System.import(url),
         moduleType: ModuleType.SYSTEM,
       },
       decorate: {
-        medley: (m)=>{
+        medley: (m) => {
           makeAutoObservable(m);
         },
-        typeStore: (t)=>{
+        typeRepo: (t) => {
           makeAutoObservable(t);
         },
-        nodeStore: (n)=>{
+        nodeRepo: (n) => {
           makeAutoObservable(n);
-        }, 
-        linkStore: (l)=>{
+        },
+        linkRepo: (l) => {
           makeAutoObservable(l);
-        },                         
-      }
+        },
+      },
     };
+
     this.medley = new Medley(options);
     this.typeStore = new TypeStore(this.medley);
     this.layoutStore = new LayoutStore(this.typeStore);

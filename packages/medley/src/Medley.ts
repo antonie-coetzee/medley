@@ -8,10 +8,10 @@ import {
   nullLogger,
   Link,
 } from "./core";
-import { TypeStore } from "./TypeStore";
-import { NodeStore } from "./NodeStore";
+import { TypeRepo } from "./TypeRepo";
+import { NodeRepo } from "./NodeRepo";
 import { FlowEngine } from "./FlowEngine";
-import { LinkStore } from "./LinkStore";
+import { LinkRepo } from "./LinkRepo";
 import { ReturnedPromiseType } from "./Context";
 
 export interface MedleyOptions {
@@ -19,34 +19,34 @@ export interface MedleyOptions {
   logger?: Logger;
   decorate?: {
     medley?: (medley: Medley) => void;
-    typeStore?: (typeStore: TypeStore) => void;
-    nodeStore?: (nodeStore: NodeStore) => void;
-    linkStore?: (linkStore: LinkStore) => void;
+    typeRepo?: (typeRepo: TypeRepo) => void;
+    nodeRepo?: (nodeRepo: NodeRepo) => void;
+    linkRepo?: (linkRepo: LinkRepo) => void;
   };
 }
 
 export class Medley {
   private graph?: Graph;
-  private nodeStore: NodeStore;
-  private typeStore: TypeStore;
-  private linkStore: LinkStore;
+  private nodeRepo: NodeRepo;
+  private typeRepo: TypeRepo;
+  private linkRepo: LinkRepo;
   private flowEngine: FlowEngine;
   private baseLogger: Logger;
 
   public constructor(public options: MedleyOptions) {
     this.baseLogger = options.logger || nullLogger;
     const loader = new Loader(options.loader);
-    this.typeStore = new TypeStore(loader, options.decorate?.typeStore);
-    this.nodeStore = new NodeStore(options.decorate?.nodeStore);
-    this.linkStore = new LinkStore(options.decorate?.linkStore);
+    this.typeRepo = new TypeRepo(loader, options.decorate?.typeRepo);
+    this.nodeRepo = new NodeRepo(options.decorate?.nodeRepo);
+    this.linkRepo = new LinkRepo(options.decorate?.linkRepo);
     this.flowEngine = new FlowEngine(this);
     options.decorate?.medley?.call(null, this);
   }
 
   public import = (graph: Graph, baseUrl: URL) => {
-    this.typeStore.load(graph.types, baseUrl);
-    this.nodeStore.load(graph.nodes);
-    this.linkStore.load(graph.links);
+    this.typeRepo.load(graph.types, baseUrl);
+    this.nodeRepo.load(graph.nodes);
+    this.linkRepo.load(graph.links);
     this.graph = graph;
   };
 
@@ -58,6 +58,10 @@ export class Medley {
     this.checkGraph();
     return this.flowEngine.runNodeFunction(context, nodeId, ...args);
   };
+
+  public clearCache() {
+    this.flowEngine.clearCache();
+  }
 
   public getGraph = () => {
     return this.graph;
@@ -72,7 +76,7 @@ export class Medley {
 
   public getNode = (nodeId: string) => {
     this.checkGraph();
-    return this.nodeStore.getNode(nodeId);
+    return this.nodeRepo.getNode(nodeId);
   };
 
   public upsertTypedNode = (node: Partial<Node>) => {
@@ -80,17 +84,17 @@ export class Medley {
     if (node.type == null) {
       throw new Error("node requires typeName to be defined");
     }
-    const type = this.typeStore.getType(node.type);
+    const type = this.typeRepo.getType(node.type);
     return this.upsertNode(type, node);
   };
 
   public upsertNode = (type: Type, node: Partial<Node>) => {
     this.checkGraph();
-    const hasType = this.typeStore.hasType(type.name);
+    const hasType = this.typeRepo.hasType(type.name);
     if (hasType === false) {
-      this.typeStore.addType(type);
+      this.typeRepo.addType(type);
     }
-    const outNode = this.nodeStore.upsertNode({
+    const outNode = this.nodeRepo.upsertNode({
       ...node,
       type: type.name,
     });
@@ -99,7 +103,7 @@ export class Medley {
 
   public getNodesByType = (typeName: string) => {
     this.checkGraph();
-    return this.nodeStore.getNodesByType(typeName);
+    return this.nodeRepo.getNodesByType(typeName);
   };
 
   public copyNode = (node: Node, newName: string) => {
@@ -107,43 +111,45 @@ export class Medley {
     nodeCopy.name = newName;
     delete nodeCopy.id;
     this.upsertTypedNode(nodeCopy);
-  };  
+  };
 
   public deleteNode = (nodeId: string) => {
     this.checkGraph();
-    const typeName = this.nodeStore.getTypeNameFromNodeId(nodeId);
+    const typeName = this.nodeRepo.getTypeNameFromNodeId(nodeId);
     if (typeName == null) {
       throw new Error(`type name for node with id: '${nodeId}', not found`);
     }
 
-    const sourceLinks = this.linkStore.getSourceToLinks(nodeId);
-    if(sourceLinks && sourceLinks.length > 0){
-      throw new Error(`node with id: '${nodeId}' is linked and cannot be deleted`);
+    const sourceLinks = this.linkRepo.getSourceToLinks(nodeId);
+    if (sourceLinks && sourceLinks.length > 0) {
+      throw new Error(
+        `node with id: '${nodeId}' is linked and cannot be deleted`
+      );
     }
-    const deleted = this.nodeStore.deleteNode(nodeId);
+    const deleted = this.nodeRepo.deleteNode(nodeId);
 
     if (deleted) {
-      const nodes = this.nodeStore.getNodesByType(typeName);
+      const nodes = this.nodeRepo.getNodesByType(typeName);
       // delete type if not referenced
       if (nodes && nodes.length === 0) {
-        this.typeStore.deleteType(typeName);
+        this.typeRepo.deleteType(typeName);
       }
     }
   };
 
   public getType = (typeName: string) => {
     this.checkGraph();
-    return this.typeStore.getType(typeName);
+    return this.typeRepo.getType(typeName);
   };
 
   public getTypes = () => {
     this.checkGraph();
-    return this.typeStore.getTypes();
+    return this.typeRepo.getTypes();
   };
 
   public getNodeFunctionFromType = async (typeName: string) => {
     this.checkGraph();
-    return this.typeStore.getNodeFunction(typeName);
+    return this.typeRepo.getNodeFunction(typeName);
   };
 
   public getExportFromType = async <T>(
@@ -151,14 +157,14 @@ export class Medley {
     exportName: string
   ) => {
     this.checkGraph();
-    return this.typeStore.getExport(typeName, exportName) as Promise<T>;
+    return this.typeRepo.getExport(typeName, exportName) as Promise<T>;
   };
 
   public export = <T extends Graph = Graph>() => {
     this.checkGraph();
-    const types = this.typeStore.getTypes();
-    const links = this.linkStore.getLinks();
-    const nodes = this.nodeStore.getNodes();
+    const types = this.typeRepo.getTypes();
+    const links = this.linkRepo.getLinks();
+    const nodes = this.nodeRepo.getNodes();
     return {
       ...(this.graph as T),
       types,
@@ -173,19 +179,19 @@ export class Medley {
     port: string,
     instance?: string
   ) {
-    this.linkStore.addLink(source, target, port, instance);
+    this.linkRepo.addLink(source, target, port, instance);
   }
 
   public getPortLinks(nodeId: string, portName: string) {
-    return this.linkStore.getPortLinks(nodeId, portName);
+    return this.linkRepo.getPortLinks(nodeId, portName);
   }
 
   public deleteLink(link: Link) {
-    return this.linkStore.deleteLink(link);
+    return this.linkRepo.deleteLink(link);
   }
 
   public getPortsFromType(typeName: string) {
-    return this.typeStore.getPortsFromType(typeName);
+    return this.typeRepo.getPortsFromType(typeName);
   }
 
   public getLogger = () => {

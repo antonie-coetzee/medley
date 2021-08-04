@@ -1,10 +1,10 @@
 import { Link } from "./core";
 
-export class LinkStore {
+export class LinkRepo {
   private linkSourceMap: Map<string, Link[]> = new Map();
   private linkTargetMap: Map<string, Link[]>= new Map();
 
-  constructor(decorator?:(linkStore:LinkStore)=>void
+  constructor(decorator?:(linkStore:LinkRepo)=>void
   ) {
     decorator?.call(null, this);
   }

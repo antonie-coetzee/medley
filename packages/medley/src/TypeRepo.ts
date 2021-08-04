@@ -1,10 +1,10 @@
 import { Type, Loader, isModule } from "./core";
 
-export class TypeStore {
+export class TypeRepo {
   private typeMap: Map<string, Type> = new Map();
   private baseUrl?: URL;
 
-  constructor(private loader: Loader, decorator?:(typeStore:TypeStore)=>void) {
+  constructor(private loader: Loader, decorator?:(typeStore:TypeRepo)=>void) {
     decorator?.call(null, this);
   }
 
