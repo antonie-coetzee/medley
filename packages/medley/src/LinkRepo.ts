@@ -2,11 +2,10 @@ import { Link } from "./core";
 
 export class LinkRepo {
   private linkSourceMap: Map<string, Link[]> = new Map();
-  private linkTargetMap: Map<string, Link[]>= new Map();
+  private linkTargetMap: Map<string, Link[]> = new Map();
 
-  constructor(decorator?:(linkStore:LinkRepo)=>void
-  ) {
-    decorator?.call(null, this);
+  constructor(onConstruct?: () => void) {
+    onConstruct?.call(this);
   }
 
   public load(links: Link[]) {
@@ -40,7 +39,7 @@ export class LinkRepo {
     };
     const links = this.getPortLinks(target, port);
     const existingLink = links?.find((l) => {
-      if (this.linksAreEqual(l, newLink)) {
+      if (linksAreEqual(l, newLink)) {
         return l;
       }
     });
@@ -61,7 +60,7 @@ export class LinkRepo {
   public deleteLink(link: Link) {
     const links = this.getPortLinks(link.target, link.port);
     const existingLink = links?.find((l) => {
-      if (this.linksAreEqual(l, link)) {
+      if (linksAreEqual(l, link)) {
         return l;
       }
     });
@@ -95,9 +94,8 @@ export class LinkRepo {
     const key = this.targetKey(link.target, link.port);
     if (this.linkTargetMap.has(key)) {
       const links = this.linkTargetMap.get(key);
-      //const link = links?.findIndex(l=>)
       if (links && links?.length > 1) {
-        const idx = links.findIndex((l) => this.linksAreEqual(l,link));
+        const idx = links.findIndex((l) => linksAreEqual(l, link));
         if (idx && idx > -1) {
           links?.splice(idx, 1);
         }
@@ -112,7 +110,7 @@ export class LinkRepo {
     if (this.linkSourceMap.has(key)) {
       const links = this.linkSourceMap.get(key);
       if (links && links?.length > 1) {
-        const idx = links.findIndex((l) => this.linksAreEqual(l,link));
+        const idx = links.findIndex((l) => linksAreEqual(l, link));
         if (idx && idx > -1) {
           links?.splice(idx, 1);
         }
@@ -125,13 +123,13 @@ export class LinkRepo {
   private targetKey(nodeId: string, portName: string) {
     return `${nodeId}${portName}`;
   }
-
-  private linksAreEqual(linkA: Link, linkB: Link) {
-    return (
-      linkA.target === linkB.target &&
-      linkA.source === linkB.source &&
-      linkA.port === linkB.port &&
-      linkA.instance === linkB.instance
-    );
-  }
 }
+
+const linksAreEqual = function (linkA: Link, linkB: Link) {
+  return (
+    linkA.target === linkB.target &&
+    linkA.source === linkB.source &&
+    linkA.port === linkB.port &&
+    linkA.instance === linkB.instance
+  );
+};

@@ -13,34 +13,36 @@ import { NodeRepo } from "./NodeRepo";
 import { FlowEngine } from "./FlowEngine";
 import { LinkRepo } from "./LinkRepo";
 import { ReturnedPromiseType } from "./Context";
-
 export interface MedleyOptions {
-  loader: LoaderOptions;
+  typeRepo: TypeRepo;
+  nodeRepo: NodeRepo;
+  linkRepo: LinkRepo;
+  cache?: Map<string, unknown>;
   logger?: Logger;
-  decorate?: {
-    medley?: (medley: Medley) => void;
-    typeRepo?: (typeRepo: TypeRepo) => void;
-    nodeRepo?: (nodeRepo: NodeRepo) => void;
-    linkRepo?: (linkRepo: LinkRepo) => void;
-  };
+  onConstruct?: () => void;
 }
 
 export class Medley {
+  private cache: Map<string, unknown>;
   private graph?: Graph;
   private nodeRepo: NodeRepo;
   private typeRepo: TypeRepo;
   private linkRepo: LinkRepo;
   private flowEngine: FlowEngine;
-  private baseLogger: Logger;
+  private logger: Logger;
 
-  public constructor(public options: MedleyOptions) {
-    this.baseLogger = options.logger || nullLogger;
-    const loader = new Loader(options.loader);
-    this.typeRepo = new TypeRepo(loader, options.decorate?.typeRepo);
-    this.nodeRepo = new NodeRepo(options.decorate?.nodeRepo);
-    this.linkRepo = new LinkRepo(options.decorate?.linkRepo);
-    this.flowEngine = new FlowEngine(this);
-    options.decorate?.medley?.call(null, this);
+  public constructor(private options: MedleyOptions) {
+    this.cache = this.options.cache || new Map();
+    this.logger = options.logger || nullLogger;
+    this.typeRepo = options.typeRepo;
+    this.nodeRepo = options.nodeRepo;
+    this.linkRepo = options.linkRepo;
+    this.flowEngine = new FlowEngine(this, this.cache);
+    options.onConstruct?.call(this);
+  }
+
+  public newChild(options: Partial<MedleyOptions>) {
+    return new Medley({ ...this.options, ...options });
   }
 
   public import = (graph: Graph, baseUrl: URL) => {
@@ -59,8 +61,8 @@ export class Medley {
     return this.flowEngine.runNodeFunction(context, nodeId, ...args);
   };
 
-  public clearCache() {
-    this.flowEngine.clearCache();
+  public clearCache = () => {
+    this.cache.clear();
   }
 
   public getGraph = () => {
@@ -182,23 +184,23 @@ export class Medley {
     this.linkRepo.addLink(source, target, port, instance);
   }
 
-  public getPortLinks(nodeId: string, portName: string) {
+  public getPortLinks = (nodeId: string, portName: string) => {
     return this.linkRepo.getPortLinks(nodeId, portName);
   }
 
-  public deleteLink(link: Link) {
+  public deleteLink = (link: Link) => {
     return this.linkRepo.deleteLink(link);
   }
 
-  public getPortsFromType(typeName: string) {
+  public getPortsFromType = (typeName: string) => {
     return this.typeRepo.getPortsFromType(typeName);
   }
 
   public getLogger = () => {
-    return this.baseLogger;
+    return this.logger;
   };
 
-  private checkGraph() {
+  private checkGraph = () => {
     if (this.graph == null) {
       throw new Error("graph not loaded");
     }

@@ -3,8 +3,8 @@ import { Node } from "./core";
 export class NodeRepo {
   public nodeMap: Map<string, Node> = new Map();
 
-  constructor(decorator?:(nodeStore:NodeRepo)=>void) {
-    decorator?.call(null, this);
+  constructor(onConstruct?:()=>void) {
+    onConstruct?.call(this);
   }
 
   public load(nodes: Node[]): void {

@@ -78,7 +78,7 @@ export const TypeExplorerComponent = observer(() => {
               <TreeItem
                 nodeId={type.name}
                 key={type.name}
-                label={type.displayName || type.name}
+                label={type.label || type.name}
                 onMouseDown={(e) => {
                   e.preventDefault();
                 }}

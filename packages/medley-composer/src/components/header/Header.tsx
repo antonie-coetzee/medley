@@ -23,6 +23,7 @@ import {
 } from "@material-ui/core";
 import {Menu} from "@material-ui/icons";
 import { useSnackbar } from "notistack";
+import { Graph, Medley } from "../../vendor/medley";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -137,7 +138,11 @@ export const HeaderComponent: React.FC<HeaderProps> = () => {
 
   const runActiveGraph = async ()=>{
     try{
-      const res = await medley.runNodeFunction(null, "nodeOne");
+      const graphCopy =JSON.parse(JSON.stringify(medley.export())) as Graph;
+
+      const runtime = medley.newChild({});
+      runtime.import(graphCopy, new URL(window.location.toString() + "assets/Graphs/"));
+      const res = await runtime.runNodeFunction(null, "nodeOne");
       console.log(res);
       toggleDrawer(false);
     }catch(e){

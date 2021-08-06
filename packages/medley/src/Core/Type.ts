@@ -14,7 +14,7 @@ export interface TypeVersion {
   tag?: string;
   module: Module;
   ports?: Port[];
-  cache?:boolean;
+  cache?: boolean;
   /*
    ** string: (standard export name) -> (different export name)
    ** Module: (standard export name) -> (different module).(standard export name)
@@ -25,7 +25,7 @@ export interface TypeVersion {
     [name: string]: string | Module | ({ name: string } & Module) | undefined;
   };
   label?: string;
-  categories?: string[];
+  category?: string[];
   icon?: URL;
   url?: URL;
 }

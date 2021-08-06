@@ -24,13 +24,12 @@ export type PortInputMultiple = <T extends (...args: any) => any>(
 ) => Promise<ReturnedPromiseType<T>[] | undefined>;
 
 export type Context = {
-  medley: Medley & {
-    logger: Logger;
-    node: Node;
-    port: {
-      single: PortInput;
-      multiple: PortInputMultiple;
-      instances: { [portName: string]: string[] | undefined };
-    };
+  medley: Medley;
+  logger: Logger;
+  node: Node;
+  port: {
+    single: PortInput;
+    multiple: PortInputMultiple;
+    instances: { [portName: string]: string[] | undefined };
   };
 };

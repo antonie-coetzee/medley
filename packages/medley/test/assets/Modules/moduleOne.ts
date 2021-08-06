@@ -12,10 +12,10 @@ export default async function (this: Context & {
   customContextProp: string,
   xmlFormatter?: (xmlString:string)=>string;
 }) {
-  this.medley.logger.info("log from ModuleOne.typeOne");
+  this.logger.info("log from ModuleOne.typeOne");
   this.customContextProp = "type one context value";
-  const portOneValue = await this.medley.port.single(portOne);
-  const portTwoValue = await this.medley.port.single(
+  const portOneValue = await this.port.single(portOne);
+  const portTwoValue = await this.port.single(
     portTwo,
     "arg from typeOne into port two"
   );
@@ -24,7 +24,7 @@ export default async function (this: Context & {
 
   if(this.xmlFormatter){
     const formattedXml = this.xmlFormatter(xml);
-    this.medley.logger.info(`\n${formattedXml}`);
+    this.logger.info(`\n${formattedXml}`);
     return formattedXml;
   }else{
     return xml

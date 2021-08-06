@@ -1,5 +1,5 @@
 import { Dialog } from "@material-ui/core";
-import { Medley, MedleyOptions, ModuleType, Type, Node } from "medley";
+import { Medley, MedleyOptions, ModuleType, Type, Node, LinkRepo, TypeRepo, Loader, NodeRepo } from "medley";
 import { MobXProviderContext } from "mobx-react";
 import React from "react";
 import { GraphStore } from "./GraphStore";
@@ -20,26 +20,40 @@ export class Stores {
   public medley: Medley;
 
   constructor() {
+    // const options: MedleyOptions = {
+    //   loader: {
+    //     import: (url: string) => System.import(url),
+    //     moduleType: ModuleType.SYSTEM,
+    //   },
+    //   decorate: {
+    //     medley: (m) => {
+    //       makeAutoObservable(m);
+    //     },
+    //     typeRepo: (t) => {
+    //       makeAutoObservable(t);
+    //     },
+    //     nodeRepo: (n) => {
+    //       makeAutoObservable(n);
+    //     },
+    //     linkRepo: (l) => {
+    //       makeAutoObservable(l);
+    //     },
+    //   },
+    // };
+    const makeObservable = function(this:any){makeAutoObservable(this)};
     const options: MedleyOptions = {
-      loader: {
-        import: (url: string) => System.import(url),
-        moduleType: ModuleType.SYSTEM,
-      },
-      decorate: {
-        medley: (m) => {
-          makeAutoObservable(m);
-        },
-        typeRepo: (t) => {
-          makeAutoObservable(t);
-        },
-        nodeRepo: (n) => {
-          makeAutoObservable(n);
-        },
-        linkRepo: (l) => {
-          makeAutoObservable(l);
-        },
-      },
-    };
+      linkRepo: new LinkRepo(makeObservable),
+      typeRepo: new TypeRepo(
+        new Loader({
+          moduleType: ModuleType.SYSTEM,
+          import: async (url) => {
+            const module = await System.import(url);
+            return module;
+          },
+        }), makeObservable
+      ),
+      nodeRepo: new NodeRepo(makeObservable),
+    };    
 
     this.medley = new Medley(options);
     this.typeStore = new TypeStore(this.medley);

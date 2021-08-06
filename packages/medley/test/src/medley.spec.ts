@@ -1,7 +1,15 @@
 import fs from "fs/promises";
 import path from "path";
 import { URL } from "url";
-import { Medley, MedleyOptions, ModuleType } from "../../src/index";
+import {
+  LinkRepo,
+  Loader,
+  Medley,
+  MedleyOptions,
+  ModuleType,
+  NodeRepo,
+  TypeRepo,
+} from "../../src/index";
 import xml from "xml-formatter";
 import "systemjs";
 import winston from "winston";
@@ -27,13 +35,17 @@ describe("Medley", function () {
       ],
     });
     const options: MedleyOptions = {
-      loader: {
-        moduleType: ModuleType.SYSTEM,
-        import: async (url) => {
-          const module = await System.import(url);
-          return module;
-        },
-      },
+      linkRepo: new LinkRepo(),
+      typeRepo: new TypeRepo(
+        new Loader({
+          moduleType: ModuleType.SYSTEM,
+          import: async (url) => {
+            const module = await System.import(url);
+            return module;
+          },
+        })
+      ),
+      nodeRepo: new NodeRepo(),
       logger,
     };
     const medley = new Medley(options);
@@ -49,7 +61,7 @@ describe("Medley", function () {
       return xml(xmlString, { indentation: "  " });
     };
     const res = await medley.runNodeFunction<() => Promise<string>>(
-      { xmlFormatter: formatter }, /* used by typeOne */
+      { xmlFormatter: formatter } /* used by typeOne */,
       "nodeOne"
     );
     expect(res).toEqual(
@@ -58,13 +70,17 @@ describe("Medley", function () {
   });
   it("should return the active composition", async function () {
     const options: MedleyOptions = {
-      loader: {
-        moduleType: ModuleType.SYSTEM,
-        import: async (url) => {
-          const module = await System.import(url);
-          return module;
-        },
-      },
+      linkRepo: new LinkRepo(),
+      typeRepo: new TypeRepo(
+        new Loader({
+          moduleType: ModuleType.SYSTEM,
+          import: async (url) => {
+            const module = await System.import(url);
+            return module;
+          },
+        })
+      ),
+      nodeRepo: new NodeRepo(),
     };
     const medley = new Medley(options);
 

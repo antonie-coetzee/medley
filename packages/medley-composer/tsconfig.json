@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "sourceMap": true,
-    "inlineSources": true,
+    //"inlineSources": true,
     "target": "ESNext",                          
     "module": "esnext",
     "moduleResolution": "node",
