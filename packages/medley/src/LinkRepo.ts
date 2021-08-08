@@ -4,7 +4,7 @@ export class LinkRepo {
   private linkSourceMap: Map<string, Link[]> = new Map();
   private linkTargetMap: Map<string, Link[]> = new Map();
 
-  constructor(onConstruct?: () => void) {
+  constructor(onConstruct?: (this:LinkRepo) => void) {
     onConstruct?.call(this);
   }
 

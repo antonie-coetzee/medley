@@ -19,7 +19,7 @@ export interface MedleyOptions {
   linkRepo: LinkRepo;
   cache?: Map<string, unknown>;
   logger?: Logger;
-  onConstruct?: () => void;
+  onConstruct?: (this:Medley) => void;
 }
 
 export class Medley {

@@ -9,6 +9,11 @@ import url from "postcss-url";
 
 const vendors = [
   {
+    srcName: "notistack.ts",
+    dstName: "notistack.1.0.9.js",
+    name: "notistack"
+  }, 
+  {
     srcName: "material-ui-data-grid.ts",
     dstName: "material-ui-data-grid.4.0.0-alpha.34.js",
     name: "@material-ui/data-grid"
@@ -95,6 +100,19 @@ function fixRjsfMaterialUiImports(){
   }
 }
 
+function fixNotistackMaterialUiImports(){
+  return {
+    name: "replacor",
+    transform(code,id){
+      if(id.includes("notistack.esm.js")){
+        return code
+          .replace(/import (\w*) from '@material-ui\/core\/(\1)';/g, "import {$1} from '@material-ui/core';")
+          .replace(/import (\w*) from '@material-ui\/icons\/(\1)';/g, "import {$1} from '@material-ui/icons';");
+      }
+    }
+  }
+}
+
 function fixDataGridMuiImports(){
   return {
     name: "replacor",
@@ -128,6 +146,7 @@ const configs = vendors.map((v) => {
       }),
       fixDataGridMuiImports(),
       fixRjsfMaterialUiImports(),
+      fixNotistackMaterialUiImports(),
       typescript({
         "include": ["./src/vendor/**/*.ts"]
       }),

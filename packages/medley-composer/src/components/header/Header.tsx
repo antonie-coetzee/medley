@@ -2,7 +2,6 @@ import React, { useRef } from "react";
 import { fade, styled } from '@material-ui/core/styles';
 import { useStores } from "../../stores/Stores";
 import { AddCircle, Category, CloudDownload, Save, Search } from "@material-ui/icons";
-import SearchIcon from '@material-ui/icons/Search';
 import { CloudUpload } from "@material-ui/icons";
 import {
   AppBar,
@@ -215,7 +214,7 @@ export const HeaderComponent: React.FC<HeaderProps> = () => {
           </Typography>   
           <div className={classes.search}>
             <div className={classes.searchIcon}>
-              <SearchIcon />
+              <Search />
             </div>
             <InputBase
               placeholder="Search…"

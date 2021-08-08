@@ -3,7 +3,7 @@ import { Node } from "./core";
 export class NodeRepo {
   public nodeMap: Map<string, Node> = new Map();
 
-  constructor(onConstruct?:()=>void) {
+  constructor(onConstruct?:(this:NodeRepo)=>void) {
     onConstruct?.call(this);
   }
 

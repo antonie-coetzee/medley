@@ -46,7 +46,7 @@ export const WithToolBar: React.FC<{actions?:JSX.Element[]}> = (props) => {
   const styles = useToolBarStyles();
   return (<EditContainer>
     <Toolbar variant="dense" disableGutters={true} className={styles.toolBar}>
-     {props.actions}
+     {props.actions && props.actions.map((a,i)=><React.Fragment key={i}>{a}</React.Fragment>)}
     </Toolbar>
     <EditPanel>
       {props.children}

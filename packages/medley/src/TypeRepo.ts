@@ -4,7 +4,7 @@ export class TypeRepo {
   private typeMap: Map<string, Type> = new Map();
   private baseUrl?: URL;
 
-  constructor(private loader: Loader, onConstruct?:()=>void) {
+  constructor(private loader: Loader, onConstruct?:(this:TypeRepo)=>void) {
     onConstruct?.call(this);
   }
 

@@ -20,6 +20,7 @@
     "@rollup/plugin-node-resolve": "11.2.1",
     "@rollup/plugin-replace": "2.4.2",
     "@rollup/plugin-typescript": "8.2.1",
+    "@statoscope/webpack-plugin": "^5.6.2",
     "@types/crypto-js": "^4.0.2",
     "@types/react": "17.0.5",
     "@types/react-dom": "17.0.5",

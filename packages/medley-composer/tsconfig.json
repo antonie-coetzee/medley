@@ -3,18 +3,22 @@
   "compilerOptions": {
     "sourceMap": true,
     //"inlineSources": true,
-    "target": "ESNext",                          
+    "target": "ESNext",
     "module": "esnext",
     "moduleResolution": "node",
-    "skipLibCheck": true,   
-    "allowSyntheticDefaultImports": true,                  
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
     "noEmitOnError": true,
-    "lib": ["ESNext", "DOM"],                            
-    "strict": true,  
-    "esModuleInterop": true,                 
+    "lib": ["ESNext", "DOM"],
+    "strict": true,
+    "esModuleInterop": true,
     "outDir": "./dist",
     "rootDir": "./src",
     "jsx": "react",
+    "baseUrl": "src",
+    "paths": {
+      "@/*": ["*"]
+    }
   },
   "include": ["./src/**/*.ts", "./src/**/*.tsx"]
 }

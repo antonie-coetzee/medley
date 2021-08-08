@@ -1,40 +1,18 @@
-import DefaultForm from "@rjsf/core";
-import { withTheme } from "@rjsf/core";
-import { Theme as MaterialUITheme } from "@rjsf/material-ui";
-import { JSONSchema7 } from "json-schema";
+import React from "react";
+import {Paper, Tabs, Tab} from "@material-ui/core";
 import { TabNode } from "flexlayout-react";
-import { observer } from "mobx-react";
-import React, { useEffect, useState, useRef } from "react";
-import { useSnackbar } from "notistack";
-import { useStores } from "../../../stores/Stores";
 import {
+  Box,
   createStyles,
   makeStyles,
-  styled,
   Theme,
-} from "@material-ui/core/styles";
-import { IconButton, Toolbar } from "@material-ui/core";
-import { AccountTree, FileCopy, Link, Save } from "@material-ui/icons";
-import { Medley, Node } from "../../../vendor/medley";
+  Typography,
+} from "@material-ui/core";
+import { NodeValueToolbar } from "@/components/panels/NodeEdit/NodeValue/NodeValueToolbar";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    rsfContainer: {
-      padding: "0px 16px 16px 16px",
-    },
-    editComponentContainer: {
-      padding: "10px 16px 10px 16px",
-    },
-  })
-);
-
-const Form = (withTheme(MaterialUITheme) as unknown) as {
-  new (): DefaultForm<{}>;
-};
-
-const useToolBarStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    toolBar: {
+    tabs: {
       backgroundColor: "#e9e9e9",
       flex: 0,
       boxShadow: theme.shadows[1],
@@ -45,147 +23,54 @@ const useToolBarStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const ToolBar: React.FC<{ doSave?: () => void; doCopy?: () => void }> = (
-  props
-) => {
-  const styles = useToolBarStyles();
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: any;
+  value: any;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
   return (
-    <Toolbar variant="dense" disableGutters={true} className={styles.toolBar}>
-      <IconButton
-        onClick={() => {
-          if (props.doSave) {
-            props.doSave();
-          }
-        }}
-      >
-        <Save />
-      </IconButton>
-      <IconButton
-        onClick={() => {
-          if (props.doCopy) {
-            props.doCopy();
-          }
-        }}
-      >
-        <FileCopy />
-      </IconButton>
-      <IconButton>
-        <Link />
-      </IconButton>
-      <IconButton>
-        <AccountTree />
-      </IconButton>
-    </Toolbar>
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      {...other}
+    >
+      {value === index && (
+       children
+      )}
+    </div>
   );
-};
+}
 
-const EditContainer = styled("div")({
-  display: "flex",
-  flexDirection: "column",
-  height: "100%",
-});
+function NodeEditComponent() {
+  const [value, setValue] = React.useState(1);
 
-const EditPanel = styled("div")({
-  flex: 1,
-  overflowY: "auto",
-});
-
-const NodeEditComponent = observer((props: { node: TabNode }) => {
-  const [schemas, setSchemas] = useState<{
-    valueSchema: string | null;
-    uiSchema: string | null;
-  }>({ valueSchema: null, uiSchema: null });
-  const { enqueueSnackbar } = useSnackbar();
-  const [EditComponent, setEditComponent] = useState<
-    React.FC<{ node: Node; medley: Medley }>
-  >();
-  const { medley, typeStore, dialogStore } = useStores();
-  const classes = useStyles();
-  const nodeId = props.node.getConfig()?.modelId as string;
-  const node = medley.getNode(nodeId);
-  const submitRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    (async () => {
-      const EditComponent = await typeStore.getEditComponent(node.type);
-      if (EditComponent == null) {
-        const valueSchema = await typeStore.getValueSchema(node.type);
-        const uiSchema = await typeStore.getUiSchema(node.type);
-        setSchemas({ valueSchema, uiSchema });
-      } else {
-        setEditComponent(EditComponent);
-      }
-    })();
-  }, []);
-  const doSave = () => {
-    if (submitRef.current) {
-      submitRef.current.click();
-    }
+  const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+    setValue(newValue);
   };
 
-  const doCopy = () => {
-    dialogStore.openStringDialog({
-      title: `Copy ${node.name}`,
-      inputLabel: "New name",
-      successMessage: `Copy successful`,
-      onOk: (name) => {
-        medley.copyNode(node, name);
-      },
-    });
-  };
+  return (
+    <React.Fragment>
 
-  if (schemas.valueSchema) {
-    const schema = JSON.parse(schemas.valueSchema) as JSONSchema7;
-    const ui = JSON.parse(schemas.uiSchema || "{}");
-    return (
-      <EditContainer>
-        <ToolBar doSave={doSave} doCopy={doCopy} />
-        <EditPanel>
-          <Form
-            className={classes.rsfContainer}
-            uiSchema={ui}
-            schema={schema}
-            formData={node.value}
-            onSubmit={(e, nativeEvent) => {
-              nativeEvent.preventDefault();
-              medley.upsertTypedNode({
-                id: node.id,
-                type: node.type,
-                value: e.formData,
-              });
-              enqueueSnackbar("Save successful", { variant: "success" });
-            }}
-          >
-            <button
-              type={"submit"}
-              style={{ display: "none" }}
-              ref={submitRef}
-            />
-          </Form>
-          );
-        </EditPanel>
-      </EditContainer>
-    );
-  } else if (EditComponent)
-    return (
-      <React.Fragment>
-        <ToolBar doSave={doSave} doCopy={doCopy} />
-        <div className={classes.editComponentContainer}>{EditComponent}</div>
-      </React.Fragment>
-    );
-  {
-    return null;
-  }
-});
+        <Tabs
+          value={value}
+          onChange={handleChange}
+        >
+          <Tab label="Config" />
+          <Tab label="Links" />
+        </Tabs>
 
-const NodeEditMemo = React.memo(NodeEditComponent, (props, nextProps) => {
-  if (props.node.getConfig()?.modelId === nextProps.node.getConfig()?.modelId) {
-    return true;
-  } else {
-    return false;
-  }
-});
+      {/* <TabPanel value={value} index={0}>
+        <NodeValueToolbar/>
+      </TabPanel> */}
+    </React.Fragment>
+  );
+}
 
 export const NodeEdit = (node: TabNode) => {
-  return <NodeEditMemo node={node} />;
+  return <NodeEditComponent />;
 };

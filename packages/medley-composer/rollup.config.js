@@ -16,6 +16,7 @@ const production = false;
 
 const external = [
 "react-is",
+"notistack",
 "react-dom",
 "react",
 "mobx",
