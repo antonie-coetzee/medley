@@ -32,6 +32,7 @@ module.exports = {
     "@rjsf/material-ui",
     "@rjsf/core",
     "@material-ui/data-grid",
+    "react-dnd"
   ],
   module: {
     rules: [

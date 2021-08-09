@@ -1,14 +1,25 @@
 import React from "react";
-import {Paper, Tabs, Tab} from "@material-ui/core";
-import { TabNode } from "flexlayout-react";
 import {
+  Tabs,
+  Tab,
   Box,
-  createStyles,
-  makeStyles,
-  Theme,
   Typography,
+  IconButton,
+  withStyles,
+  Divider,
+  TextField,
+  InputLabel,
+  List,
+  ListItem,
+  Chip,
 } from "@material-ui/core";
-import { NodeValueToolbar } from "@/components/panels/NodeEdit/NodeValue/NodeValueToolbar";
+import { TabNode } from "flexlayout-react";
+import { createStyles, makeStyles, Theme } from "@material-ui/core";
+import { WithEditToolbar } from "./WithEditToolbar";
+import { FileCopy, Link, Save, Settings } from "@material-ui/icons";
+import { WithToolBar } from "@/components/util/Toolbar";
+import { useStores } from "@/stores/Stores";
+import { NodeLinks } from "./NodeLinks";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -22,6 +33,14 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 );
+
+const StyledTab = withStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      minWidth: "0",
+    },
+  })
+)((props: any) => <Tab {...props} />);
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -39,38 +58,52 @@ function TabPanel(props: TabPanelProps) {
       id={`simple-tabpanel-${index}`}
       {...other}
     >
-      {value === index && (
-       children
-      )}
+      {value === index && children}
     </div>
   );
 }
 
-function NodeEditComponent() {
-  const [value, setValue] = React.useState(1);
+const NodeEditComponent: React.FC<{ node: TabNode }> = (props) => {
+  const { medley } = useStores();
+  const nodeId = props.node.getConfig()?.nodeId as string;
+  const node = medley.getNode(nodeId);
 
+  const [value, setValue] = React.useState(1);
   const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setValue(newValue);
   };
 
   return (
-    <React.Fragment>
-
+    <WithToolBar
+      actions={[
         <Tabs
           value={value}
           onChange={handleChange}
+          indicatorColor="primary"
+          textColor="primary"
         >
-          <Tab label="Config" />
-          <Tab label="Links" />
-        </Tabs>
-
-      {/* <TabPanel value={value} index={0}>
-        <NodeValueToolbar/>
-      </TabPanel> */}
-    </React.Fragment>
+          <StyledTab icon={<Settings />} />
+          <StyledTab icon={<Link />} />
+        </Tabs>,
+        <Divider orientation="vertical" flexItem />,
+        <IconButton key={"save"}>
+          <Save />
+        </IconButton>,
+        <IconButton key={"copy"}>
+          <FileCopy />
+        </IconButton>,
+      ]}
+    >
+      <TabPanel value={value} index={0}>
+        Item One
+      </TabPanel>
+      <TabPanel value={value} index={1}>
+        <NodeLinks node={node} />
+      </TabPanel>
+    </WithToolBar>
   );
-}
+};
 
 export const NodeEdit = (node: TabNode) => {
-  return <NodeEditComponent />;
+  return <NodeEditComponent node={node} />;
 };

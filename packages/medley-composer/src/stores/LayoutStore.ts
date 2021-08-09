@@ -62,12 +62,12 @@ export class LayoutStore {
 		})
 	}
 
-  public addNodeEdit(model: Node){
+  public addNodeEdit(node: Node){
 		if(this.layout == null) return;
 		this.layout.addTabToActiveTabSet({
 			component: NODE_EDIT,
-			name: `${model.name}`,
-      config: {modelId: model.id}
+			name: `${node.name}`,
+      config: {nodeId: node.id}
 		})
 	}
 }

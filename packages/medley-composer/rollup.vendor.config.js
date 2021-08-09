@@ -9,6 +9,11 @@ import url from "postcss-url";
 
 const vendors = [
   {
+    srcName: "react-dnd.ts",
+    dstName: "react-dnd.14.0.2.js",
+    name: "react-dnd"
+  }, 
+  {
     srcName: "notistack.ts",
     dstName: "notistack.1.0.9.js",
     name: "notistack"
