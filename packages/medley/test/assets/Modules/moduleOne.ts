@@ -15,6 +15,7 @@ export default async function (this: Context & {
   this.logger.info("log from ModuleOne.typeOne");
   this.customContextProp = "type one context value";
   const portOneValue = await this.port.single(portOne);
+  const portOneValueMulti = await this.port.multiple(portOne);
   const portTwoValue = await this.port.single(
     portTwo,
     "arg from typeOne into port two"

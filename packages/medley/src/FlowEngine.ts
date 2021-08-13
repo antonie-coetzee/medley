@@ -51,14 +51,12 @@ export class FlowEngine {
       );
       return nodeFuction(args);
     };
-
     const node = flowEngine.medley.getNode(nodeId);
     const portInput = flowEngine.buildPortInputSingleFunction(
       flowEngine.medley,
       node,
       runNodeFunction
     );
-
     const portInputMultiple = flowEngine.buildPortInputMultipleFunction(
       flowEngine.medley,
       node,

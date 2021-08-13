@@ -18,8 +18,8 @@ export interface systemModule extends BaseModule {
 export type Module = esmModule | systemModule;
 
 export const isModule = (module: any): module is Module => {
-  return (module as esmModule).esm !== undefined || 
-  (module as systemModule).system !== undefined
-}
-
-
+  return (
+    (module as esmModule).esm !== undefined ||
+    (module as systemModule).system !== undefined
+  );
+};

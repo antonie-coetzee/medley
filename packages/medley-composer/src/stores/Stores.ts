@@ -20,26 +20,6 @@ export class Stores {
   public medley: Medley;
 
   constructor() {
-    // const options: MedleyOptions = {
-    //   loader: {
-    //     import: (url: string) => System.import(url),
-    //     moduleType: ModuleType.SYSTEM,
-    //   },
-    //   decorate: {
-    //     medley: (m) => {
-    //       makeAutoObservable(m);
-    //     },
-    //     typeRepo: (t) => {
-    //       makeAutoObservable(t);
-    //     },
-    //     nodeRepo: (n) => {
-    //       makeAutoObservable(n);
-    //     },
-    //     linkRepo: (l) => {
-    //       makeAutoObservable(l);
-    //     },
-    //   },
-    // };
     const makeObservable = function(this:any){makeAutoObservable(this)};
     const options: MedleyOptions = {
       linkRepo: new LinkRepo(makeObservable),
