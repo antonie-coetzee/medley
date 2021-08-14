@@ -1,0 +1,11 @@
+{
+  "name": "medley-common",
+  "version": "1.0.0",
+  "description": "",
+  "types": "types.d.ts",
+  "scripts": {},
+  "devDependencies": {
+    "medley": "1.0.0",
+    "@types/react": "17.0.5"
+  }
+}

@@ -1,24 +1,38 @@
 import { Link } from "./core";
 
+type Splice = { source?: Link; target?: Link };
+
 export class LinkRepo {
   private linkSourceMap: Map<string, Link[]> = new Map();
   private linkTargetMap: Map<string, Link[]> = new Map();
+  private linkSpliceMap: Map<string, Splice> = new Map();
 
-  constructor(onConstruct?: (this:LinkRepo) => void) {
+  constructor(onConstruct?: (this: LinkRepo) => void) {
     onConstruct?.call(this);
   }
 
   public load(links: Link[]) {
     this.linkTargetMap.clear();
+    this.linkSourceMap.clear();
+    this.linkSpliceMap.clear();
     for (const link of links) {
       this.addToTargetMap(link);
       this.addToSourceMap(link);
+      this.addToSpliceMap(link);
     }
   }
 
-  public getPortLinks(nodeId: string, portName: string) {
+  public getPortLinks(
+    nodeId: string,
+    portName: string,
+    resolve: boolean = true
+  ) {
     const key = this.targetKey(nodeId, portName);
-    return this.linkTargetMap.get(key);
+    if (resolve) {
+      return this.resolveSplices(this.linkTargetMap.get(key));
+    } else {
+      return this.linkTargetMap.get(key);
+    }
   }
 
   public getSourceToLinks(nodeId: string) {
@@ -37,7 +51,7 @@ export class LinkRepo {
       source,
       instance,
     };
-    const links = this.getPortLinks(target, port);
+    const links = this.getPortLinks(target, port, false);
     const existingLink = links?.find((l) => {
       if (linksAreEqual(l, newLink)) {
         return l;
@@ -58,7 +72,7 @@ export class LinkRepo {
   }
 
   public deleteLink(link: Link) {
-    const links = this.getPortLinks(link.target, link.port);
+    const links = this.getPortLinks(link.target, link.port, false);
     const existingLink = links?.find((l) => {
       if (linksAreEqual(l, link)) {
         return l;
@@ -87,6 +101,25 @@ export class LinkRepo {
       links?.push(link);
     } else {
       this.linkSourceMap.set(key, [link]);
+    }
+  }
+
+  private addToSpliceMap(link: Link) {
+    if (link.spliceId == null) {
+      return;
+    }
+    const splice = this.linkSpliceMap.get(link.spliceId);
+    if (splice == null) {
+      this.linkSpliceMap.set(
+        link.spliceId,
+        link.spliceSource ? { source: link } : { target: link }
+      );
+    } else {
+      if (link.spliceSource) {
+        splice.source = link;
+      } else {
+        splice.target = link;
+      }
     }
   }
 
@@ -122,6 +155,26 @@ export class LinkRepo {
 
   private targetKey(nodeId: string, portName: string) {
     return `${nodeId}${portName}`;
+  }
+
+  private resolveSplices(links: Link[] | undefined) {
+    return links?.map((l) => {
+      if (l.spliceId == null) {
+        return l;
+      }
+      const splice = this.linkSpliceMap.get(l.spliceId);
+      if (splice == null) {
+        throw new Error(`splice with id: '${l.spliceId}' missing`);
+      }
+      if (splice.source == null) {
+        throw new Error(`splice source with id: '${l.spliceId}' missing`);
+      }
+      if (splice.target == null) {
+        throw new Error(`splice target with id: '${l.spliceId}' missing`);
+      }
+
+      return { ...splice.source, target: splice.target.target };
+    });
   }
 }
 

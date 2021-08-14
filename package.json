@@ -4,10 +4,6 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "build:mve": "npx lerna run build:mve --stream",
-    "build:admin": "npx lerna run build:admin --stream",
-    "start:admin": "npx lerna run start:admin --stream",
-    "test:mve": "npx lerna run test:mve --stream"
   },
   "workspaces": [
     "packages/**"

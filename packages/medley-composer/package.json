@@ -6,8 +6,7 @@
     "serve": "npx webpack serve",
     "build": "webpack --config webpack.config.js",
     "build:vendor": "npx rollup -c rollup.vendor.config.js",
-    "build:dev": "npx rollup -c rollup.config.js",
-    "build:watch": "npx rollup -cw rollup.config.js"
+    "build:mpt": "npx rollup -c rollup.mpt.config.js"
   },
   "devDependencies": {
     "@oat-sa/rollup-plugin-wildcard-external": "0.1.0",
@@ -50,7 +49,8 @@
     "@types/color-hash": "1.0.1",
     "@types/systemjs": "6.1.0",
     "postcss": "8.2.14",
-    "postcss-url": "10.1.3"
+    "postcss-url": "10.1.3",
+    "medley-common": "1.0.0"
   },
   "dependencies": {
     "@material-ui/core": "4.11.4",

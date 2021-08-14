@@ -3,4 +3,7 @@ export interface Link {
   instance?: string;
   target: string;
   source: string;
+  spliceId?:string;
+  spliceSource?:boolean;
 }
+
