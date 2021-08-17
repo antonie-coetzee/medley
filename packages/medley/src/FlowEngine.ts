@@ -61,7 +61,7 @@ export class FlowEngine {
     const nodeFunction = await flowEngine.medley.getNodeFunctionFromType(
       node.type
     );
-    return (...args:any[]) => nodeFunction(childContext, ...args);
+    return (...args: any[]) => nodeFunction(childContext, ...args);
   }
 
   private createContext(
@@ -99,14 +99,14 @@ export class FlowEngine {
       logger,
       port: {
         input: portInput,
-        instances: (port: Port)=>{
+        instances: (port: Port) => {
           return medley.getPortLinks(node.id, port.name)?.reduce((acc, l) => {
             if (l.instance) {
               acc.push(l.instance);
             }
             return acc;
-          }, [] as string[])
-        }
+          }, [] as string[]);
+        },
       },
     };
 

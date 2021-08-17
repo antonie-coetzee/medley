@@ -1,4 +1,5 @@
 import { Type, Loader, isModule } from "./core";
+import { NodeFunction } from "./NodeFunction";
 
 export class TypeRepo {
   private typeMap: Map<string, Type> = new Map();
@@ -19,16 +20,16 @@ export class TypeRepo {
     }
   }
 
-  public getNodeFunction = async (typeName: string): Promise<Function> => {
-    return this.getExportFunction(typeName);
+  public getNodeFunction = async (typeName: string): Promise<NodeFunction> => {
+    return this.getExportFunction<NodeFunction>(typeName);
   };
 
-  public async getExportFunction(typeName: string, functionName?: string) {
+  public async getExportFunction<T extends Function = Function>(typeName: string, functionName?: string) {
     const moduleFunction = await this.getExport(typeName, functionName);
     if (typeof moduleFunction !== "function") {
       throw new Error(`export ${typeName}[${functionName}] not a function`);
     }
-    return moduleFunction as Function;
+    return moduleFunction as T;
   }
 
   public async getExport(typeName: string, name: string = "default") {
@@ -67,14 +68,6 @@ export class TypeRepo {
       throw new Error(`type with name: '${typeName}', not found`);
     }
     return type;
-  }
-
-  public getPortsFromType(typeName: string) {
-    const type = this.typeMap.get(typeName);
-    if (type == null) {
-      throw new Error(`type with name: '${typeName}', not found`);
-    }
-    return type.ports;
   }
 
   public hasType(typeName: string): boolean {

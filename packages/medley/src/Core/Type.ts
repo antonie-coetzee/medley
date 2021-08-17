@@ -13,7 +13,6 @@ export interface TypeVersion {
   version: string;
   tag?: string;
   module: Module;
-  ports?: Port[];
   cache?: boolean;
   /*
    ** string: (standard export name) -> (different export name)

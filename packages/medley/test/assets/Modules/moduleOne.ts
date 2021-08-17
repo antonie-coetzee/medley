@@ -4,11 +4,11 @@ const nodeFunction: NF<{
   customContextProp: string;
   xmlFormatter?: (xmlString: string) => string;
 }> = async (cntx, testArg:string) => {
-  const {logger, port, xmlFormatter } = cntx;
+  const {logger, port:{input}, xmlFormatter } = cntx;
   logger.info("log from ModuleOne.typeOne");
   cntx.customContextProp = testArg;
-  const portOneValue = await port.input(portOne);
-  const portTwoValue = await port.input(portTwo);
+  const portOneValue = await input(portOne);
+  const portTwoValue = await input(portTwo);
 
   const xml = `<moduleOne-typeOne>${portOneValue}${portTwoValue}</moduleOne-typeOne>`;
 

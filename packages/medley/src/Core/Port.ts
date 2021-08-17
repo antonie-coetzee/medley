@@ -5,6 +5,9 @@ export interface Port {
   hidden?: boolean;
   singleArity?: boolean;
   template?: boolean;
+  // at runtime
+  getType?: ()=>unknown;
+  isType?: (type:unknown)=>boolean;
 }
 
 export interface TypedPort<T> extends Port {

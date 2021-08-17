@@ -18,7 +18,7 @@ export interface MedleyOptions {
   linkRepo: LinkRepo;
   cache?: Map<string, unknown>;
   logger?: Logger;
-  onConstruct?: (this:Medley) => void;
+  onConstruct?: (this: Medley) => void;
 }
 
 export class Medley {
@@ -62,7 +62,7 @@ export class Medley {
 
   public clearCache = () => {
     this.cache.clear();
-  }
+  };
 
   public getGraph = () => {
     return this.graph;
@@ -185,15 +185,16 @@ export class Medley {
 
   public getPortLinks = (nodeId: string, portName: string) => {
     return this.linkRepo.getPortLinks(nodeId, portName);
-  }
+  };
 
   public deleteLink = (link: Link) => {
     return this.linkRepo.deleteLink(link);
-  }
+  };
 
-  public getPortsFromType = (typeName: string) => {
-    return this.typeRepo.getPortsFromType(typeName);
-  }
+  public getPortsFromNode = async (node: Node) => {
+    const nodeFunction = await this.typeRepo.getNodeFunction(node.type);
+    return nodeFunction.ports;
+  };
 
   public getLogger = () => {
     return this.logger;
@@ -203,5 +204,5 @@ export class Medley {
     if (this.graph == null) {
       throw new Error("graph not loaded");
     }
-  }
+  };
 }
