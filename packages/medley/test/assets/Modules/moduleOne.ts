@@ -1,33 +1,40 @@
-import { Context, NodeFunction } from "medley";
+import { NF, TypedPort} from "medley";
 
-const portOne: { name: string; shape?: () => Promise<string> } = {
-  name: "typeOnePortOne",
-};
-
-const portTwo: { name: string; shape?: (arg01: String) => Promise<string> } = {
-  name: "typeOnePortTwo",
-};
-
-export const nodeFunction: NodeFunction<{
+const nodeFunction: NF<{
   customContextProp: string;
   xmlFormatter?: (xmlString: string) => string;
-}> = async function () {
-  this.logger.info("log from ModuleOne.typeOne");
-  this.customContextProp = "type one context value";
-  const portOneValue = await this.port.single(portOne);
-  const portOneValueMulti = await this.port.multiple(portOne);
-  const portTwoValue = await this.port.single(
-    portTwo,
-    "arg from typeOne into port two"
-  );
+}> = async (cntx, testArg:string) => {
+  const {logger, port, xmlFormatter } = cntx;
+  logger.info("log from ModuleOne.typeOne");
+  cntx.customContextProp = testArg;
+  const portOneValue = await port.input(portOne);
+  const portTwoValue = await port.input(portTwo);
 
   const xml = `<moduleOne-typeOne>${portOneValue}${portTwoValue}</moduleOne-typeOne>`;
 
-  if (this.xmlFormatter) {
-    const formattedXml = this.xmlFormatter(xml);
-    this.logger.info(`\n${formattedXml}`);
+  if (xmlFormatter) {
+    const formattedXml = xmlFormatter(xml);
+    logger.info(`\n${formattedXml}`);
     return formattedXml;
   } else {
     return xml;
   }
 };
+
+nodeFunction.ports = ()=>{
+  return [portOne, portTwo];
+}
+
+export default nodeFunction;
+
+const portOne: TypedPort<string> = {
+  name: "typeOnePortOne",
+};
+
+const portTwo: TypedPort<string> = {
+  name: "typeOnePortTwo",
+  singleArity: false 
+};
+
+
+

@@ -1,7 +1,9 @@
-import {Context} from "./Context"
+import { BasicContext, RuntimeContext } from "./Context";
 import { Port } from "./core";
 
 export interface NodeFunction<T = {}> {
-  (this:T & Context, ...args:any) : any;
-  ports?:Port[];
+  (context: T & RuntimeContext, ...args: any[]): any;
+  ports?: (context: BasicContext) => Port[];
 }
+
+export type NF<T = {}> = NodeFunction<T>;

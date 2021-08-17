@@ -1,35 +1,17 @@
-import { Logger, Node } from "./core";
+import { Logger, Node, Port, TypedPort } from "./core";
 import { Medley } from "./Medley";
 
-export type ReturnedPromiseType<T> = T extends (
-  ...args: any[]
-) => Promise<infer R>
-  ? R
-  : never;
+export type PortInput = <T>(port: TypedPort<T>, instance?: string) => Promise<T | undefined>;
 
-export type PortDefinition<T extends (...args: any) => any> = {
-  name: string;
-  instance?: string;
-  shape?: T;
-};
-
-export type PortInput = <T extends (...args: any) => any>(
-  portDefinition: PortDefinition<T>,
-  ...args: Parameters<T>
-) => Promise<ReturnedPromiseType<T> | undefined>;
-
-export type PortInputMultiple = <T extends (...args: any) => any>(
-  portDefinition: PortDefinition<T>,
-  ...args: Parameters<T>
-) => Promise<ReturnedPromiseType<T>[] | undefined>;
-
-export type Context = {
+export type BasicContext = {
   medley: Medley;
   logger: Logger;
   node: Node;
+};
+
+export type RuntimeContext = BasicContext & {
   port: {
-    single: PortInput;
-    multiple: PortInputMultiple;
-    instances: { [portName: string]: string[] | undefined };
+    input: PortInput;
+    instances: <T>(port: Port) => string[] | undefined;
   };
 };

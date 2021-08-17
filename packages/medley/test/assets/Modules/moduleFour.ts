@@ -1,9 +1,11 @@
-import { Context } from "medley";
+import { NF } from "medley";
 
-type extendedContext = Context & {
+type extendedContext = {
   customContextProp: string;
 };
 
-export default async function (this: extendedContext, arg01: string) {
-  return `<moduleFour-typeFour argument="${arg01}" context="${this.customContextProp}"></moduleFour-typeFour>`;
-}
+const nodeFunction: NF<extendedContext> = ({ customContextProp }) => {
+  return `<moduleFour-typeFour context="${customContextProp}"></moduleFour-typeFour>`;
+};
+
+export default nodeFunction;

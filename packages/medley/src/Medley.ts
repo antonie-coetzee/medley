@@ -12,7 +12,6 @@ import { TypeRepo } from "./TypeRepo";
 import { NodeRepo } from "./NodeRepo";
 import { FlowEngine } from "./FlowEngine";
 import { LinkRepo } from "./LinkRepo";
-import { ReturnedPromiseType } from "./Context";
 export interface MedleyOptions {
   typeRepo: TypeRepo;
   nodeRepo: NodeRepo;
@@ -52,11 +51,11 @@ export class Medley {
     this.graph = graph;
   };
 
-  public runNodeFunction = async <T extends (...args: any) => any>(
+  public runNodeFunction = async <T>(
     context: {} | null,
     nodeId: string,
-    ...args: Parameters<T>
-  ): Promise<ReturnedPromiseType<T>> => {
+    ...args: any[]
+  ): Promise<T> => {
     this.checkGraph();
     return this.flowEngine.runNodeFunction(context, nodeId, ...args);
   };

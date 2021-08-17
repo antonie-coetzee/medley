@@ -3,6 +3,10 @@ export interface Port {
   description?: string;
   required?: boolean;
   hidden?: boolean;
-  arity?: number;
+  singleArity?: boolean;
   template?: boolean;
+}
+
+export interface TypedPort<T> extends Port {
+  type?: T;
 }

@@ -1,12 +1,6 @@
 import { Medley } from "./Medley";
-import { Node } from "./core";
-import {
-  Context,
-  PortDefinition,
-  PortInput,
-  PortInputMultiple,
-  ReturnedPromiseType,
-} from "./Context";
+import { Node, Port, TypedPort } from "./core";
+import { PortInput, RuntimeContext } from "./Context";
 
 export class FlowEngine {
   private resultCache: Map<string, unknown>;
@@ -14,74 +8,68 @@ export class FlowEngine {
     this.resultCache = cache || new Map();
   }
 
-  public runNodeFunction = async <T extends (...args: any) => any>(
+  public runNodeFunction = async <T>(
     context: {} | null,
     nodeId: string,
-    ...args: Parameters<T>
-  ): Promise<ReturnedPromiseType<T>> => {
+    ...args: any[]
+  ): Promise<T> => {
     // use closure to capture nodeEngine on initial invocation
     const flowEngine = this;
-    const getNodeFunction = async function (this: Context | void) {
+    const getNodeFunction = async function (context: RuntimeContext) {
       const nodeFuction = await FlowEngine.buildNodeFunction(
-        this,
+        context,
         flowEngine,
         nodeId
       );
       return nodeFuction;
     };
 
-    const nodeFunction = await getNodeFunction.call(context as Context);
-    return nodeFunction(args);
+    const nodeFunction = await getNodeFunction(context as RuntimeContext);
+    return nodeFunction(...args);
   };
 
   private static async buildNodeFunction(
-    context: Context | void,
+    context: RuntimeContext | void,
     flowEngine: FlowEngine,
     nodeId: string
   ) {
-    const runNodeFunction = async function <T extends (...args: any) => any>(
-      this: Context | undefined,
+    const runNodeFunction = async function <T>(
+      parentContext: RuntimeContext | undefined,
       nodeId: string,
-      ...args: Parameters<T>
-    ): Promise<ReturnedPromiseType<T>> {
-      const nodeFuction = await FlowEngine.buildNodeFunction(
-        this,
+      ...args: any[]
+    ): Promise<T> {
+      const nodeFunction = await FlowEngine.buildNodeFunction(
+        parentContext,
         flowEngine,
         nodeId
       );
-      return nodeFuction(args);
+      return nodeFunction(...args);
     };
     const node = flowEngine.medley.getNode(nodeId);
-    const portInput = flowEngine.buildPortInputSingleFunction(
+    const portInput = flowEngine.buildPortInputFunction(
       flowEngine.medley,
       node,
       runNodeFunction
     );
-    const portInputMultiple = flowEngine.buildPortInputMultipleFunction(
-      flowEngine.medley,
-      node,
-      runNodeFunction
-    );
-    const newContex = flowEngine.createContext(
+
+    const childContext = flowEngine.createContext(
       context,
       flowEngine.medley,
       node,
-      portInput,
-      portInputMultiple
+      portInput
     );
     const nodeFunction = await flowEngine.medley.getNodeFunctionFromType(
       node.type
     );
-    return nodeFunction.bind(newContex);
+    return (...args:any[]) => nodeFunction(childContext, ...args);
   }
 
   private createContext(
-    parentContext: Context | void,
+    parentContext: RuntimeContext | void,
     medley: Medley,
     node: Node,
-    portInputSingle: PortInput,
-    portInputMultiple: PortInputMultiple
-  ): Context {
+    portInput: PortInput
+  ): RuntimeContext {
     const logger = medley.getLogger().child({
       typeName: node.type,
       nodeId: node.id,
@@ -104,119 +92,77 @@ export class FlowEngine {
       }
     );
 
-    const context = {
+    const childContext = {
       ...parentContext,
       medley,
       node,
       logger,
       port: {
-        single: portInputSingle,
-        multiple: portInputMultiple,
-        instances,
+        input: portInput,
+        instances: (port: Port)=>{
+          return medley.getPortLinks(node.id, port.name)?.reduce((acc, l) => {
+            if (l.instance) {
+              acc.push(l.instance);
+            }
+            return acc;
+          }, [] as string[])
+        }
       },
     };
 
-    context.port.single = context.port.single.bind(context);
-    context.port.multiple = context.port.multiple.bind(context);
-    return context;
+    childContext.port.input = childContext.port.input.bind(childContext);
+    return childContext;
   }
 
-  private buildPortInputSingleFunction(
+  private buildPortInputFunction(
     medley: Medley,
     node: Node,
-    runNodeFunction: <T extends (...args: any) => any>(
+    runNodeFunction: <T>(
+      context: RuntimeContext,
       nodeId: string,
-      ...args: Parameters<T>
-    ) => Promise<ReturnedPromiseType<T>>
+      ...args: any[]
+    ) => Promise<T>
   ) {
-    const flowEngine = this;
-    const portInputSingleFunction = async function <
-      T extends (...args: any) => any
-    >(
-      this: Context | undefined,
-      portDefinition: PortDefinition<T>,
-      ...args: Parameters<T>
-    ): Promise<ReturnedPromiseType<T> | undefined> {
-      let links = medley.getPortLinks(node.id, portDefinition.name);
+    const portInputFunction = async function <T>(
+      this: RuntimeContext,
+      port: TypedPort<T>,
+      instance?: string
+    ): Promise<T | undefined> {
+      let links = medley.getPortLinks(node.id, port.name);
       if (links == null || links.length === 0) {
         return;
       }
-      if (portDefinition.instance) {
-        links = links.filter((l) => l.instance === portDefinition.instance);
+      if (instance) {
+        links = links.filter((l) => l.instance === instance);
       }
       if (links.length === 0) {
         return;
       }
-      if (links.length !== 1) {
-        throw new Error(
-          `multiple links detected for port: '${portDefinition.name}'`
+      const isSingle = port.singleArity == null || port.singleArity;
+      if (isSingle && links.length !== 1) {
+        throw new Error(`multiple links detected for port: '${port.name}'`);
+      }
+
+      if (isSingle) {
+        const link = links[0];
+        const result = runNodeFunction(this, link.source) as Promise<T>;
+        return result;
+      } else {
+        const results = await Promise.all(
+          links.map((l) => {
+            const result = runNodeFunction(this, l.source) as Promise<
+              Unboxed<T>
+            >;
+            return result;
+          })
         );
-      }
-      const link = links[0];
-      const cacheHit = flowEngine.checkCache(link.source, args);
-      if (cacheHit?.result) {
-        return cacheHit.result as any;
-      }
-      const result = runNodeFunction.call(
-        this,
-        link.source,
-        ...args
-      ) as Promise<ReturnedPromiseType<T>>;
-      if (cacheHit?.addToCache && cacheHit?.key) {
-        flowEngine.addToCache(cacheHit.key, result);
-      }
-      return result;
-    };
-    return portInputSingleFunction;
-  }
-
-  private buildPortInputMultipleFunction(
-    medley: Medley,
-    node: Node,
-    runNodeFunction: <T extends (...args: any) => any>(
-      nodeId: string,
-      ...args: Parameters<T>
-    ) => Promise<ReturnedPromiseType<T>>
-  ) {
-    const flowEngine = this;
-    const portInputMultipleFunction = async function <
-      T extends (...args: any) => any
-    >(
-      this: Context | undefined,
-      portDefinition: PortDefinition<T>,
-      ...args: Parameters<T>
-    ): Promise<ReturnedPromiseType<T>[] | undefined> {
-      let links = medley.getPortLinks(node.id, portDefinition.name);
-      if (links == null || links.length === 0) {
-        return;
-      }
-      if (portDefinition.instance) {
-        links = links.filter((l) => l.instance === portDefinition.instance);
-      }
-      if (links.length === 0) {
-        return;
-      }
-      const results = await Promise.all(
-        links.map((l) => {
-          const cacheHit = flowEngine.checkCache(l.source, args);
-          if (cacheHit?.result) {
-            return cacheHit.result as any;
-          }
-          const result = runNodeFunction.call(
-            this,
-            l.source,
-            ...args
-          ) as Promise<ReturnedPromiseType<T>>;
-          if (cacheHit?.addToCache && cacheHit?.key) {
-            flowEngine.addToCache(cacheHit.key, result);
-          }
-        })
-      );
-      if (results) {
-        return results.filter((e) => e !== undefined);
+        if (results) {
+          const result = results.filter((e) => e !== undefined) as unknown;
+          return result as T;
+        }
       }
     };
-    return portInputMultipleFunction;
+    return portInputFunction;
   }
 
   private checkCache(sourceId: string, ...args: any[]) {
@@ -238,3 +184,5 @@ export class FlowEngine {
     this.resultCache.set(key, result);
   }
 }
+
+type Unboxed<T> = T extends Array<infer U> ? U : T;
