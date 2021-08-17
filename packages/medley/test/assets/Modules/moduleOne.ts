@@ -1,4 +1,4 @@
-import { Context } from "medley";
+import { Context, NodeFunction } from "medley";
 
 const portOne: { name: string; shape?: () => Promise<string> } = {
   name: "typeOnePortOne",
@@ -8,10 +8,10 @@ const portTwo: { name: string; shape?: (arg01: String) => Promise<string> } = {
   name: "typeOnePortTwo",
 };
 
-export default async function (this: Context & { 
-  customContextProp: string,
-  xmlFormatter?: (xmlString:string)=>string;
-}) {
+export const nodeFunction: NodeFunction<{
+  customContextProp: string;
+  xmlFormatter?: (xmlString: string) => string;
+}> = async function () {
   this.logger.info("log from ModuleOne.typeOne");
   this.customContextProp = "type one context value";
   const portOneValue = await this.port.single(portOne);
@@ -23,11 +23,11 @@ export default async function (this: Context & {
 
   const xml = `<moduleOne-typeOne>${portOneValue}${portTwoValue}</moduleOne-typeOne>`;
 
-  if(this.xmlFormatter){
+  if (this.xmlFormatter) {
     const formattedXml = this.xmlFormatter(xml);
     this.logger.info(`\n${formattedXml}`);
     return formattedXml;
-  }else{
-    return xml
+  } else {
+    return xml;
   }
-}
+};

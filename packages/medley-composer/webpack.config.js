@@ -2,6 +2,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
   .BundleAnalyzerPlugin;
 const StatoscopeWebpackPlugin = require('@statoscope/webpack-plugin').default;
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const path = require("path");
 
 module.exports = {
@@ -53,9 +54,10 @@ module.exports = {
   },
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
+    //plugins: [new TsconfigPathsPlugin()],
     alias: {
       "@": path.resolve(__dirname, "src"),
-    },
+    } 
   },
   output: {
     libraryTarget: "system",

@@ -1,6 +1,6 @@
 import { NodeChip } from "@/components/util/NodeChip";
 import { useStores } from "@/stores/Stores";
-import { DnD_Node } from "@/util/types";
+import { DnD_Node } from "medley-common";
 import { createStyles, makeStyles, Theme } from "@material-ui/core";
 import { Port, Node } from "medley";
 import { observer } from "mobx-react";

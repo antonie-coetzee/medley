@@ -3,7 +3,7 @@ import { Node } from "medley";
 import React from "react";
 import ColorHash from "color-hash";
 import { useDrag } from "react-dnd";
-import { DnD_Node } from "@/util/types";
+import { DnD_Node } from "medley-common";
 
 const borderColorHash = new ColorHash({ saturation: 0.5 });
 const backgroundColorHash = new ColorHash({ saturation: 0.5, lightness: 0.95 });

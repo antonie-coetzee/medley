@@ -12,6 +12,10 @@
       "name": "@medley/medley-common",
       "path": "./packages/medley-common"
     },
+    {
+      "name": "@medley/medley-types",
+      "path": "./packages/medley-types"
+    },    
   ],
   "settings": {
     "livePreview.defaultPreviewPath": "c:\\Dev\\medley\\packages\\medley-composer\\dist\\index.html"
