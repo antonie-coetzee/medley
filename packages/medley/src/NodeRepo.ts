@@ -1,4 +1,9 @@
-import { Node } from "./core";
+import { generateId, Node } from "./core";
+
+/**
+ * read only access to a node repo
+ */
+export type NodesRO = Omit<NodeRepo, "upsertNode" | "deleteNode" | "deleteNodesByType" | "load">;
 
 export class NodeRepo {
   public nodeMap: Map<string, Node> = new Map();
@@ -49,9 +54,9 @@ export class NodeRepo {
       // new node
       let newId: string;
       do {
-        newId = this.generateId();
+        newId = generateId();
       } while (this.nodeMap.has(newId));
-      const nodeCpy = { ...node, type: node.type, id: newId };
+      const nodeCpy = { ...node, type: node.type, id: newId } as Node;
       this.nodeMap.set(nodeCpy.id, nodeCpy);
       return nodeCpy;
     } else {
@@ -60,7 +65,7 @@ export class NodeRepo {
       if (existingNode == null) {
         throw new Error(`node with id: '${node.id}' does not exist`);
       }
-      const updatedNode = { ...existingNode, ...node };
+      const updatedNode = { ...existingNode, ...node } as Node;
       this.nodeMap.set(updatedNode.id, updatedNode);
       return updatedNode;
     }
@@ -68,29 +73,5 @@ export class NodeRepo {
 
   public deleteNode(id: string): boolean {
     return this.nodeMap.delete(id);
-  }
-
-  public deleteNodesByType(typeName: string) {
-    const nodesToDelete = Array.from(this.nodeMap.values()).filter(
-      (el) => el.type === typeName
-    );
-    nodesToDelete.forEach((m) => this.deleteNode(m.id));
-    return nodesToDelete?.length > 0 ? true : false;
-  }
-
-  /* 
-    8,361,453,672 possible combinations
-    ~87 days needed, in order to have a 1% probability 
-    of at least one collision
-   */
-  private generateId() {
-    const alphanumeric =
-      "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    const length = 8;
-    var result = "";
-    for (var i = 0; i < length; ++i) {
-      result += alphanumeric[Math.floor(Math.random() * alphanumeric.length)];
-    }
-    return result;
   }
 }

@@ -1,9 +1,4 @@
 import { Module } from "./Module";
-import { Port } from "./Port";
-
-export interface Typed {
-  type: string;
-}
 
 export interface TypeName {
   name: string;

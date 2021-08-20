@@ -1,6 +1,6 @@
 import { Medley } from "./Medley";
 import { Node, Port, TypedPort } from "./core";
-import { PortInput, RuntimeContext } from "./Context";
+import { PortInput, PortInstances, ExecutionContext } from "./Context";
 
 export class FlowEngine {
   private resultCache: Map<string, unknown>;
@@ -15,7 +15,7 @@ export class FlowEngine {
   ): Promise<T> => {
     // use closure to capture nodeEngine on initial invocation
     const flowEngine = this;
-    const getNodeFunction = async function (context: RuntimeContext) {
+    const getNodeFunction = async function (context: ExecutionContext) {
       const nodeFuction = await FlowEngine.buildNodeFunction(
         context,
         flowEngine,
@@ -24,17 +24,17 @@ export class FlowEngine {
       return nodeFuction;
     };
 
-    const nodeFunction = await getNodeFunction(context as RuntimeContext);
+    const nodeFunction = await getNodeFunction(context as ExecutionContext);
     return nodeFunction(...args);
   };
 
   private static async buildNodeFunction(
-    context: RuntimeContext | void,
+    context: ExecutionContext | void,
     flowEngine: FlowEngine,
     nodeId: string
   ) {
     const runNodeFunction = async function <T>(
-      parentContext: RuntimeContext | undefined,
+      parentContext: ExecutionContext | undefined,
       nodeId: string,
       ...args: any[]
     ): Promise<T> {
@@ -46,51 +46,56 @@ export class FlowEngine {
       return nodeFunction(...args);
     };
     const node = flowEngine.medley.getNode(nodeId);
-    const portInput = flowEngine.buildPortInputFunction(
-      flowEngine.medley,
-      node,
-      runNodeFunction
-    );
-
-    const childContext = flowEngine.createContext(
-      context,
-      flowEngine.medley,
-      node,
-      portInput
-    );
     const nodeFunction = await flowEngine.medley.getNodeFunctionFromType(
       node.type
     );
-    return (...args: any[]) => nodeFunction(childContext, ...args);
-  }
-
-  private createContext(
-    parentContext: RuntimeContext | void,
-    medley: Medley,
-    node: Node,
-    portInput: PortInput
-  ): RuntimeContext {
-    const logger = medley.getLogger().child({
-      typeName: node.type,
-      nodeId: node.id,
-    });
-
-    const instances = new Proxy(
-      {},
-      {
-        get: (target: {}, property: string) => {
-          if (typeof property === "symbol") {
-            return;
-          }
-          return medley.getPortLinks(node.id, property)?.reduce((acc, l) => {
+    // only build port interaction functions if required
+    let portInput: PortInput;
+    let portInstances: PortInstances;
+    const nodePorts = nodeFunction.ports;
+    if (nodePorts) {
+      portInput = flowEngine.buildPortInputFunction(
+        flowEngine.medley,
+        node,
+        runNodeFunction
+      );
+      portInstances = (port: Port) => {
+        return flowEngine.medley
+          .getPortLinks(node.id, port.name)
+          ?.reduce((acc, l) => {
             if (l.instance) {
               acc.push(l.instance);
             }
             return acc;
           }, [] as string[]);
-        },
-      }
+      };
+    } else {
+      portInput = async () => undefined;
+      portInstances = () => undefined;
+    }
+
+    const childContext = flowEngine.createContext(
+      context,
+      flowEngine.medley,
+      node,
+      portInput,
+      portInstances
     );
+
+    return (...args: any[]) => nodeFunction(childContext, ...args);
+  }
+
+  private createContext(
+    parentContext: ExecutionContext | void,
+    medley: Medley,
+    node: Node,
+    portInput: PortInput,
+    portInstances: PortInstances
+  ): ExecutionContext {
+    const logger = medley.getLogger().child({
+      typeName: node.type,
+      nodeId: node.id,
+    });
 
     const childContext = {
       ...parentContext,
@@ -99,14 +104,7 @@ export class FlowEngine {
       logger,
       port: {
         input: portInput,
-        instances: (port: Port) => {
-          return medley.getPortLinks(node.id, port.name)?.reduce((acc, l) => {
-            if (l.instance) {
-              acc.push(l.instance);
-            }
-            return acc;
-          }, [] as string[]);
-        },
+        instances: portInstances,
       },
     };
 
@@ -118,13 +116,13 @@ export class FlowEngine {
     medley: Medley,
     node: Node,
     runNodeFunction: <T>(
-      context: RuntimeContext,
+      context: ExecutionContext,
       nodeId: string,
       ...args: any[]
     ) => Promise<T>
   ) {
     const portInputFunction = async function <T>(
-      this: RuntimeContext,
+      this: ExecutionContext,
       port: TypedPort<T>,
       instance?: string
     ): Promise<T | undefined> {

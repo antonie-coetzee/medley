@@ -1,9 +1,5 @@
 export interface Link {
-  port: string;
-  instance?: string;
-  target: string;
+  port?: string;
   source: string;
-  spliceId?:string;
-  spliceSource?:boolean;
+  target: string;
 }
-

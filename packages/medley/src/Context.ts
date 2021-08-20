@@ -1,17 +1,17 @@
 import { Logger, Node, Port, TypedPort } from "./core";
 import { Medley } from "./Medley";
 
-export type PortInput = <T>(port: TypedPort<T>, instance?: string) => Promise<T | undefined>;
+export type PortInput = <Tport>(
+  port: TypedPort<Tport>
+) => Promise<Tport | undefined>;
 
-export type BasicContext = {
+export type BasicContext<Tvalue extends unknown = undefined> = {
   medley: Medley;
   logger: Logger;
-  node: Node;
+  node: Node<Tvalue>;
 };
 
-export type RuntimeContext = BasicContext & {
-  port: {
+export type ExecutionContext<Tvalue extends unknown = undefined> =
+  BasicContext<Tvalue> & {
     input: PortInput;
-    instances: <T>(port: Port) => string[] | undefined;
   };
-};
