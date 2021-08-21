@@ -1,9 +1,13 @@
-import { Graph } from "./core";
+import { Graph, Link, Type, Node } from "./core";
 import { LinkRepo } from "./LinkRepo";
 import { NodeRepo } from "./NodeRepo";
 import { TypeRepo } from "./TypeRepo";
 
-export class GraphApi {
+export class GraphApi<
+TNode extends Node = Node,
+TType extends Type = Type,
+TLink extends Link = Link
+> {
   private graph?: Graph;
   
   constructor(
@@ -20,9 +24,9 @@ export class GraphApi {
   };
 
   public getGraph = <T extends Graph = Graph>() => {
-    const types = this.typeRepo.getTypes();
-    const links = this.linkRepo.getLinks();
-    const nodes = this.nodeRepo.getNodes();
+    const types = this.typeRepo.getTypes() as TType[];
+    const links = this.linkRepo.getLinks() as TLink[];
+    const nodes = this.nodeRepo.getNodes() as TNode[];
     return {
       ...(this.graph as T),
       types,

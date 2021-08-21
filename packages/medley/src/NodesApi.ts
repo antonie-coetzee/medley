@@ -4,7 +4,7 @@ import { LinkRepo } from "./LinkRepo";
 import { NodeRepo } from "./NodeRepo";
 import { TypeRepo } from "./TypeRepo";
 
-export class NodesApi
+export class NodesApi<TNode extends Node = Node>
   implements Omit<NodeRepo, "deleteNode" | "deleteNodesByType" | "upsertNode">
 {
   public nodeMap: Map<string, Node<undefined>>;
@@ -22,7 +22,7 @@ export class NodesApi
     return this.nodeRepo.load(nodes);
   }
   public getNode(id: string) {
-    return this.nodeRepo.getNode(id);
+    return this.nodeRepo.getNode(id) as TNode;
   }
 
   public getTypeNameFromNodeId(id: string): string | undefined {
@@ -30,11 +30,11 @@ export class NodesApi
   }
 
   public getNodesByType(typeName: string): Node[] {
-    return this.nodeRepo.getNodesByType(typeName);
+    return this.nodeRepo.getNodesByType(typeName) as TNode[];
   }
 
   public getNodes(): Node[] {
-    return this.nodeRepo.getNodes();
+    return this.nodeRepo.getNodes() as TNode[];
   }
 
   public getUsedTypes(): string[] {
@@ -49,7 +49,7 @@ export class NodesApi
     return this.flowEngine.runNodeFunction(context, nodeId, ...args);
   };
 
-  public upsertNode = (node: Partial<Node>, type?: Type) => {
+  public upsertNode = (node: Partial<Node>, type?: Type):TNode => {
     let nodeType: Type;
     if (type) {
       nodeType = type;
@@ -67,14 +67,14 @@ export class NodesApi
       ...node,
       type: nodeType.name,
     });
-    return outNode;
+    return outNode as TNode;
   };
 
   public copyNode = (node: Node, newName: string) => {
     const nodeCopy = JSON.parse(JSON.stringify(node)) as Partial<Node>;
     nodeCopy.name = newName;
     delete nodeCopy.id;
-    return this.upsertNode(nodeCopy);
+    return this.upsertNode(nodeCopy) as TNode;
   };
 
   public deleteNode = (nodeId: string) => {
