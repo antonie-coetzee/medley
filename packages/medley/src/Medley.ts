@@ -9,11 +9,12 @@ import {
   Link,
 } from "./core";
 import { TypeRepo } from "./TypeRepo";
-import { NodeRepo} from "./NodeRepo";
+import { NodeRepo } from "./NodeRepo";
 import { FlowEngine } from "./FlowEngine";
 import { LinkRepo } from "./LinkRepo";
 import { NodesApi } from "./NodesApi";
 import { TypesApi } from "./TypesApi";
+import { GraphApi } from "./GraphApi";
 
 export interface MedleyOptions {
   typeRepo: TypeRepo;
@@ -25,14 +26,16 @@ export interface MedleyOptions {
 }
 
 export class Medley {
+  private flowEngine: FlowEngine;
   private cache: Map<string, unknown>;
-  private graph?: Graph;
+
+  public readonly logger: Logger;
+ 
   public nodes: NodesApi;
   public types: TypesApi;
   public links: LinkRepo;
-  private flowEngine: FlowEngine;
-  private logger: Logger;
-
+  public graph: GraphApi;
+  
   public constructor(private options: MedleyOptions) {
     this.cache = this.options.cache || new Map();
     this.flowEngine = new FlowEngine(this, this.cache);
@@ -40,6 +43,11 @@ export class Medley {
     this.types = new TypesApi(options.typeRepo);
     this.nodes = new NodesApi(
       this.flowEngine,
+      options.nodeRepo,
+      options.typeRepo,
+      options.linkRepo
+    );
+    this.graph = new GraphApi(
       options.nodeRepo,
       options.typeRepo,
       options.linkRepo
@@ -53,37 +61,7 @@ export class Medley {
     return new Medley({ ...this.options, ...options });
   }
 
-  public setGraph = (graph: Graph, baseUrl: URL) => {
-    this.options.typeRepo.load(graph.types, baseUrl);
-    this.options.nodeRepo.load(graph.nodes);
-    this.options.linkRepo.load(graph.links);
-    this.graph = graph;
-  };
-
-  public getGraph = <T extends Graph = Graph>() => {
-    this.checkGraph();
-    const types = this.options.typeRepo.getTypes();
-    const links = this.options.linkRepo.getLinks();
-    const nodes = this.options.nodeRepo.getNodes();
-    return {
-      ...(this.graph as T),
-      types,
-      nodes,
-      links,
-    };
-  };
-
   public clearCache = () => {
     this.cache.clear();
-  };
-
-  public getLogger = () => {
-    return this.logger;
-  };
-
-  private checkGraph = () => {
-    if (this.graph == null) {
-      throw new Error("graph not loaded");
-    }
   };
 }
