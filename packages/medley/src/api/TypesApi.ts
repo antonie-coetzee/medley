@@ -1,8 +1,10 @@
-import { Type } from "./core";
-import { NodeFunction } from "./NodeFunction";
-import { TypeRepo } from "./TypeRepo";
+import { Type } from "../core";
+import { NodeFunction } from "../NodeFunction";
+import { TypeRepo } from "../repos";
 
-export class TypesApi<TType extends Type = Type> implements Omit<TypeRepo, "deleteType"> {
+export class TypesApi<TType extends Type = Type>
+  implements Omit<TypeRepo, "deleteType">
+{
   constructor(private typeRepo: TypeRepo) {}
 
   public load(types: TType[], baseUrl: URL): void {
@@ -24,7 +26,7 @@ export class TypesApi<TType extends Type = Type> implements Omit<TypeRepo, "dele
     return this.typeRepo.getExport(typeName, name);
   }
 
-  public getTypes():TType[] {
+  public getTypes(): TType[] {
     return this.typeRepo.getTypes() as TType[];
   }
 
@@ -35,7 +37,7 @@ export class TypesApi<TType extends Type = Type> implements Omit<TypeRepo, "dele
   public hasType(typeName: string): boolean {
     return this.typeRepo.hasType(typeName);
   }
-  
+
   public addType(type: TType) {
     return this.typeRepo.addType(type);
   }

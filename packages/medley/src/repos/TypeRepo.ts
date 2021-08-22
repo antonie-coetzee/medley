@@ -1,5 +1,5 @@
-import { Type, Loader, isModule } from "./core";
-import { NodeFunction } from "./NodeFunction";
+import { Type, Loader, isModule } from "../core";
+import { NodeFunction } from "../NodeFunction";
 
 export class TypeRepo {
   private typeMap: Map<string, Type> = new Map();

@@ -1,18 +1,7 @@
-import {
-  Node,
-  Type,
-  Logger,
-  nullLogger,
-  Link,
-} from "./core";
-import { TypeRepo } from "./TypeRepo";
-import { NodeRepo } from "./NodeRepo";
+import { Node, Type, Logger, nullLogger, Link } from "./core";
+import { TypeRepo, NodeRepo, LinkRepo } from "./repos";
 import { FlowEngine } from "./FlowEngine";
-import { LinkRepo } from "./LinkRepo";
-import { NodesApi } from "./NodesApi";
-import { TypesApi } from "./TypesApi";
-import { GraphApi } from "./GraphApi";
-import { LinksApi } from "./LinksApi";
+import { GraphApi, TypesApi, NodesApi, LinksApi } from "./api";
 
 export interface MedleyOptions {
   typeRepo: TypeRepo;

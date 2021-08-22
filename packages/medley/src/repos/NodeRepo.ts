@@ -1,4 +1,4 @@
-import { generateId, Node } from "./core";
+import { generateId, Node } from "../core";
 
 /**
  * read only access to a node repo

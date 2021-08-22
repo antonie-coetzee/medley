@@ -1,5 +1,5 @@
 import { Medley } from "./Medley";
-import { Node, Port, TypedPort } from "./core";
+import { Node, TypedPort } from "./core";
 import { PortInput, ExecutionContext } from "./Context";
 
 export class FlowEngine {

@@ -1,4 +1,4 @@
-import { Logger, Node, Port, TypedPort } from "./core";
+import { Logger, Node, TypedPort } from "./core";
 import { Medley } from "./Medley";
 
 export type PortInput = <TPort>(

@@ -1,15 +1,13 @@
-import { Graph, Link, Type, Node } from "./core";
-import { LinkRepo } from "./LinkRepo";
-import { NodeRepo } from "./NodeRepo";
-import { TypeRepo } from "./TypeRepo";
+import { Graph, Link, Type, Node } from "../core";
+import { TypeRepo, NodeRepo, LinkRepo } from "../repos";
 
 export class GraphApi<
-TNode extends Node = Node,
-TType extends Type = Type,
-TLink extends Link = Link
+  TNode extends Node = Node,
+  TType extends Type = Type,
+  TLink extends Link = Link
 > {
   private graph?: Graph;
-  
+
   constructor(
     private nodeRepo: NodeRepo,
     private typeRepo: TypeRepo,
@@ -24,7 +22,7 @@ TLink extends Link = Link
   };
 
   public getGraph = <T extends Graph = Graph>() => {
-    const types = this.typeRepo.getTypes() as TType[];    
+    const types = this.typeRepo.getTypes() as TType[];
     const nodes = this.nodeRepo.getNodes() as TNode[];
     const links = this.linkRepo.getLinks() as TLink[];
     return {

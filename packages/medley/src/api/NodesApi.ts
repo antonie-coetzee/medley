@@ -1,8 +1,6 @@
-import { Type, Node } from "./core";
-import { FlowEngine } from "./FlowEngine";
-import { LinkRepo } from "./LinkRepo";
-import { NodeRepo } from "./NodeRepo";
-import { TypeRepo } from "./TypeRepo";
+import { Type, Node } from "../core";
+import { FlowEngine } from "../FlowEngine";
+import { TypeRepo, NodeRepo, LinkRepo } from "../repos";
 
 export class NodesApi<TNode extends Node = Node>
   implements Omit<NodeRepo, "deleteNode" | "deleteNodesByType" | "upsertNode">
@@ -49,7 +47,7 @@ export class NodesApi<TNode extends Node = Node>
     return this.flowEngine.runNodeFunction(context, nodeId, ...args);
   };
 
-  public upsertNode = (node: Partial<Node>, type?: Type):TNode => {
+  public upsertNode = (node: Partial<Node>, type?: Type): TNode => {
     let nodeType: Type;
     if (type) {
       nodeType = type;

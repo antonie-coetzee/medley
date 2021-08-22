@@ -1,7 +1,9 @@
-import { BasicContext, ExecutionContext } from "./Context";
-import { Link, Port } from "./core";
+import { ExecutionContext } from "./Context";
 
-export interface NodeFunction<TContext extends {} = {}, TValue extends unknown = undefined> {
+export interface NodeFunction<
+  TContext extends {} = {},
+  TValue extends unknown = undefined
+> {
   (context: TContext & ExecutionContext<TValue>, ...args: any[]): any;
 }
 
