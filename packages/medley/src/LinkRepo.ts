@@ -1,7 +1,5 @@
 import { Link } from "./core";
 
-type Splice = { source?: Link; target?: Link };
-
 export class LinkRepo {
   private linkSourceMap: Map<string, Link[]> = new Map();
   private linkTargetMap: Map<string, Link[]> = new Map();
@@ -19,16 +17,16 @@ export class LinkRepo {
     }
   }
 
-  public getPortLinks(
-    nodeId: string,
-    portName: string,
+  public getTargetLinks(
+    target: string,
+    name?: string,
     resolve: boolean = true
   ) {
-    const key = this.targetKey(nodeId, portName);
+    const key = toTargetKey(target, name);
     if (resolve) {
-      const links = this.resolveLinkChains(this.linkTargetMap.get(key))?.map(
+      const links = this.resolveLinks(this.linkTargetMap.get(key))?.map(
         (l) => {
-          return { portName, source: l.source, target: nodeId };
+          return { source: l.source, target, name };
         }
       );
       return links;
@@ -37,23 +35,21 @@ export class LinkRepo {
     }
   }
 
-  public getSourceToLinks(nodeId: string) {
-    return this.linkSourceMap.get(nodeId);
+  public getSourceLinks(source: string) {
+    return this.linkSourceMap.get(source);
   }
 
   public addLink(
     source: string,
     target: string,
-    port: string,
-    instance?: string
+    name?: string,
   ) {
     const newLink = {
-      port,
       target,
       source,
-      instance,
+      name,
     };
-    const links = this.getPortLinks(target, port, false);
+    const links = this.getTargetLinks(target, name);
     const existingLink = links?.find((l) => {
       if (linksAreEqual(l, newLink)) {
         return l;
@@ -74,7 +70,7 @@ export class LinkRepo {
   }
 
   public deleteLink(link: Link) {
-    const links = this.getPortLinks(link.target, link.port, false);
+    const links = this.getTargetLinks(link.target);
     const existingLink = links?.find((l) => {
       if (linksAreEqual(l, link)) {
         return l;
@@ -87,12 +83,11 @@ export class LinkRepo {
   }
 
   private addToTargetMap(link: Link) {
-    const key = this.targetKey(link.target, link.port);
-    if (this.linkTargetMap.has(key)) {
-      const links = this.linkTargetMap.get(key);
+    if (this.linkTargetMap.has(link.target)) {
+      const links = this.linkTargetMap.get(link.target);
       links?.push(link);
     } else {
-      this.linkTargetMap.set(key, [link]);
+      this.linkTargetMap.set(link.target, [link]);
     }
   }
 
@@ -107,7 +102,7 @@ export class LinkRepo {
   }
 
   private deleteFromTargetMap(link: Link) {
-    const key = this.targetKey(link.target, link.port);
+    const key = toTargetKey(link.target);
     if (this.linkTargetMap.has(key)) {
       const links = this.linkTargetMap.get(key);
       if (links && links?.length > 1) {
@@ -136,23 +131,31 @@ export class LinkRepo {
     }
   }
 
-  private targetKey(nodeId: string, portName: string) {
-    return `${nodeId}${portName}`;
-  }
-
-  private resolveLinkChains(links: Link[] | undefined) {
+  private resolveLinks(links: Link[] | undefined) {
     const srcLinks = links?.flatMap((l) => {
       const targetLinks = this.linkTargetMap.get(l.source);
-      return this.resolveLinkChains(targetLinks);
+      if(targetLinks){
+        return this.resolveLinks(targetLinks);
+      }else{
+        return [];
+      }      
     }) as Link[] | undefined;
     return srcLinks;
   }
+}
+
+const toTargetKey = function (targetId: string, name?: string) {
+  if(name){
+    return `${targetId}.${name}`;
+  }else{
+    return targetId;
+  }    
 }
 
 const linksAreEqual = function (linkA: Link, linkB: Link) {
   return (
     linkA.target === linkB.target &&
     linkA.source === linkB.source &&
-    linkA.port === linkB.port
+    linkA.name === linkB.name
   );
 };

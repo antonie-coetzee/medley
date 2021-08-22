@@ -6,7 +6,6 @@ export interface TypeName {
 
 export interface TypeVersion {
   version: string;
-  tag?: string;
   module: Module;
   cache?: boolean;
   /*
@@ -18,17 +17,6 @@ export interface TypeVersion {
   exportMap?: {
     [name: string]: string | Module | ({ name: string } & Module) | undefined;
   };
-  label?: string;
-  category?: string[];
-  icon?: URL;
-  url?: URL;
 }
 
 export interface Type extends TypeName, TypeVersion {}
-
-export type TypeCollection = [
-  TypeName & {
-    current: TypeVersion;
-    history?: URL | TypeVersion[];
-  }
-];

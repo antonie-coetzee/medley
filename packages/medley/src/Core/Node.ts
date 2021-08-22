@@ -1,7 +1,6 @@
-export interface Node<Tvalue extends unknown = undefined> {
-  type:string;
+export interface Node<TValue extends unknown = undefined> {
+  type: string;
   id: string;
   cache?: boolean;
-  name?: string;
-  value?: Tvalue;
+  value?: TValue;
 }

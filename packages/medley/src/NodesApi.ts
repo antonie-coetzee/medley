@@ -70,9 +70,8 @@ export class NodesApi<TNode extends Node = Node>
     return outNode as TNode;
   };
 
-  public copyNode = (node: Node, newName: string) => {
+  public copyNode = (node: Node) => {
     const nodeCopy = JSON.parse(JSON.stringify(node)) as Partial<Node>;
-    nodeCopy.name = newName;
     delete nodeCopy.id;
     return this.upsertNode(nodeCopy) as TNode;
   };
@@ -83,20 +82,12 @@ export class NodesApi<TNode extends Node = Node>
       throw new Error(`type name for node with id: '${nodeId}', not found`);
     }
 
-    const sourceLinks = this.linkRepo.getSourceToLinks(nodeId);
+    const sourceLinks = this.linkRepo.getSourceLinks(nodeId);
     if (sourceLinks && sourceLinks.length > 0) {
       throw new Error(
         `node with id: '${nodeId}' is linked and cannot be deleted`
       );
     }
     const deleted = this.nodeRepo.deleteNode(nodeId);
-
-    if (deleted) {
-      const nodes = this.nodeRepo.getNodesByType(typeName);
-      // delete type if not referenced
-      if (nodes && nodes.length === 0) {
-        this.typeRepo.deleteType(typeName);
-      }
-    }
   };
 }

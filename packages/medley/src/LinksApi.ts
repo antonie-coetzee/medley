@@ -8,18 +8,13 @@ export class LinksApi<TLink extends Link = Link>
   public load(links: TLink[]): void {
     return this.linkRepo.load(links);
   }
-  public getPortLinks(
-    nodeId: string,
-    portName: string,
-    resolve?: boolean
-  ):
-    | TLink[]
-    | { portName: string; source: string; target: string }[]
-    | undefined {
-    return this.linkRepo.getPortLinks(nodeId, portName, resolve) as TLink[];
+
+  public getTargetLinks(target: string, name?: string, resolve?: boolean): Link[] | undefined {
+    return this.linkRepo.getTargetLinks(target, name, resolve) as TLink[];
   }
-  public getSourceToLinks(nodeId: string): TLink[] | undefined {
-    return this.linkRepo.getSourceToLinks(nodeId) as TLink[];
+    
+  public getSourceLinks(nodeId: string): TLink[] | undefined {
+    return this.linkRepo.getSourceLinks(nodeId) as TLink[];
   }
   public addLink(source: string, target: string, port: string): void {
     return this.linkRepo.addLink(source, target, port);

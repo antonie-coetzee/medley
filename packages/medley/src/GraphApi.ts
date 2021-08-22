@@ -24,9 +24,9 @@ TLink extends Link = Link
   };
 
   public getGraph = <T extends Graph = Graph>() => {
-    const types = this.typeRepo.getTypes() as TType[];
-    const links = this.linkRepo.getLinks() as TLink[];
+    const types = this.typeRepo.getTypes() as TType[];    
     const nodes = this.nodeRepo.getNodes() as TNode[];
+    const links = this.linkRepo.getLinks() as TLink[];
     return {
       ...(this.graph as T),
       types,
