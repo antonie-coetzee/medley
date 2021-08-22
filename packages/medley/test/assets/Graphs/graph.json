@@ -20,8 +20,7 @@
       },
       "exportMap": {
         "default": "typeTwoNodeFunction"
-      },
-      "ports": [{ "name": "typeTwoPortOne" }]
+      }
     },
     {
       "name": "typeFive",
@@ -33,8 +32,7 @@
       },
       "exportMap": {
         "default": "typeFiveNodeFunction"
-      },
-      "ports": [{ "name": "typeFivePortOne" }, {"name": "typeFivePortTwo" }]
+      }
     },
     {
       "name": "typeThree",
@@ -90,27 +88,32 @@
   ],
   "links": [
     {
-      "port": "typeOnePortOne",
+      "name": "typeOnePortOne",
       "target": "nodeOne",
       "source": "nodeTwo"
     },
     {
-      "port": "typeOnePortTwo",
+      "name": "typeOnePortTwo",
       "target": "nodeOne",
       "source": "nodeThree"
     },
     {
-      "port": "typeTwoPortOne",
+      "name": "typeTwoPortOne",
       "target": "nodeTwo",
       "source": "nodeFive"
     },
+
     {
-      "port": "typeFivePortOne",
+      "name": "typeFivePortOne",
       "target": "nodeFive",
+      "source": "chainedLink"
+    },
+    {
+      "target": "chainedLink",
       "source": "nodeFour"
     },
     {
-      "port": "typeFivePortTwo",
+      "name": "typeFivePortTwo",
       "target": "nodeFive",
       "source": "nodeFour"
     }

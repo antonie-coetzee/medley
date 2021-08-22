@@ -55,13 +55,13 @@ describe("Medley", function () {
       encoding: "utf-8",
     });
     const graph = JSON.parse(graphJson);
-    await medley.import(graph, baseUrl);
+    await medley.graph.setGraph(graph, baseUrl);
 
     const formatter = (xmlString: string) => {
       return xml(xmlString, { indentation: "  " });
     };
     
-    const res = await medley.runNodeFunction<string>(
+    const res = await medley.nodes.runNode<string>(
       { xmlFormatter: formatter } /* used by typeOne */,
       "nodeOne",
       "testArg"
@@ -93,6 +93,6 @@ describe("Medley", function () {
       encoding: "utf-8",
     });
     const graph = JSON.parse(graphJson);
-    await medley.import(graph, baseUrl);
+    await medley.graph.setGraph(graph, baseUrl);
   });
 });

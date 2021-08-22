@@ -83,11 +83,12 @@ export class LinkRepo {
   }
 
   private addToTargetMap(link: Link) {
-    if (this.linkTargetMap.has(link.target)) {
-      const links = this.linkTargetMap.get(link.target);
+    const key = toTargetKey(link.target, link.name);
+    if (this.linkTargetMap.has(key)) {
+      const links = this.linkTargetMap.get(key);
       links?.push(link);
     } else {
-      this.linkTargetMap.set(link.target, [link]);
+      this.linkTargetMap.set(key, [link]);
     }
   }
 
@@ -137,7 +138,7 @@ export class LinkRepo {
       if(targetLinks){
         return this.resolveLinks(targetLinks);
       }else{
-        return [];
+        return l;
       }      
     }) as Link[] | undefined;
     return srcLinks;

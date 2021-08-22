@@ -6,7 +6,7 @@ const nodeFunction: NF<{
 }> = async (cntx, testArg: string) => {
   const {
     logger,
-    port: { input },
+    input,
     xmlFormatter,
   } = cntx;
   logger.info("log from ModuleOne.typeOne");
@@ -25,7 +25,6 @@ const nodeFunction: NF<{
   }
 };
 
-nodeFunction.ports = () => [portOne, portTwo];
 
 export default nodeFunction;
 

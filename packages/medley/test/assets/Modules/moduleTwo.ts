@@ -3,15 +3,13 @@ import { NF, TypedPort } from "medley";
 export const typeTwoNodeFunction: NF<{ customContextProp: string }> = async (cntx) => {
   const {
     logger,
-    port,
+    input,
   } = cntx;
   logger.info("log from ModuleTwo.typeTwo");
   cntx.customContextProp = "type two context value";
-  const portOneValue = await port.input(typeTwoPortOne);
+  const portOneValue = await input(typeTwoPortOne);
   return `<moduleTwo-typeTwo>${portOneValue}</moduleTwo-typeTwo>`;
 };
-
-typeTwoNodeFunction.ports = ()=>[typeTwoPortOne]
 
 const typeTwoPortOne: TypedPort<string> = {
   name: "typeTwoPortOne",
@@ -19,15 +17,13 @@ const typeTwoPortOne: TypedPort<string> = {
 
 export const typeFiveNodeFunction:NF = async ({
   logger,
-  port,
+  input,
 }) => {
   logger.info("log from ModuleTwo.typeFive");
-  const portOneValue = await port.input(typeFivePortOne);
-  const portTwoValue = await port.input(typeFivePortTwo);
+  const portOneValue = await input(typeFivePortOne);
+  const portTwoValue = await input(typeFivePortTwo);
   return `<moduleTwo-typeFive>${portOneValue}</moduleTwo-typeFive>`;
 }
-
-typeFiveNodeFunction.ports = ()=>[typeFivePortOne,typeFivePortTwo]
 
 const typeFivePortOne: TypedPort<string> = {
   name: "typeFivePortOne",
