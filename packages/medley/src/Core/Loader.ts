@@ -1,4 +1,4 @@
-import { esmModule, Module, ModuleType, systemModule } from "./Module";
+import { EsmModule, Module, ModuleType, SystemModule, toVirtualModule } from "./Module";
 
 export interface LoaderOptions {
   moduleType: ModuleType;
@@ -14,20 +14,24 @@ export class Loader {
     search?: string
   ): Promise<any> {
     let resolvedModuleBaseUrl: URL | undefined;
+    const virtualModule = toVirtualModule(module);
+    if(virtualModule){
+      return virtualModule.exports;
+    }
     if (module.base) {
       resolvedModuleBaseUrl = new URL(module.base.toString(), baseUrl);
     }
     let resolvedUrl: URL;
     switch (this.loaderOptions.moduleType) {
       case ModuleType.SYSTEM:
-        const systemModule = module as systemModule;
+        const systemModule = module as SystemModule;
         resolvedUrl = new URL(
           systemModule.system.toString(),
           resolvedModuleBaseUrl
         );
         break;
       case ModuleType.ESM:
-        const esmModule = module as esmModule;
+        const esmModule = module as EsmModule;
         resolvedUrl = new URL(esmModule.esm.toString(), resolvedModuleBaseUrl);
         break;
       default:

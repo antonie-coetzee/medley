@@ -3,13 +3,18 @@ import { TypeRepo, NodeRepo, LinkRepo } from "./repos";
 import { FlowEngine } from "./FlowEngine";
 import { GraphApi, TypesApi, NodesApi, LinksApi } from "./api";
 
-export interface MedleyOptions {
+export interface MedleyOptions<
+TNode extends Node = Node,
+TType extends Type = Type,
+TLink extends Link = Link
+> {
   typeRepo: TypeRepo;
   nodeRepo: NodeRepo;
   linkRepo: LinkRepo;
   cache?: Map<string, unknown>;
   logger?: Logger;
-  onConstruct?: (this: Medley) => void;
+  parent?: string;
+  onConstruct?: (this: Medley<TNode, TType, TLink>) => void;
 }
 
 export class Medley<
@@ -17,28 +22,25 @@ export class Medley<
   TType extends Type = Type,
   TLink extends Link = Link
 > {
-  private flowEngine: FlowEngine;
-  private cache: Map<string, unknown>;
-
+  private flowEngine: FlowEngine<TNode, TType, TLink>;
   public readonly logger: Logger;
 
-  public nodes: NodesApi<TNode>;
+  public nodes: NodesApi<TNode, TType, TLink>;
   public types: TypesApi<TType>;
   public links: LinksApi<TLink>;
   public graph: GraphApi<TNode, TType, TLink>;
 
-  public constructor(private options: MedleyOptions) {
-    this.cache = this.options.cache || new Map();
-    this.flowEngine = new FlowEngine(this, this.cache);
+  public constructor(private options: MedleyOptions<TNode, TType, TLink>) {
     this.logger = options.logger || nullLogger;
+    this.flowEngine = new FlowEngine<TNode, TType, TLink>(this, options.cache);
     this.types = new TypesApi<TType>(options.typeRepo);
-    this.nodes = new NodesApi<TNode>(
+    this.nodes = new NodesApi<TNode, TType, TLink>(
       this.flowEngine,
       options.nodeRepo,
       options.typeRepo,
       options.linkRepo
     );
-    this.links = new LinksApi<TLink>(options.linkRepo);
+    this.links = new LinksApi<TLink>(options.linkRepo, options.parent);
     this.graph = new GraphApi(
       options.nodeRepo,
       options.typeRepo,
@@ -47,11 +49,9 @@ export class Medley<
     options.onConstruct?.call(this);
   }
 
-  public newChild(options: Partial<MedleyOptions>) {
+  public newChild(options: Partial<MedleyOptions<TNode, TType, TLink>>) {
+    const childOptions: Partial<MedleyOptions<TNode, TType, TLink>> = {...options};
+    childOptions.typeRepo = childOptions.typeRepo || this.options.typeRepo.newChild();
     return new Medley<TNode, TType, TLink>({ ...this.options, ...options });
   }
-
-  public clearCache = () => {
-    this.cache.clear();
-  };
 }

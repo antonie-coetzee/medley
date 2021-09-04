@@ -1,12 +1,20 @@
-import { Type, Loader, isModule } from "../core";
+import { Type, Loader, isModule, isVirtualModule, Link, Node } from "../core";
 import { NodeFunction } from "../NodeFunction";
 
 export class TypeRepo {
   private typeMap: Map<string, Type> = new Map();
+  private scopedTypeMap: Map<string, Type> = new Map();
   private baseUrl?: URL;
 
-  constructor(private loader: Loader, onConstruct?:(this:TypeRepo)=>void) {
+  constructor(private loader: Loader, onConstruct?: (this: TypeRepo) => void) {
     onConstruct?.call(this);
+  }
+
+  public newChild() {
+    const childTypeRepo = new TypeRepo(this.loader);
+    childTypeRepo.typeMap = this.typeMap;
+    childTypeRepo.baseUrl = this.baseUrl;
+    return childTypeRepo;
   }
 
   public load(types: Type[], baseUrl: URL) {
@@ -20,11 +28,22 @@ export class TypeRepo {
     }
   }
 
-  public getNodeFunction = async (typeName: string): Promise<NodeFunction> => {
-    return this.getExportFunction<NodeFunction>(typeName);
+  public getNodeFunction = async <
+    TNode extends Node = Node,
+    TType extends Type = Type,
+    TLink extends Link = Link
+  >(
+    typeName: string
+  ): Promise<NodeFunction<{}, TNode, TType, TLink>> => {
+    return this.getExportFunction<NodeFunction<{}, TNode, TType, TLink>>(
+      typeName
+    );
   };
 
-  public async getExportFunction<T extends Function = Function>(typeName: string, functionName?: string) {
+  public async getExportFunction<T extends Function = Function>(
+    typeName: string,
+    functionName?: string
+  ) {
     const moduleFunction = await this.getExport(typeName, functionName);
     if (typeof moduleFunction !== "function") {
       throw new Error(`export ${typeName}[${functionName}] not a function`);
@@ -33,7 +52,7 @@ export class TypeRepo {
   }
 
   public async getExport(typeName: string, name: string = "default") {
-    const type = this.typeMap.get(typeName);
+    const type = this.scopedTypeMap.get(typeName) ?? this.typeMap.get(typeName);
     if (type == null) {
       throw new Error(`type with name: '${typeName}' not found`);
     }
@@ -58,20 +77,23 @@ export class TypeRepo {
     return module[exportName];
   }
 
-  public getTypes(): Type[] {
-    return Array.from(this.typeMap.values());
+  public getTypes(scoped?: boolean): Type[] {
+    let map = this.getMap(scoped);
+    return Array.from(map.values());
   }
 
-  public getType(typeName: string): Type {
-    const type = this.typeMap.get(typeName);
+  public getType(typeName: string, scoped?: boolean): Type {
+    let map = this.getMap(scoped);
+    const type = map.get(typeName);
     if (type == null) {
       throw new Error(`type with name: '${typeName}', not found`);
     }
     return type;
   }
 
-  public hasType(typeName: string): boolean {
-    const type = this.typeMap.get(typeName);
+  public hasType(typeName: string, scoped?: boolean): boolean {
+    let map = this.getMap(scoped);
+    const type = map.get(typeName);
     if (type == null) {
       return false;
     } else {
@@ -79,14 +101,20 @@ export class TypeRepo {
     }
   }
 
-  public deleteType(typeName: string) {
-    return this.typeMap.delete(typeName);
+  public deleteType(typeName: string, scoped?: boolean) {
+    let map = this.getMap(scoped);
+    return map.delete(typeName);
   }
 
-  public addType(type: Type) {
-    if (this.typeMap.has(type.name)) {
+  public addType(type: Type, scoped?: boolean) {
+    let map = this.getMap(scoped);
+    if (map.has(type.name)) {
       throw new Error(`type with name: '${type.name}' exists`);
     }
-    this.typeMap.set(type.name, type);
+    map.set(type.name, type);
+  }
+
+  private getMap(scoped?: boolean) {
+    return scoped ? this.scopedTypeMap : this.typeMap;
   }
 }

@@ -1,24 +1,22 @@
-import { Type, Node } from "../core";
+import { Type, Node, Link } from "../core";
 import { FlowEngine } from "../FlowEngine";
 import { TypeRepo, NodeRepo, LinkRepo } from "../repos";
 
-export class NodesApi<TNode extends Node = Node>
-  implements Omit<NodeRepo, "deleteNode" | "deleteNodesByType" | "upsertNode">
+export class NodesApi<
+TNode extends Node = Node,
+TType extends Type = Type,
+TLink extends Link = Link
+>
+  implements Omit<NodeRepo, "deleteNode" | "deleteNodesByType" | "upsertNode" | "load" | "nodeMap">
 {
-  public nodeMap: Map<string, Node<undefined>>;
-
   constructor(
-    private flowEngine: FlowEngine,
+    private flowEngine: FlowEngine<TNode, TType, TLink>,
     private nodeRepo: NodeRepo,
     private typeRepo: TypeRepo,
     private linkRepo: LinkRepo
   ) {
-    this.nodeMap = nodeRepo.nodeMap;
   }
 
-  public load(nodes: Node[]): void {
-    return this.nodeRepo.load(nodes);
-  }
   public getNode(id: string) {
     return this.nodeRepo.getNode(id) as TNode;
   }
@@ -39,15 +37,15 @@ export class NodesApi<TNode extends Node = Node>
     return this.nodeRepo.getUsedTypes();
   }
 
-  public runNode = async <T>(
+  public runNode<T>(
     context: {} | null,
     nodeId: string,
     ...args: any[]
-  ): Promise<T> => {
+  ): Promise<T> {
     return this.flowEngine.runNodeFunction(context, nodeId, ...args);
-  };
+  }
 
-  public upsertNode = (node: Partial<Node>, type?: Type): TNode => {
+  public upsertNode(node: Partial<Node>, type?: Type): TNode {
     let nodeType: Type;
     if (type) {
       nodeType = type;
@@ -66,15 +64,15 @@ export class NodesApi<TNode extends Node = Node>
       type: nodeType.name,
     });
     return outNode as TNode;
-  };
+  }
 
-  public copyNode = (node: Node) => {
+  public copyNode(node: Node) {
     const nodeCopy = JSON.parse(JSON.stringify(node)) as Partial<Node>;
     delete nodeCopy.id;
     return this.upsertNode(nodeCopy) as TNode;
-  };
+  }
 
-  public deleteNode = (nodeId: string) => {
+  public deleteNode(nodeId: string) {
     const typeName = this.nodeRepo.getTypeNameFromNodeId(nodeId);
     if (typeName == null) {
       throw new Error(`type name for node with id: '${nodeId}', not found`);
@@ -87,5 +85,5 @@ export class NodesApi<TNode extends Node = Node>
       );
     }
     const deleted = this.nodeRepo.deleteNode(nodeId);
-  };
+  }
 }

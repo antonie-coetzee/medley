@@ -7,7 +7,7 @@ const nodeFunction: NF<{
   const {
     logger,
     input,
-    xmlFormatter,
+    xmlFormatter
   } = cntx;
   logger.info("log from ModuleOne.typeOne");
   cntx.customContextProp = testArg;
@@ -23,8 +23,7 @@ const nodeFunction: NF<{
   } else {
     return xml;
   }
-};
-
+}
 
 export default nodeFunction;
 

@@ -1,162 +1,93 @@
-import { Link } from "../core";
+import { Link, TreeMap } from "../core";
+
+export type LinkRepoOptions = {};
 
 export class LinkRepo {
-  private linkSourceMap: Map<string, Link[]> = new Map();
-  private linkTargetMap: Map<string, Link[]> = new Map();
+  private static defaultParent = "root";
+  /* Parent -> Port -> Target -> Source -> link */
+  private targetMap: TreeMap<Link>;
+  /* Parent -> Source -> Target -> Port -> link */
+  private sourceMap: TreeMap<Link>;
 
   constructor(onConstruct?: (this: LinkRepo) => void) {
     onConstruct?.call(this);
+    this.targetMap = new TreeMap();
+    this.sourceMap = new TreeMap();
   }
 
   public load(links: Link[]) {
-    this.linkTargetMap.clear();
-    this.linkSourceMap.clear();
+    this.targetMap.clear();
+    this.sourceMap.clear();
     for (const link of links) {
       this.addToTargetMap(link);
       this.addToSourceMap(link);
     }
   }
 
-  public getTargetLinks(
+  public getPortLinks(
+    port: string,
     target: string,
-    name?: string,
-    resolve: boolean = true
+    parent: string = LinkRepo.defaultParent,
   ) {
-    const key = toTargetKey(target, name);
-    if (resolve) {
-      const links = this.resolveLinks(this.linkTargetMap.get(key))?.map(
-        (l) => {
-          return { source: l.source, target, name };
-        }
-      );
-      return links;
-    } else {
-      return this.linkTargetMap.get(key);
-    }
+    const links = this.targetMap.getFromPath(false, parent, port, target);
+    return links;
   }
 
-  public getSourceLinks(source: string) {
-    return this.linkSourceMap.get(source);
-  }
-
-  public addLink(
+  public getSourceLinks(
     source: string,
-    target: string,
-    name?: string,
+    parent: string = LinkRepo.defaultParent,
   ) {
-    const newLink = {
-      target,
-      source,
-      name,
-    };
-    const links = this.getTargetLinks(target, name);
-    const existingLink = links?.find((l) => {
-      if (linksAreEqual(l, newLink)) {
-        return l;
-      }
-    });
-    if (existingLink) {
-      return;
-    }
+    const links = this.sourceMap.getFromPath(true, parent, source);
+    return links;
+  }
 
+  public addLink(newLink: Link) {
     this.addToTargetMap(newLink);
     this.addToSourceMap(newLink);
   }
 
-  public getLinks() {
-    return Array.from(this.linkTargetMap.values())
-      .flatMap((el) => el)
-      .sort((a, b) => a.target.localeCompare(b.target));
+  public getLinks(parent?: string) {
+    if (parent) {
+      return this.targetMap.getFromPath(true, parent);
+    } else {
+      return this.targetMap.getAll();
+    }
   }
 
   public deleteLink(link: Link) {
-    const links = this.getTargetLinks(link.target);
-    const existingLink = links?.find((l) => {
-      if (linksAreEqual(l, link)) {
-        return l;
-      }
-    });
-    if (existingLink) {
-      this.deleteFromTargetMap(link);
-      this.deleteFromSourceMap(link);
-    }
+    this.deleteFromTargetMap(link);
+    this.deleteFromSourceMap(link);
   }
 
   private addToTargetMap(link: Link) {
-    const key = toTargetKey(link.target, link.name);
-    if (this.linkTargetMap.has(key)) {
-      const links = this.linkTargetMap.get(key);
-      links?.push(link);
-    } else {
-      this.linkTargetMap.set(key, [link]);
-    }
+    let parent = link.parent || LinkRepo.defaultParent;
+    this.targetMap.setNodeValue(
+      link,
+      parent,
+      link.port,
+      link.target,
+      link.source
+    );
   }
 
   private addToSourceMap(link: Link) {
-    const key = link.source;
-    if (this.linkSourceMap.has(key)) {
-      const links = this.linkSourceMap.get(key);
-      links?.push(link);
-    } else {
-      this.linkSourceMap.set(key, [link]);
-    }
+    let parent = link.parent || LinkRepo.defaultParent;
+    this.sourceMap.setNodeValue(
+      link,
+      parent,
+      link.source,
+      link.target,
+      link.port
+    );
   }
 
   private deleteFromTargetMap(link: Link) {
-    const key = toTargetKey(link.target);
-    if (this.linkTargetMap.has(key)) {
-      const links = this.linkTargetMap.get(key);
-      if (links && links?.length > 1) {
-        const idx = links.findIndex((l) => linksAreEqual(l, link));
-        if (idx && idx > -1) {
-          links?.splice(idx, 1);
-        }
-      } else {
-        this.linkTargetMap.delete(key);
-      }
-    }
+    let parent = link.parent || LinkRepo.defaultParent;
+    this.sourceMap.deleteNode(parent, link.port, link.target, link.source);
   }
 
   private deleteFromSourceMap(link: Link) {
-    const key = link.source;
-    if (this.linkSourceMap.has(key)) {
-      const links = this.linkSourceMap.get(key);
-      if (links && links?.length > 1) {
-        const idx = links.findIndex((l) => linksAreEqual(l, link));
-        if (idx && idx > -1) {
-          links?.splice(idx, 1);
-        }
-      } else {
-        this.linkSourceMap.delete(key);
-      }
-    }
-  }
-
-  private resolveLinks(links: Link[] | undefined) {
-    const srcLinks = links?.flatMap((l) => {
-      const targetLinks = this.linkTargetMap.get(l.source);
-      if(targetLinks){
-        return this.resolveLinks(targetLinks);
-      }else{
-        return l;
-      }      
-    }) as Link[] | undefined;
-    return srcLinks;
+    let parent = link.parent || LinkRepo.defaultParent;
+    this.sourceMap.deleteNode(parent, link.source, link.target, link.port);
   }
 }
-
-const toTargetKey = function (targetId: string, name?: string) {
-  if(name){
-    return `${targetId}.${name}`;
-  }else{
-    return targetId;
-  }    
-}
-
-const linksAreEqual = function (linkA: Link, linkB: Link) {
-  return (
-    linkA.target === linkB.target &&
-    linkA.source === linkB.source &&
-    linkA.name === linkB.name
-  );
-};

@@ -2,27 +2,19 @@ import { Link } from "../core";
 import { LinkRepo } from "../repos";
 
 export class LinksApi<TLink extends Link = Link>
-  implements Omit<LinkRepo, "deleteNode" | "deleteNodesByType" | "upsertNode">
+  implements Omit<LinkRepo, "load">
 {
-  constructor(private linkRepo: LinkRepo) {}
+  constructor(private linkRepo: LinkRepo, private parent?:string) {}
 
-  public load(links: TLink[]): void {
-    return this.linkRepo.load(links);
+  public getPortLinks(port:string, target: string): TLink[] {
+      return this.linkRepo.getPortLinks(port, target, this.parent) as TLink[];
   }
 
-  public getTargetLinks(
-    target: string,
-    name?: string,
-    resolve?: boolean
-  ): Link[] | undefined {
-    return this.linkRepo.getTargetLinks(target, name, resolve) as TLink[];
+  public getSourceLinks(source: string): TLink[] {
+    return this.linkRepo.getSourceLinks(source, this.parent) as TLink[];
   }
-
-  public getSourceLinks(nodeId: string): TLink[] | undefined {
-    return this.linkRepo.getSourceLinks(nodeId) as TLink[];
-  }
-  public addLink(source: string, target: string, port: string): void {
-    return this.linkRepo.addLink(source, target, port);
+  public addLink(newLink: TLink): void {
+    return this.linkRepo.addLink(newLink);
   }
   public getLinks(): TLink[] {
     return this.linkRepo.getLinks() as TLink[];

@@ -8,6 +8,7 @@ export interface TypeVersion {
   version: string;
   module: Module;
   cache?: boolean;
+  composite?: boolean;
   /*
    ** string: (standard export name) -> (different export name)
    ** Module: (standard export name) -> (different module).(standard export name)

@@ -1,9 +1,9 @@
-import { Type } from "../core";
+import { Link, Type, Node } from "../core";
 import { NodeFunction } from "../NodeFunction";
 import { TypeRepo } from "../repos";
 
 export class TypesApi<TType extends Type = Type>
-  implements Omit<TypeRepo, "deleteType">
+  implements Omit<TypeRepo, "deleteType" | "newChild">
 {
   constructor(private typeRepo: TypeRepo) {}
 
@@ -11,8 +11,12 @@ export class TypesApi<TType extends Type = Type>
     this.typeRepo.load(types, baseUrl);
   }
 
-  public async getNodeFunction(typeName: string): Promise<NodeFunction> {
-    return this.typeRepo.getNodeFunction(typeName);
+  public async getNodeFunction<
+  TNode extends Node = Node,
+  TType extends Type = Type,
+  TLink extends Link = Link
+  >(typeName: string): Promise<NodeFunction<{}, TNode,TType,TLink>> {
+    return this.typeRepo.getNodeFunction<TNode,TType,TLink>(typeName);
   }
 
   public async getExportFunction<T extends Function = Function>(

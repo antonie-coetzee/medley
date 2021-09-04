@@ -1,5 +1,6 @@
-export interface Link {
+export interface Link { 
   source: string;
   target: string;
-  name?:string;
+  port:string;
+  parent?: string;
 }
