@@ -52,25 +52,27 @@ export class TreeMap<T> {
     }
   }
 
-  public getFromPath(recursive: boolean, ...path: string[]): T[] | undefined {
+  public getFromPath(recursive: boolean, ...path: string[]): T[] {
     this.checkPath(path);
     const nodeAtPath = this.getNodeFromPath(this.rootNode, false, path);
     if (nodeAtPath) {
       if (!recursive) {
         if(nodeAtPath.tmap){
-          return Object.values(nodeAtPath.tmap).map(n=>n.value as T);
+          return Object.values(nodeAtPath.tmap).map(n=>n.value as T) || [];
         }else{
           return [nodeAtPath.value as T];
         } 
       } else {
-        return this.getNodeValuesRecursive(nodeAtPath);
+        return this.getNodeValuesRecursive(nodeAtPath) || [];
       }
+    }else{
+      return [];
     }
   }
 
-  public getAll(): T[] | undefined {
+  public getAll(): T[] {
     const childNodes = Object.values(this.rootNode);
-    return childNodes.flatMap((cn) => this.getNodeValuesRecursive(cn));
+    return childNodes.flatMap((cn) => this.getNodeValuesRecursive(cn)) || [];
   }
 
   public clear() {
@@ -117,11 +119,11 @@ export class TreeMap<T> {
         tempNode = Object.create(null);
         currentNode[path[i]] = tempNode;
       }
-      if (tempNode == null) {
-        return;
-      }
       if (createIfNotExists && tempNode.tmap == null && i < path.length - 1) {
         tempNode.tmap = Object.create(null);
+      }
+      if (tempNode == null) {
+        return;
       }
       if (i === path.length - 1) {
         currentNode = tempNode;

@@ -5,7 +5,8 @@ export type LinkRepoOptions = {};
 export class LinkRepo {
   private static defaultParent = "root";
   /* Parent -> Port -> Target -> Source -> link */
-  private targetMap: TreeMap<Link>;
+  private targetMap: TreeMap<Link>;  
+  private updateSourceMap:boolean = false;
   /* Parent -> Source -> Target -> Port -> link */
   private sourceMap: TreeMap<Link>;
 
@@ -20,9 +21,8 @@ export class LinkRepo {
     this.sourceMap.clear();
     for (const link of links) {
       this.addToTargetMap(link);
-      this.addToSourceMap(link);
     }
-    //console.log(this.targetMap.toJson());
+    this.updateSourceMap = true;
   }
 
   public getPortLinks(
@@ -38,13 +38,20 @@ export class LinkRepo {
     source: string,
     parent: string = LinkRepo.defaultParent,
   ) {
-    const links = this.sourceMap.getFromPath(true, parent, source);
-    return links;
+    if(this.updateSourceMap){
+      this.sourceMap.clear();
+      const allLinks = this.targetMap.getAll();
+      for (const link of allLinks ) {
+        this.addToSourceMap(link);
+      }
+    }
+    
+    return this.sourceMap.getFromPath(true, parent, source);
   }
 
   public addLink(newLink: Link) {
     this.addToTargetMap(newLink);
-    this.addToSourceMap(newLink);
+    this.updateSourceMap = true;
   }
 
   public getLinks(parent?: string) {
@@ -56,8 +63,9 @@ export class LinkRepo {
   }
 
   public deleteLink(link: Link) {
-    this.deleteFromTargetMap(link);
-    this.deleteFromSourceMap(link);
+    let parent = link.parent || LinkRepo.defaultParent;
+    this.targetMap.deleteNode(parent, link.port, link.target, link.source);
+    this.updateSourceMap = true;
   }
 
   private addToTargetMap(link: Link) {
@@ -80,15 +88,5 @@ export class LinkRepo {
       link.target,
       link.port
     );
-  }
-
-  private deleteFromTargetMap(link: Link) {
-    let parent = link.parent || LinkRepo.defaultParent;
-    this.sourceMap.deleteNode(parent, link.port, link.target, link.source);
-  }
-
-  private deleteFromSourceMap(link: Link) {
-    let parent = link.parent || LinkRepo.defaultParent;
-    this.sourceMap.deleteNode(parent, link.source, link.target, link.port);
   }
 }
