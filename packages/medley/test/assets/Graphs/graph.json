@@ -88,32 +88,22 @@
   ],
   "links": [
     {
-      "name": "typeOnePortOne",
+      "port": "typeOnePortOne",
       "target": "nodeOne",
       "source": "nodeTwo"
     },
     {
-      "name": "typeOnePortTwo",
+      "port": "typeOnePortTwo",
       "target": "nodeOne",
       "source": "nodeThree"
     },
     {
-      "name": "typeTwoPortOne",
+      "port": "typeTwoPortOne",
       "target": "nodeTwo",
       "source": "nodeFive"
     },
-
     {
-      "name": "typeFivePortOne",
-      "target": "nodeFive",
-      "source": "chainedLink"
-    },
-    {
-      "target": "chainedLink",
-      "source": "nodeFour"
-    },
-    {
-      "name": "typeFivePortTwo",
+      "port": "typeFivePortOne",
       "target": "nodeFive",
       "source": "nodeFour"
     }

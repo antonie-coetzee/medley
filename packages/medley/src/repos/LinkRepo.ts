@@ -22,6 +22,7 @@ export class LinkRepo {
       this.addToTargetMap(link);
       this.addToSourceMap(link);
     }
+    //console.log(this.targetMap.toJson());
   }
 
   public getPortLinks(

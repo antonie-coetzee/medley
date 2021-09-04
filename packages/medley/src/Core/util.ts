@@ -58,7 +58,7 @@ export class TreeMap<T> {
     if (nodeAtPath) {
       if (!recursive) {
         if(nodeAtPath.tmap){
-          return [];
+          return Object.values(nodeAtPath.tmap).map(n=>n.value as T);
         }else{
           return [nodeAtPath.value as T];
         } 
@@ -75,6 +75,10 @@ export class TreeMap<T> {
 
   public clear() {
     return (this.rootNode = {});
+  }
+
+  public toJson() {
+    return JSON.stringify(this.rootNode, null, " ");
   }
 
   private checkPath(path: string[]) {
@@ -109,14 +113,14 @@ export class TreeMap<T> {
     let currentNode: TreeMapNode<T> = rootNode;
     for (let i = 0; i < path.length; i++) {
       let tempNode = currentNode[path[i]];
-      if (tempNode == null && createIfNotExists) {
+      if (createIfNotExists && tempNode == null) {
         tempNode = Object.create(null);
         currentNode[path[i]] = tempNode;
       }
       if (tempNode == null) {
         return;
       }
-      if (tempNode.tmap == null && createIfNotExists && i < path.length - 1) {
+      if (createIfNotExists && tempNode.tmap == null && i < path.length - 1) {
         tempNode.tmap = Object.create(null);
       }
       if (i === path.length - 1) {

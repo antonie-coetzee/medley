@@ -1,6 +1,6 @@
 import { TreeMap } from "../../src";
 
-describe("treemap", function () {
+describe.skip("treemap", function () {
   it("can add and retrieve a value", function () {
     const treemap = new TreeMap<string>();
     treemap.setNodeValue("test", "1");
@@ -12,6 +12,12 @@ describe("treemap", function () {
     treemap.setNodeValue("test", "1", "2");
     const testVal = treemap.getNodeValue("1", "2");
     expect(testVal).toBe("test");
+  });
+  it("can add and retrieve", function () {
+    const treemap = new TreeMap<string>();
+    treemap.setNodeValue( "asd", "root", "typeOnePortOne", "nodeOne", "nodeTwo");
+    const testVal = treemap.getFromPath(true, "root", "typeOnePortOne", "nodeOne");
+    expect(testVal).toBe("asd");
   });
   it("can add multiple values and retrieve specific", function () {
     const treemap = new TreeMap<string>();
