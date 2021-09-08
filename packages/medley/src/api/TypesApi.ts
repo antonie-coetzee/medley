@@ -11,13 +11,13 @@ export class TypesApi<TType extends Type = Type>
     this.typeRepo.load(types, baseUrl);
   }
 
-  public async getNodeFunction<
-  TNode extends Node = Node,
-  TType extends Type = Type,
-  TLink extends Link = Link
-  >(typeName: string): Promise<NodeFunction<{}, TNode,TType,TLink>> {
-    return this.typeRepo.getNodeFunction<TNode,TType,TLink>(typeName);
-  }
+  // public async getNodeFunction<
+  // TNode extends Node = Node,
+  // TType extends Type = Type,
+  // TLink extends Link = Link
+  // >(typeName: string): Promise<NodeFunction<{}, TNode,TType,TLink>> {
+  //   return this.typeRepo.getNodeFunction<TNode,TType,TLink>(typeName);
+  // }
 
   public async getExportFunction<T extends Function = Function>(
     typeName: string,
@@ -42,7 +42,7 @@ export class TypesApi<TType extends Type = Type>
     return this.typeRepo.hasType(typeName);
   }
 
-  public addType(type: TType) {
-    return this.typeRepo.addType(type);
+  public addType(type: TType, scoped?: boolean) {
+    return this.typeRepo.addType(type, scoped);
   }
 }

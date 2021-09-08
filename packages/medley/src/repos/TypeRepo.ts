@@ -1,5 +1,4 @@
-import { Type, Loader, isModule, isVirtualModule, Link, Node } from "../core";
-import { NodeFunction } from "../NodeFunction";
+import { Type, Loader, isModule } from "../core";
 
 export class TypeRepo {
   private typeMap: Map<string, Type> = new Map();
@@ -28,25 +27,13 @@ export class TypeRepo {
     }
   }
 
-  public getNodeFunction = async <
-    TNode extends Node = Node,
-    TType extends Type = Type,
-    TLink extends Link = Link
-  >(
-    typeName: string
-  ): Promise<NodeFunction<{}, TNode, TType, TLink>> => {
-    return this.getExportFunction<NodeFunction<{}, TNode, TType, TLink>>(
-      typeName
-    );
-  };
-
   public async getExportFunction<T extends Function = Function>(
     typeName: string,
     functionName?: string
   ) {
     const moduleFunction = await this.getExport(typeName, functionName);
     if (typeof moduleFunction !== "function") {
-      throw new Error(`export ${typeName}[${functionName}] not a function`);
+      throw new Error(`export '${functionName}' from type '${typeName}' not a function`);
     }
     return moduleFunction as T;
   }

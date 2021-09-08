@@ -1,6 +1,6 @@
 import { TreeMap } from "../../src";
 
-describe.skip("treemap", function () {
+describe("treemap", function () {
   it("can add and retrieve a value", function () {
     const treemap = new TreeMap<string>();
     treemap.setNodeValue("test", "1");
@@ -17,7 +17,7 @@ describe.skip("treemap", function () {
     const treemap = new TreeMap<string>();
     treemap.setNodeValue( "asd", "root", "typeOnePortOne", "nodeOne", "nodeTwo");
     const testVal = treemap.getFromPath(true, "root", "typeOnePortOne", "nodeOne");
-    expect(testVal).toBe("asd");
+    expect(testVal).toStrictEqual(["asd"]);
   });
   it("can add multiple values and retrieve specific", function () {
     const treemap = new TreeMap<string>();
@@ -98,7 +98,7 @@ describe.skip("treemap", function () {
     treemap.deleteNode("1", "2", "3");
 
     const nodesValAt3 = treemap.getFromPath(true, "1", "2", "3");
-    expect(nodesValAt3).toBeUndefined();
+    expect(nodesValAt3).toEqual([]);
 
     const nodesValAt4 = treemap.getFromPath(true, "1", "2", "4");
     expect(nodesValAt4).toEqual(expect.arrayContaining(["e", "f"]));
@@ -134,12 +134,12 @@ describe.skip("treemap", function () {
     treemap.deleteNode("1");
 
     const dir1 = treemap.getFromPath(true, "1");
-    expect(dir1).toBeUndefined();
+    expect(dir1).toEqual([]);
 
     const dir3 = treemap.getFromPath(true, "1", "2", "3");
-    expect(dir3).toBeUndefined();
+    expect(dir3).toEqual([]);
 
     const dir4 = treemap.getFromPath(true, "1", "2", "4");
-    expect(dir4).toBeUndefined();
+    expect(dir4).toEqual([]);
   });     
 });

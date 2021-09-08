@@ -1,7 +1,7 @@
 import { URL } from "url";
 import { Loader, Module, LoaderOptions, ModuleType } from "../../src/index";
 
-describe.skip("Loader", function () {
+describe("Loader", function () {
   it("should load a systemjs module without a baseUrl", async function () {
     const importFn = jest.fn((url: string) => Promise.resolve(true));
     const loaderOptions:LoaderOptions = {

@@ -21,7 +21,6 @@ export const typeFiveNodeFunction:NF = async ({
 }) => {
   logger.info("log from ModuleTwo.typeFive");
   const portOneValue = await input(typeFivePortOne);
-  const portTwoValue = await input(typeFivePortTwo);
   return `<moduleTwo-typeFive>${portOneValue}</moduleTwo-typeFive>`;
 }
 

@@ -1,6 +1,8 @@
 import { ExecutionContext } from "./Context";
 import { Link, Type, Node } from "./core";
 
+export const nodeFunctionExportName = "nodeFunction";
+
 export interface NodeFunction<
   TContext extends {} = {},
   TNode extends Node = Node,

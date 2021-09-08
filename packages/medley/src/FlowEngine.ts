@@ -1,7 +1,7 @@
 import { Medley } from "./Medley";
 import { Link, Node, Type, TypedPort } from "./core";
 import { PortInput, ExecutionContext } from "./Context";
-import { NodeFunction } from "./NodeFunction";
+import { NodeFunction, nodeFunctionExportName } from "./NodeFunction";
 
 export class FlowEngine<
   TNode extends Node = Node,
@@ -63,11 +63,9 @@ export class FlowEngine<
     };
 
     const node = flowEngine.medley.nodes.getNode(nodeId);
-    const nodeFunction = await flowEngine.medley.types.getNodeFunction<
-      TNode,
-      TType,
-      TLink
-    >(node.type);
+    const nodeFunction = await flowEngine.medley.types.getExportFunction<
+      NodeFunction<{}, TNode, TType, TLink>
+    >(node.type, nodeFunctionExportName);
 
     const portInput = flowEngine.buildPortInputFunction(
       flowEngine.medley,

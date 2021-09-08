@@ -1,2 +1,2 @@
-export * from "./EditComponent"
-export * from "./dragAndDropTypes"
+export * from "./type/edit"
+export * from "./util/dragAndDropTypes"

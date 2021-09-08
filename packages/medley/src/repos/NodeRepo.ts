@@ -1,10 +1,5 @@
 import { generateId, Node } from "../core";
 
-/**
- * read only access to a node repo
- */
-export type NodesRO = Omit<NodeRepo, "upsertNode" | "deleteNode" | "deleteNodesByType" | "load">;
-
 export class NodeRepo {
   public nodeMap: Map<string, Node> = new Map();
 

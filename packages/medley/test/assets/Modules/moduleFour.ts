@@ -4,8 +4,6 @@ type extendedContext = {
   customContextProp: string;
 };
 
-const nodeFunction: NF<extendedContext> = ({ customContextProp }) => {
+export const nodeFunction: NF<extendedContext> = ({ customContextProp }) => {
   return `<moduleFour-typeFour context="${customContextProp}"></moduleFour-typeFour>`;
 };
-
-export default nodeFunction;

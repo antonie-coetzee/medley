@@ -1,6 +1,6 @@
 import { NF, TypedPort } from "medley";
 
-const nodeFunction: NF<{
+export const nodeFunction: NF<{
   customContextProp: string;
   xmlFormatter?: (xmlString: string) => string;
 }> = async (cntx, testArg: string) => {
@@ -24,8 +24,6 @@ const nodeFunction: NF<{
     return xml;
   }
 }
-
-export default nodeFunction;
 
 const portOne: TypedPort<string> = {
   name: "typeOnePortOne",
