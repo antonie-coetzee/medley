@@ -1,18 +1,14 @@
-import { NF, TypedPort } from "medley";
+import { NF, PortSingle } from "medley";
 
 export const nodeFunction: NF<{
-  customContextProp: string;
   xmlFormatter?: (xmlString: string) => string;
-}> = async (cntx, testArg: string) => {
-  const {
-    logger,
-    input,
-    xmlFormatter
-  } = cntx;
+}> = async ({ logger, xmlFormatter, input }, testArg: string) => {
   logger.info("log from ModuleOne.typeOne");
-  cntx.customContextProp = testArg;
   const portOneValue = await input(portOne);
-  const portTwoValue = await input(portTwo);
+  const portTwoValue = await input<typeof portTwo>({
+    ...portTwo,
+    context: { customContextProp: testArg },
+  });
 
   const xml = `<moduleOne-typeOne>${portOneValue}${portTwoValue}</moduleOne-typeOne>`;
 
@@ -23,13 +19,12 @@ export const nodeFunction: NF<{
   } else {
     return xml;
   }
-}
+};
 
-const portOne: TypedPort<string> = {
+const portOne: PortSingle<string> = {
   name: "typeOnePortOne",
 };
 
-const portTwo: TypedPort<string> = {
+const portTwo: PortSingle<string> = {
   name: "typeOnePortTwo",
-  singleArity: false,
 };

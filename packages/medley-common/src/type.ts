@@ -1,9 +1,7 @@
 import React from "react";
 import { BasicContext, Link, Medley, Node, Port, Type } from "medley";
 
-export type EditNodeComponentProps<TNode extends Node = Node> = {
-  medley: Medley<TNode>;
-  node: TNode;
+export type EditNodeComponentProps<TNode extends Node = Node> = BasicContext<TNode> & {
   onSave: (saveCallback: () => void) => void;
   isChanged: () => void;
 };

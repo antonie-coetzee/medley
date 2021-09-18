@@ -1,4 +1,4 @@
-import { NF, PortInput, Type, Node } from "medley";
+import { NF, Input, Type, Node } from "medley";
 
 export const nodeFunction: NF<{}, Node<{outputId:string}>> = (cntx) => {
   const { node, medley, input } = cntx;
@@ -16,7 +16,7 @@ export const nodeFunction: NF<{}, Node<{outputId:string}>> = (cntx) => {
   }
 };
 
-function getInputType(input: PortInput): Type {
+function getInputType(input: Input): Type {
   const nodeFunction: NF<
     {},
     Node<{

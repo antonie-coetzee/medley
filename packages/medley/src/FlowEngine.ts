@@ -1,6 +1,6 @@
 import { Medley } from "./Medley";
-import { Link, Node, Type, TypedPort } from "./core";
-import { PortInput, ExecutionContext } from "./Context";
+import { Link, Node, Type, Port } from "./core";
+import { Input, ExecutionContext } from "./Context";
 import { NodeFunction, nodeFunctionExportName } from "./NodeFunction";
 
 export class FlowEngine<
@@ -67,18 +67,20 @@ export class FlowEngine<
       NodeFunction<{}, TNode, TType, TLink>
     >(node.type, nodeFunctionExportName);
 
-    const portInput = flowEngine.buildPortInputFunction(
-      flowEngine.medley,
-      node,
-      runNodeFunction
-    );
-
     const childContext = flowEngine.createContext(
       context,
       flowEngine.medley,
-      node,
-      portInput
+      node
     );
+
+    const portInput = flowEngine.buildPortInputFunction(
+      flowEngine.medley,
+      node,
+      childContext,
+      runNodeFunction
+    );
+
+    childContext.input = portInput as Input;
 
     return (...args: any[]) => nodeFunction(childContext, ...args);
   }
@@ -86,8 +88,7 @@ export class FlowEngine<
   private createContext(
     parentContext: ExecutionContext<TNode, TType, TLink> | void,
     medley: Medley<TNode, TType, TLink>,
-    node: TNode,
-    portInput: PortInput
+    node: TNode
   ): ExecutionContext<TNode, TType, TLink> {
     const logger = medley.logger.child({
       typeName: node.type,
@@ -98,17 +99,16 @@ export class FlowEngine<
       ...parentContext,
       medley,
       node,
-      logger,
-      input: portInput,
+      logger
     };
 
-    childContext.input = childContext.input.bind(childContext);
     return childContext as ExecutionContext<TNode, TType, TLink>;
   }
 
   private buildPortInputFunction(
     medley: Medley<TNode, TType, TLink>,
     node: Node,
+    context: ExecutionContext<TNode, TType, TLink>,
     runNodeFunction: <T>(
       context: ExecutionContext<TNode, TType, TLink>,
       nodeId: string,
@@ -116,8 +116,8 @@ export class FlowEngine<
     ) => Promise<T>
   ) {
     const portInputFunction = async function <T>(
-      this: ExecutionContext<TNode, TType, TLink>,
-      port: TypedPort<T>
+      port: Port,
+      ...args: any[]
     ): Promise<T | undefined> {
       let links = medley.links.getPortLinks(port.name, node.id);
       if (links == null || links.length === 0) {
@@ -128,14 +128,16 @@ export class FlowEngine<
         throw new Error(`multiple links detected for port: '${port.name}'`);
       }
 
+      const executionContext = port.context ? {...context, ...port.context} : context;
+
       if (isSingle) {
         const link = links[0];
-        const result = runNodeFunction(this, link.source) as Promise<T>;
+        const result = runNodeFunction(executionContext, link.source, args) as Promise<T>;
         return result;
       } else {
         const results = await Promise.all(
           links.map((l) => {
-            const result = runNodeFunction(this, l.source) as Promise<
+            const result = runNodeFunction(executionContext, l.source, args) as Promise<
               UnArray<T>
             >;
             return result;

@@ -1,8 +1,13 @@
 export interface Port {
   name: string;
   singleArity?: boolean;
+  context?: {}
 }
 
-export interface TypedPort<TPort> extends Port {
-  type?: TPort;
+export type PortSingle<TPort> = Port & {
+  singleArity?:true;
+}
+
+export type PortMultiple<TPort> = Port & {
+  singleArity:false;
 }
