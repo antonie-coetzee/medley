@@ -13,7 +13,8 @@ TLink extends Link = Link
     private flowEngine: FlowEngine<TNode, TType, TLink>,
     private nodeRepo: NodeRepo,
     private typeRepo: TypeRepo,
-    private linkRepo: LinkRepo
+    private linkRepo: LinkRepo,
+    private parent?:string
   ) {
   }
 
@@ -30,7 +31,7 @@ TLink extends Link = Link
   }
 
   public getNodes(): Node[] {
-    return this.nodeRepo.getNodes() as TNode[];
+    return this.nodeRepo.getNodes(this.parent) as TNode[];
   }
 
   public getUsedTypes(): string[] {

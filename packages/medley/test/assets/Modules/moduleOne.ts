@@ -1,4 +1,4 @@
-import { NF, PortSingle } from "medley";
+import { NF, UniPort } from "medley";
 
 export const nodeFunction: NF<{
   xmlFormatter?: (xmlString: string) => string;
@@ -21,10 +21,10 @@ export const nodeFunction: NF<{
   }
 };
 
-const portOne: PortSingle<string> = {
+const portOne: UniPort<string> = {
   name: "typeOnePortOne",
 };
 
-const portTwo: PortSingle<string> = {
+const portTwo: UniPort<string> = {
   name: "typeOnePortTwo",
 };

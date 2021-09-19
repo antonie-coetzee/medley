@@ -10,7 +10,7 @@ export type EditNodeComponent<TNode extends Node = Node> = React.FC<
   EditNodeComponentProps<TNode>
 >;
 
-export interface getEditNodeComponent<TNode extends Node = Node> {
+export interface GetEditNodeComponent<TNode extends Node = Node> {
   (): EditNodeComponent<TNode>;
 }
 

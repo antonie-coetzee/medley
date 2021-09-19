@@ -1,13 +1,13 @@
 export interface Port {
   name: string;
-  singleArity?: boolean;
+  multiArity?: boolean;
   context?: {}
 }
 
-export type PortSingle<TPort> = Port & {
-  singleArity?:true;
+export type UniPort<TPort> = Port & {
+  multiArity?:false;
 }
 
-export type PortMultiple<TPort> = Port & {
-  singleArity:false;
+export type MultiPort<TPort> = Port & {
+  multiArity:true;
 }

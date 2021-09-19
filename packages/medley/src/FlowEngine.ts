@@ -74,7 +74,6 @@ export class FlowEngine<
     );
 
     const portInput = flowEngine.buildPortInputFunction(
-      flowEngine.medley,
       node,
       childContext,
       runNodeFunction
@@ -99,14 +98,13 @@ export class FlowEngine<
       ...parentContext,
       medley,
       node,
-      logger
+      logger,
     };
 
     return childContext as ExecutionContext<TNode, TType, TLink>;
   }
 
   private buildPortInputFunction(
-    medley: Medley<TNode, TType, TLink>,
     node: Node,
     context: ExecutionContext<TNode, TType, TLink>,
     runNodeFunction: <T>(
@@ -115,37 +113,49 @@ export class FlowEngine<
       ...args: any[]
     ) => Promise<T>
   ) {
+    const flowEngine = this;
     const portInputFunction = async function <T>(
       port: Port,
       ...args: any[]
-    ): Promise<T | undefined> {
-      let links = medley.links.getPortLinks(port.name, node.id);
+    ): Promise<T | T[] | undefined> {
+      let links = flowEngine.medley.links.getPortLinks(port.name, node.id);
       if (links == null || links.length === 0) {
         return;
       }
-      const isSingle = port.singleArity == null || port.singleArity;
+      const isSingle = port.multiArity == null || port.multiArity === false;
       if (isSingle && links.length !== 1) {
         throw new Error(`multiple links detected for port: '${port.name}'`);
       }
 
-      const executionContext = port.context ? {...context, ...port.context} : context;
+      const executionContext = port.context
+        ? { ...context, ...port.context }
+        : context;
 
       if (isSingle) {
         const link = links[0];
-        const result = runNodeFunction(executionContext, link.source, args) as Promise<T>;
+        const cacheItem = flowEngine.checkCache(node.id, args);
+        if (cacheItem && cacheItem.result) {
+          return cacheItem.result as T;
+        }
+        const result = runNodeFunction<T>(executionContext, link.source, args);
+        if (cacheItem && cacheItem.addToCache && cacheItem.key) {
+          flowEngine.addToCache(cacheItem.key, result);
+        }
         return result;
       } else {
+        const cacheItem = flowEngine.checkCache(node.id, args);
+        if (cacheItem && cacheItem.result) {
+          return cacheItem.result as T[];
+        }
         const results = await Promise.all(
-          links.map((l) => {
-            const result = runNodeFunction(executionContext, l.source, args) as Promise<
-              UnArray<T>
-            >;
-            return result;
-          })
+          links.map((l) => runNodeFunction<T>(executionContext, l.source, args))
         );
         if (results) {
-          const result = results.filter((e) => e !== undefined) as unknown;
-          return result as T;
+          const validResults = results.filter((e) => e !== undefined);
+          if (cacheItem && cacheItem.addToCache && cacheItem.key) {
+            flowEngine.addToCache(cacheItem.key, validResults);
+          }
+          return validResults;
         }
       }
     };
@@ -171,5 +181,3 @@ export class FlowEngine<
     this.resultCache.set(key, result);
   }
 }
-
-type UnArray<T> = T extends Array<infer U> ? U : T;

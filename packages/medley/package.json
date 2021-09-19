@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "medley",
+  "name": "@medley-org/medley",
   "version": "1.0.0",
   "type": "module",
   "main": "dist/medley.cjs.js",

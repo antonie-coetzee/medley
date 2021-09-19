@@ -1,7 +1,7 @@
 export enum ModuleType {
   ESM,
   SYSTEM,
-  VIRTUAL,
+  CUSTOM,
 }
 
 export interface BaseModule {
@@ -16,26 +16,38 @@ export interface SystemModule extends BaseModule {
   system: string;
 }
 
-export interface VirtualModule extends BaseModule {
-  exports: {};
+export interface CustomModule extends BaseModule {
+  import?: () => Promise<any>;
 }
 
-export type Module = EsmModule | SystemModule | VirtualModule;
+export type Module = EsmModule | SystemModule | CustomModule;
 
 export const isModule = (module: any): module is Module => {
   return (
     (module as EsmModule).esm !== undefined ||
     (module as SystemModule).system !== undefined || 
-    (module as VirtualModule).exports !== undefined
+    (module as CustomModule).import !== undefined
   );
 };
 
-export const toVirtualModule = (module: Module): VirtualModule | undefined => {
-    if((module as VirtualModule).exports !== undefined){
-        return module as VirtualModule;
+export const toEsmModule = (module: Module): EsmModule | undefined => {
+  if((module as EsmModule).esm !== undefined){
+      return module as EsmModule;
+  }
+};
+
+export const toSystemModule = (module: Module): SystemModule | undefined => {
+  if((module as SystemModule).system !== undefined){
+      return module as SystemModule;
+  }
+};
+
+export const toCustomModule = (module: Module): CustomModule | undefined => {
+    if((module as CustomModule).import !== undefined){
+        return module as CustomModule;
     }
 };
 
-export const isVirtualModule = (module: Module): boolean => {
-  return (module as VirtualModule).exports !== undefined ? true : false;
+export const isCustomModule = (module: Module): boolean => {
+  return (module as CustomModule).import !== undefined ? true : false;
 };

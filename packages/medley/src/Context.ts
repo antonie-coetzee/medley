@@ -1,12 +1,4 @@
-import {
-  Link,
-  Logger,
-  PortMultiple,
-  Node,
-  Type,
-  PortSingle,
-  Port,
-} from "./core";
+import { Link, Logger, MultiPort, Node, Type, UniPort, Port } from "./core";
 import { Medley } from "./Medley";
 
 type Unwrap<T> = T extends Promise<infer U>
@@ -17,28 +9,20 @@ type Unwrap<T> = T extends Promise<infer U>
   ? U
   : T;
 
-type typedPortOf<T> = T extends PortSingle<infer X>
+type TypeOfPort<T> = T extends UniPort<infer X>
   ? X
-  : T extends PortMultiple<infer Y>
+  : T extends MultiPort<infer Y>
   ? Y
   : never;
 
-export type Input = <
-  TPort extends Port
->(
-  port: TPort,
-  ...args: typedPortOf<TPort> extends (...args: any) => any
-    ? Parameters<typedPortOf<TPort>>
+export type Input = <TypedPort extends Port>(
+  port: TypedPort,
+  ...args: TypeOfPort<TypedPort> extends (...args: any) => any
+    ? Parameters<TypeOfPort<TypedPort>>
     : any[]
-) => typedPortOf<TPort> extends (...args: any) => any
-  ? TPort extends PortMultiple<typedPortOf<TPort>>
-    ? Promise<Unwrap<typedPortOf<TPort>>[] | undefined>
-    : Promise<Unwrap<typedPortOf<TPort>> | undefined>
-  : TPort extends PortMultiple<typedPortOf<TPort>>
-  ? Promise<Unwrap<typedPortOf<TPort>>[] | undefined>
-  : Promise<Unwrap<typedPortOf<TPort>> | undefined>;
-
-//export type Input<TPort extends unknown = unknown> = TPort extends (...args: any) => any ? FuncInput : BasicInput;
+) => TypedPort extends MultiPort<TypeOfPort<TypedPort>>
+  ? Promise<Unwrap<TypeOfPort<TypedPort>>[] | undefined>
+  : Promise<Unwrap<TypeOfPort<TypedPort>> | undefined>;
 
 export type BasicContext<
   TNode extends Node = Node,

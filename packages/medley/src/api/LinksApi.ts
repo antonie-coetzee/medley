@@ -2,12 +2,11 @@ import { Link } from "../core";
 import { LinkRepo } from "../repos";
 
 export class LinksApi<TLink extends Link = Link>
-  implements Omit<LinkRepo, "load">
-{
-  constructor(private linkRepo: LinkRepo, private parent?:string) {}
+  implements Omit<LinkRepo, "load"> {
+  constructor(private linkRepo: LinkRepo, private parent?: string) {}
 
-  public getPortLinks(port:string, target: string): TLink[] {
-      return this.linkRepo.getPortLinks(port, target, this.parent) as TLink[];
+  public getPortLinks(port: string, target: string): TLink[] {
+    return this.linkRepo.getPortLinks(port, target, this.parent) as TLink[];
   }
 
   public getSourceLinks(source: string): TLink[] {
@@ -17,7 +16,7 @@ export class LinksApi<TLink extends Link = Link>
     return this.linkRepo.addLink(newLink);
   }
   public getLinks(): TLink[] {
-    return this.linkRepo.getLinks() as TLink[];
+    return this.linkRepo.getLinks(this.parent) as TLink[];
   }
   public deleteLink(link: Link): void {
     return this.linkRepo.deleteLink(link);

@@ -1,4 +1,4 @@
-import { NF, PortSingle } from "medley";
+import { MultiPort, NF, UniPort } from "medley";
 
 export const typeTwoNodeFunction: NF = async ({ input, logger }) => {
   logger.info("log from ModuleTwo.typeTwo");
@@ -6,11 +6,18 @@ export const typeTwoNodeFunction: NF = async ({ input, logger }) => {
     ...typeTwoPortOne,
     context: { customContextProp: "dfg" },
   });
+
+  const testResult = await input(typeTwoPortMulti, "ssdf");
   return `<moduleTwo-typeTwo>${portOneValue}</moduleTwo-typeTwo>`;
 };
 
-const typeTwoPortOne: PortSingle<string> = {
+const typeTwoPortOne: UniPort<string> = {
   name: "typeTwoPortOne",
+};
+
+const typeTwoPortMulti: MultiPort<boolean> = {
+  multiArity: true,
+  name: "typeTwoPortMulti",
 };
 
 export const typeFiveNodeFunction: NF = async ({ logger, input }) => {
@@ -19,10 +26,10 @@ export const typeFiveNodeFunction: NF = async ({ logger, input }) => {
   return `<moduleTwo-typeFive>${portOneValue}</moduleTwo-typeFive>`;
 };
 
-const typeFivePortOne: PortSingle<string> = {
+const typeFivePortOne: UniPort<string> = {
   name: "typeFivePortOne",
 };
 
-const typeFivePortTwo: PortSingle<(arg1: string) => string> = {
+const typeFivePortTwo: UniPort<(arg1: string) => string> = {
   name: "typeFivePortTwo"
 };

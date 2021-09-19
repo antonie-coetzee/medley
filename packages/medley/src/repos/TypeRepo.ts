@@ -58,8 +58,8 @@ export class TypeRepo {
     }
     const module = await this.loader.importModule(
       moduleInfo,
-      this.baseUrl,
-      `version=${type.version}`
+      `version=${type.version}`,
+      this.baseUrl
     );
     return module[exportName];
   }

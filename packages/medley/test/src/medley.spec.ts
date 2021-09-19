@@ -37,13 +37,12 @@ describe("Medley", function () {
     const options: MedleyOptions = {
       linkRepo: new LinkRepo(),
       typeRepo: new TypeRepo(
-        new Loader({
-          moduleType: ModuleType.SYSTEM,
-          import: async (url) => {
-            const module = await System.import(url);
+        new Loader(
+          Loader.SystemImportWrapper((url) => {
+            const module = System.import(url);
             return module;
-          },
-        })
+          })
+        )
       ),
       nodeRepo: new NodeRepo(),
       logger,
@@ -60,7 +59,7 @@ describe("Medley", function () {
     const formatter = (xmlString: string) => {
       return xml(xmlString, { indentation: "  " });
     };
-    
+
     const res = await medley.nodes.runNode<string>(
       { xmlFormatter: formatter } /* used by typeOne */,
       "nodeOne",
@@ -76,13 +75,12 @@ describe("Medley", function () {
     const options: MedleyOptions = {
       linkRepo: new LinkRepo(),
       typeRepo: new TypeRepo(
-        new Loader({
-          moduleType: ModuleType.SYSTEM,
-          import: async (url) => {
-            const module = await System.import(url);
+        new Loader(
+          Loader.SystemImportWrapper((url) => {
+            const module = System.import(url);
             return module;
-          },
-        })
+          })
+        )
       ),
       nodeRepo: new NodeRepo(),
     };

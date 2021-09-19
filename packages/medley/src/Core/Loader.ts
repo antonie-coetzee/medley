@@ -1,43 +1,69 @@
-import { EsmModule, Module, ModuleType, SystemModule, toVirtualModule } from "./Module";
+import {
+  EsmModule,
+  Module,
+  ModuleType,
+  SystemModule,
+  toCustomModule,
+  CustomModule,
+} from "./Module";
+
+export type ImportFunction = (
+  module: Module,
+  version: string,
+  baseUrl?: URL
+) => Promise<any>;
 
 export interface LoaderOptions {
-  moduleType: ModuleType;
-  import: (url: string) => Promise<any>;
+  import: ImportFunction;
 }
 
 export class Loader {
-  constructor(private loaderOptions: LoaderOptions) {}
+  constructor(private importer?: ImportFunction) {}
+
+  public static SystemImportWrapper(importer: (url: string) => Promise<any>) {
+    return (module: Module, version: string, baseUrl?: URL) => {
+      const systemModule = module as SystemModule;
+      let resolvedModuleBaseUrl: URL | undefined;
+      if (systemModule.base) {
+        resolvedModuleBaseUrl = new URL(systemModule.base.toString(), baseUrl);
+      }
+      const resolvedUrl = new URL(
+        systemModule.system.toString(),
+        resolvedModuleBaseUrl
+      );
+      resolvedUrl.search = `version=${version}`;
+      return importer(resolvedUrl.toString());
+    };
+  }
+
+  public static ESMImportWrapper(importer: (url: string) => Promise<any>) {
+    return (module: Module, version: string, baseUrl?: URL) => {
+      const esmModule = module as EsmModule;
+      let resolvedModuleBaseUrl: URL | undefined;
+      if (esmModule.base) {
+        resolvedModuleBaseUrl = new URL(esmModule.base.toString(), baseUrl);
+      }
+      const resolvedUrl = new URL(
+        esmModule.esm.toString(),
+        resolvedModuleBaseUrl
+      );
+      resolvedUrl.search = `version=${version}`;
+      return importer(resolvedUrl.toString());
+    };
+  }
 
   async importModule(
     module: Module,
-    baseUrl?: URL,
-    search?: string
+    version: string,
+    baseUrl?: URL
   ): Promise<any> {
-    let resolvedModuleBaseUrl: URL | undefined;
-    const virtualModule = toVirtualModule(module);
-    if(virtualModule){
-      return virtualModule.exports;
+    const customModule = toCustomModule(module);
+    if (customModule && customModule.import) {
+      return customModule.import();
     }
-    if (module.base) {
-      resolvedModuleBaseUrl = new URL(module.base.toString(), baseUrl);
+    if (this.importer == null) {
+      throw new Error("importer not defined");
     }
-    let resolvedUrl: URL;
-    switch (this.loaderOptions.moduleType) {
-      case ModuleType.SYSTEM:
-        const systemModule = module as SystemModule;
-        resolvedUrl = new URL(
-          systemModule.system.toString(),
-          resolvedModuleBaseUrl
-        );
-        break;
-      case ModuleType.ESM:
-        const esmModule = module as EsmModule;
-        resolvedUrl = new URL(esmModule.esm.toString(), resolvedModuleBaseUrl);
-        break;
-      default:
-        throw new Error("module type not supported");
-    }
-    resolvedUrl.search = search || "";
-    return this.loaderOptions.import(resolvedUrl.toString());
+    return this.importer(module, version, baseUrl);
   }
 }

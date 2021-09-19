@@ -38,7 +38,8 @@ export class Medley<
       this.flowEngine,
       options.nodeRepo,
       options.typeRepo,
-      options.linkRepo
+      options.linkRepo,
+      options.parent
     );
     this.links = new LinksApi<TLink>(options.linkRepo, options.parent);
     this.graph = new GraphApi(

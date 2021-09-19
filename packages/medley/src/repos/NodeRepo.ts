@@ -3,7 +3,7 @@ import { generateId, Node } from "../core";
 export class NodeRepo {
   public nodeMap: Map<string, Node> = new Map();
 
-  constructor(onConstruct?:(this:NodeRepo)=>void) {
+  constructor(onConstruct?: (this: NodeRepo) => void) {
     onConstruct?.call(this);
   }
 
@@ -25,20 +25,29 @@ export class NodeRepo {
     return node?.type;
   }
 
-  public getNodesByType(typeName: string): Node[] {
+  public getNodesByType(typeName: string, parent?: string): Node[] {
     return Array.from(this.nodeMap.values()).filter(
-      (el) => el.type === typeName
+      (el) =>
+        el.type === typeName && (parent != null ? el.parent === parent : true)
     );
   }
 
-  public getNodes(): Node[] {
-    return Array.from(this.nodeMap.values());
+  public getNodes(parent?: string): Node[] {
+    if (parent) {
+      return Array.from(this.nodeMap.values()).filter(
+        (n) => n.parent === parent
+      );
+    } else {
+      return Array.from(this.nodeMap.values());
+    }
   }
 
-  public getUsedTypes(): string[] {
-    const typeMap = new Map();
-    this.nodeMap.forEach((el) => typeMap.set(el.type, el.type));
-    return Array.from(typeMap.keys());
+  public getUsedTypes(parent?: string): string[] {
+    const usedTypes = Array.from(this.nodeMap.values()).reduce((pv, cv) => {
+      pv.add(cv.type);
+      return pv;
+    }, new Set<string>());
+    return Array.from(usedTypes.keys());
   }
 
   public upsertNode(node: Partial<Node>) {
