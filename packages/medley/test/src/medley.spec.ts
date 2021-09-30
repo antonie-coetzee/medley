@@ -60,7 +60,7 @@ describe("Medley", function () {
       return xml(xmlString, { indentation: "  " });
     };
 
-    const res = await medley.nodes.runNode<string>(
+    const res = await medley.runNode<string>(
       { xmlFormatter: formatter } /* used by typeOne */,
       "nodeOne",
       "testArg"

@@ -1,6 +1,7 @@
-export interface Link { 
+import { Scoped } from "./Scoped";
+
+export interface Link extends Scoped {
   source: string;
   target: string;
-  port:string;
-  parent?: string;
+  port: string;
 }

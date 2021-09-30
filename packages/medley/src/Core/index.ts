@@ -6,4 +6,5 @@ export * from "./Graph";
 export * from "./Logger";
 export * from "./Port";
 export * from "./Link";
-export * from "./util";
+export * from "./Constants";
+export * from "./TreeMap";

@@ -1,7 +1,8 @@
-export interface Node<TValue extends unknown = unknown> {
+import { Scoped } from "./Scoped";
+
+export interface Node<TValue extends unknown = unknown> extends Scoped {
   type: string;
   id: string;
-  parent?: string;
   cache?: boolean;
   value?: TValue;
 }

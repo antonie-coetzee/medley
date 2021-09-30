@@ -145,13 +145,13 @@
       "port": "typeTwoPortOne",
       "target": "nodeTwo",
       "source": "$input-id",
-      "parent": "nodeNested"
+      "scope": "nodeNested"
     },
     {
       "port": "output",
       "target": "$output-id",
       "source": "nodeTwo",
-      "parent": "nodeNested"
+      "scope": "nodeNested"
     }
   ]
 }

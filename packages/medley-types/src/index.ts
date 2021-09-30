@@ -1,1 +1,1 @@
-export * from "./composite/compositeType"
+export * as composite from "./composite"

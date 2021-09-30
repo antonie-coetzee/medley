@@ -1,81 +1,102 @@
-import { generateId, Node } from "../core";
+import { Node, ROOT_SCOPE, TreeMap } from "../core";
 
 export class NodeRepo {
-  public nodeMap: Map<string, Node> = new Map();
+  public nodeIndex: Map<string,Node> = new Map();
+  public nodeTreeMap: TreeMap<Node> = new TreeMap();
 
   constructor(onConstruct?: (this: NodeRepo) => void) {
     onConstruct?.call(this);
   }
 
   public load(nodes: Node[]): void {
-    this.nodeMap.clear();
+    this.nodeTreeMap.clear();
+    this.nodeIndex.clear();
     nodes.forEach((node) => {
-      this.nodeMap.set(node.id, node);
+      this.nodeIndex.set(node.id, node);
+      this.nodeTreeMap.setNodeValue(node, node.scope || ROOT_SCOPE, node.id);
     });
   }
 
-  public getNode = (id: string): Node => {
-    const node = this.nodeMap.get(id);
-    if (node == null) throw new Error(`node with id: ${id}, not found`);
-    return node;
+  public getNode(scopeId: string, id: string){
+    return this.nodeTreeMap.getNodeValue(scopeId, id);
   };
 
-  public getTypeNameFromNodeId(id: string) {
-    const node = this.nodeMap.get(id);
-    return node?.type;
+  public getTypeNameFromNodeId(scopeId: string, id: string) {
+    return this.nodeTreeMap.getNodeValue(scopeId, id)?.type;
   }
 
-  public getNodesByType(typeName: string, parent?: string): Node[] {
-    return Array.from(this.nodeMap.values()).filter(
-      (el) =>
-        el.type === typeName && (parent != null ? el.parent === parent : true)
-    );
+  public getNodesByType(scopeId: string, typeName: string): Node[] {
+    return this.nodeTreeMap
+      .getFromPath(false, scopeId)
+      .filter((n) => n.type === typeName);
   }
 
-  public getNodes(parent?: string): Node[] {
-    if (parent) {
-      return Array.from(this.nodeMap.values()).filter(
-        (n) => n.parent === parent
-      );
-    } else {
-      return Array.from(this.nodeMap.values());
-    }
+  public getNodes(scopeId: string): Node[] {
+    return this.nodeTreeMap.getFromPath(false, scopeId);
   }
 
-  public getUsedTypes(parent?: string): string[] {
-    const usedTypes = Array.from(this.nodeMap.values()).reduce((pv, cv) => {
-      pv.add(cv.type);
-      return pv;
-    }, new Set<string>());
+  public getAllNodes(): Node[] {
+    return this.nodeTreeMap.getAll();
+  }
+
+  public getUsedTypes(scopeId: string): string[] {
+    const nodes = this.nodeTreeMap.getFromPath(false, scopeId);
+    const usedTypes = nodes.reduce((acc, node) => {
+      acc.add(node.type);
+      return acc;
+    },new Set<string>())
     return Array.from(usedTypes.keys());
   }
 
-  public upsertNode(node: Partial<Node>) {
+  public getAllUsedTypes(): string[] {
+    const nodes = this.nodeTreeMap.getAll();
+    const usedTypes = nodes.reduce((acc, node) => {
+      acc.add(node.type);
+      return acc;
+    },new Set<string>())
+    return Array.from(usedTypes.keys());
+  }
+
+  public upsertNode(scopeId: string, node: Partial<Node>) {
     if (node.type == null) {
       throw new Error(`node requires typeName to be defined`);
     }
-    if (node.id == null) {
+    if (node.id == null) {    
       // new node
       let newId: string;
       do {
         newId = generateId();
-      } while (this.nodeMap.has(newId));
-      const nodeCpy = { ...node, type: node.type, id: newId } as Node;
-      this.nodeMap.set(nodeCpy.id, nodeCpy);
+      } while (this.nodeIndex.get(newId));
+      const nodeCpy = { ...node, type: node.type, id: newId, scope: scopeId } as Node;
+      this.nodeTreeMap.setNodeValue(nodeCpy, scopeId, nodeCpy.id);
+      this.nodeIndex.set(nodeCpy.id, nodeCpy);    
       return nodeCpy;
     } else {
       // existing node
-      const existingNode = this.nodeMap.get(node.id);
+      const existingNode = this.nodeTreeMap.getNodeValue(scopeId, node.id);
       if (existingNode == null) {
         throw new Error(`node with id: '${node.id}' does not exist`);
       }
-      const updatedNode = { ...existingNode, ...node } as Node;
-      this.nodeMap.set(updatedNode.id, updatedNode);
+      const updatedNode = { ...existingNode, ...node, scope: scopeId } as Node;
+      this.nodeTreeMap.setNodeValue(updatedNode, scopeId, node.id);
+      this.nodeIndex.set(node.id, updatedNode);  
       return updatedNode;
     }
   }
 
-  public deleteNode(id: string): boolean {
-    return this.nodeMap.delete(id);
+  public deleteNode(scopeId: string, id: string) {
+    this.nodeIndex.delete(id);
+    this.nodeTreeMap.deleteNode(scopeId, id);
   }
 }
+
+const generateId = (length?: number) => {
+  const alphanumeric =
+    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  const len = length ?? 10;
+  var result = "";
+  for (var i = 0; i < len; ++i) {
+    result += alphanumeric[Math.floor(Math.random() * alphanumeric.length)];
+  }
+  return result;
+};

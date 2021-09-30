@@ -1,19 +1,7 @@
-export const generateId = (length?: number) => {
-  const alphanumeric =
-    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-  const len = length ?? 10;
-  var result = "";
-  for (var i = 0; i < len; ++i) {
-    result += alphanumeric[Math.floor(Math.random() * alphanumeric.length)];
-  }
-  return result;
-};
-
 type TreeMapNodeValue<T> = {
   tmap?: TreeMapNode<T>;
   value?: T;
 };
-
 type TreeMapNode<T> = {
   [index: string]: TreeMapNodeValue<T>;
 };
@@ -41,12 +29,17 @@ export class TreeMap<T> {
     }
   }
 
+  public findLastNodeValue(nodeId:string, ...searchPath: string[]): T | undefined {
+    this.checkPath(searchPath);
+    return this.findLastMatch(this.rootNode, nodeId, searchPath);
+  }
+
   public deleteNode(...path: string[]) {
     this.checkPath(path);
-    if(path.length === 1){
+    if (path.length === 1) {
       delete this.rootNode[path[0]];
     }
-    const parentNode = this.getNodeFromPath(this.rootNode, false, path.slice(0,-1));
+    const parentNode = this.getNodeFromPath(this.rootNode, false, path.slice(0, -1));
     if (parentNode && parentNode.tmap) {
       delete parentNode.tmap[path[path.length - 1]];
     }
@@ -57,15 +50,15 @@ export class TreeMap<T> {
     const nodeAtPath = this.getNodeFromPath(this.rootNode, false, path);
     if (nodeAtPath) {
       if (!recursive) {
-        if(nodeAtPath.tmap){
-          return Object.values(nodeAtPath.tmap).map(n=>n.value as T) || [];
-        }else{
+        if (nodeAtPath.tmap) {
+          return Object.values(nodeAtPath.tmap).map(n => n.value as T) || [];
+        } else {
           return [nodeAtPath.value as T];
-        } 
+        }
       } else {
         return this.getNodeValuesRecursive(nodeAtPath) || [];
       }
-    }else{
+    } else {
       return [];
     }
   }
@@ -134,5 +127,31 @@ export class TreeMap<T> {
       }
     }
     return currentNode;
+  }
+
+  private findLastMatch(
+    rootNode: TreeMapNode<T>,
+    nodeId: string,
+    path: string[],
+  ): T | undefined {
+    let currentMatch: T | undefined;
+    let currentNode: TreeMapNode<T> = rootNode;
+    for (let i = 0; i < path.length; i++) {
+      let tempNode = currentNode[path[i]];
+      if (tempNode == null) {
+        return currentMatch;
+      }
+      if(tempNode.tmap){
+        currentMatch = tempNode.tmap[nodeId]?.value
+      }
+      if (i === path.length - 1) {
+        currentNode = tempNode;
+      } else if (tempNode.tmap) {
+        currentNode = tempNode.tmap;
+      } else {
+        return currentMatch;
+      }
+    }
+    return currentMatch;
   }
 }

@@ -1,13 +1,12 @@
-import { Link, TreeMap } from "../core";
+import { Link, ROOT_SCOPE, TreeMap } from "../core";
 
 export type LinkRepoOptions = {};
 
 export class LinkRepo {
-  private static defaultParent = "root";
-  /* Parent -> Port -> Target -> Source -> link */
-  private targetMap: TreeMap<Link>;  
-  private updateSourceMap:boolean = false;
-  /* Parent -> Source -> Target -> Port -> link */
+  /* scope -> port -> target -> source -> link */
+  private targetMap: TreeMap<Link>;
+  private updateSourceMap: boolean = false;
+  /* scope -> source -> target -> port -> link */
   private sourceMap: TreeMap<Link>;
 
   constructor(onConstruct?: (this: LinkRepo) => void) {
@@ -25,28 +24,19 @@ export class LinkRepo {
     this.updateSourceMap = true;
   }
 
-  public getPortLinks(
-    port: string,
-    target: string,
-    parent: string = LinkRepo.defaultParent,
-  ) {
-    const links = this.targetMap.getFromPath(false, parent, port, target);
-    return links;
+  public getPortLinks(scopeId: string, port: string, target: string) {
+    return this.targetMap.getFromPath(false, scopeId, port, target);
   }
 
-  public getSourceLinks(
-    source: string,
-    parent: string = LinkRepo.defaultParent,
-  ) {
-    if(this.updateSourceMap){
+  public getSourceLinks(scopeId: string, source: string) {
+    if (this.updateSourceMap) {
       this.sourceMap.clear();
       const allLinks = this.targetMap.getAll();
-      for (const link of allLinks ) {
+      for (const link of allLinks) {
         this.addToSourceMap(link);
       }
     }
-    
-    return this.sourceMap.getFromPath(true, parent, source);
+    return this.sourceMap.getFromPath(true, scopeId, source);
   }
 
   public addLink(newLink: Link) {
@@ -54,25 +44,29 @@ export class LinkRepo {
     this.updateSourceMap = true;
   }
 
-  public getLinks(parent?: string) {
-    if (parent) {
-      return this.targetMap.getFromPath(true, parent);
-    } else {
-      return this.targetMap.getAll();
-    }
+  public getLinks(scopeId:string) {
+    return this.targetMap.getFromPath(true, scopeId);
+  }
+
+  public getAllLinks() {
+    return this.targetMap.getAll();
   }
 
   public deleteLink(link: Link) {
-    let parent = link.parent || LinkRepo.defaultParent;
-    this.targetMap.deleteNode(parent, link.port, link.target, link.source);
+    this.targetMap.deleteNode(
+      link.scope || ROOT_SCOPE,
+      link.port,
+      link.target,
+      link.source
+    );
     this.updateSourceMap = true;
   }
 
   private addToTargetMap(link: Link) {
-    let parent = link.parent || LinkRepo.defaultParent;
+    let scope = link.scope || ROOT_SCOPE;
     this.targetMap.setNodeValue(
       link,
-      parent,
+      scope,
       link.port,
       link.target,
       link.source
@@ -80,10 +74,10 @@ export class LinkRepo {
   }
 
   private addToSourceMap(link: Link) {
-    let parent = link.parent || LinkRepo.defaultParent;
+    let scope = link.scope || ROOT_SCOPE;
     this.sourceMap.setNodeValue(
       link,
-      parent,
+      scope,
       link.source,
       link.target,
       link.port

@@ -6,6 +6,7 @@ export enum ModuleType {
 
 export interface BaseModule {
   base?: URL;
+  nameSpace?: string;
 }
 
 export interface EsmModule extends BaseModule {
@@ -46,8 +47,4 @@ export const toCustomModule = (module: Module): CustomModule | undefined => {
     if((module as CustomModule).import !== undefined){
         return module as CustomModule;
     }
-};
-
-export const isCustomModule = (module: Module): boolean => {
-  return (module as CustomModule).import !== undefined ? true : false;
 };

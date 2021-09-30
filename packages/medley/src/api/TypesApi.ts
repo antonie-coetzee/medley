@@ -1,48 +1,76 @@
-import { Link, Type, Node } from "../core";
-import { NodeFunction } from "../NodeFunction";
+import { Type } from "../core";
 import { TypeRepo } from "../repos";
 
-export class TypesApi<TType extends Type = Type>
-  implements Omit<TypeRepo, "deleteType" | "newChild">
-{
-  constructor(private typeRepo: TypeRepo) {}
+export class TypesApi<TType extends Type = Type> {
+  constructor(
+    private scopeId: string,
+    private typeRepo: TypeRepo,
+    private parentTypes?: TypesApi<TType>
+  ) {}
 
   public load(types: TType[], baseUrl: URL): void {
     this.typeRepo.load(types, baseUrl);
   }
 
-  // public async getNodeFunction<
-  // TNode extends Node = Node,
-  // TType extends Type = Type,
-  // TLink extends Link = Link
-  // >(typeName: string): Promise<NodeFunction<{}, TNode,TType,TLink>> {
-  //   return this.typeRepo.getNodeFunction<TNode,TType,TLink>(typeName);
-  // }
-
   public async getExportFunction<T extends Function = Function>(
     typeName: string,
-    functionName?: string
-  ) {
-    return this.typeRepo.getExportFunction<T>(typeName, functionName);
+    functionName: string
+  ): Promise<T | undefined> {
+    const func = await this.typeRepo.getExportFunction<T>(
+      this.scopeId,
+      typeName,
+      functionName
+    );
+    if (func) {
+      return func;
+    }
+    if (this.parentTypes) {
+      return this.parentTypes.getExportFunction<T>(typeName, functionName);
+    }
   }
 
-  public async getExport(typeName: string, name: string = "default") {
-    return this.typeRepo.getExport(typeName, name);
+  public async getExport(type: Type, name: string): Promise<any> {
+    const typeExport = await this.typeRepo.getExport(type, name);
+    if (typeExport) {
+      return typeExport;
+    }     
   }
 
   public getTypes(): TType[] {
-    return this.typeRepo.getTypes() as TType[];
+    const scopeTypes = this.typeRepo.getTypes(this.scopeId) as TType[];
+    if (this.parentTypes) {
+      const parentTypes = this.parentTypes.getTypes();
+      return  [...new Set([...parentTypes, ...scopeTypes])];
+    }
+    return scopeTypes;
   }
 
-  public getType(typeName: string): TType {
-    return this.typeRepo.getType(typeName) as TType;
+  public getAllTypes(): TType[] {
+    return this.typeRepo.getAllTypes() as TType[];
+  }
+
+  public getType(typeName: string): TType | undefined {
+    const type = this.typeRepo.getType(this.scopeId, typeName) as TType;
+    if(type){
+      return type;
+    }
+    if (this.parentTypes) {
+      return this.parentTypes.getType(typeName) as TType;
+    }
   }
 
   public hasType(typeName: string): boolean {
-    return this.typeRepo.hasType(typeName);
+    const scopeHasType = this.typeRepo.hasType(this.scopeId, typeName);
+    if(scopeHasType){
+      return true;
+    }
+    if (this.parentTypes) {
+      return this.parentTypes.hasType(typeName);
+    }
+    return false;
   }
 
-  public addType(type: TType, scoped?: boolean) {
-    return this.typeRepo.addType(type, scoped);
+  public addType(type: TType) {
+    this.typeRepo.addType(this.scopeId, type);
   }
 }

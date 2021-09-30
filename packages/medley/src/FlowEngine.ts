@@ -63,10 +63,16 @@ export class FlowEngine<
     };
 
     const node = flowEngine.medley.nodes.getNode(nodeId);
+    if(node == null){
+      throw new Error(`node with id: '${nodeId}', not found`);
+    }
     const nodeFunction = await flowEngine.medley.types.getExportFunction<
       NodeFunction<{}, TNode, TType, TLink>
     >(node.type, nodeFunctionExportName);
 
+    if(nodeFunction == null){
+      throw new Error(`node function for type: '${node.type}', not valid`);
+    }
     const childContext = flowEngine.createContext(
       context,
       flowEngine.medley,
@@ -164,7 +170,7 @@ export class FlowEngine<
 
   private checkCache(sourceId: string, ...args: any[]) {
     const node = this.medley.nodes.getNode(sourceId);
-    if (node.cache == null || node.cache === false) {
+    if (node == null || node.cache == null || node.cache === false) {
       return null;
     }
     const key = `${node.id}${JSON.stringify(args)}`;

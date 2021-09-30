@@ -24,7 +24,7 @@ export type Input = <TypedPort extends Port>(
   ? Promise<Unwrap<TypeOfPort<TypedPort>>[] | undefined>
   : Promise<Unwrap<TypeOfPort<TypedPort>> | undefined>;
 
-export type BasicContext<
+export type BaseContext<
   TNode extends Node = Node,
   TType extends Type = Type,
   TLink extends Link = Link
@@ -38,6 +38,6 @@ export type ExecutionContext<
   TNode extends Node = Node,
   TType extends Type = Type,
   TLink extends Link = Link
-> = BasicContext<TNode, TType, TLink> & {
+> = BaseContext<TNode, TType, TLink> & {
   input: Input;
 };

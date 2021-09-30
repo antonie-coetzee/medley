@@ -1,48 +1,39 @@
-import { Type, Loader, isModule } from "../core";
+import { Type, Loader, isModule, TreeMap, ROOT_SCOPE } from "../core";
 
 export class TypeRepo {
-  private typeMap: Map<string, Type> = new Map();
-  private scopedTypeMap: Map<string, Type> = new Map();
+  /* scope -> type */
+  private typeMap: TreeMap<Type> = new TreeMap();
   private baseUrl?: URL;
 
   constructor(private loader: Loader, onConstruct?: (this: TypeRepo) => void) {
     onConstruct?.call(this);
   }
 
-  public newChild() {
-    const childTypeRepo = new TypeRepo(this.loader);
-    childTypeRepo.typeMap = this.typeMap;
-    childTypeRepo.baseUrl = this.baseUrl;
-    return childTypeRepo;
-  }
-
   public load(types: Type[], baseUrl: URL) {
     this.baseUrl = baseUrl;
     this.typeMap.clear();
     for (const type of types) {
-      if (this.typeMap.has(type.name)) {
-        throw new Error(`type with name: '${type.name}', already mapped`);
-      }
-      this.typeMap.set(type.name, type);
+      this.typeMap.setNodeValue(type, type.scope || ROOT_SCOPE, type.name)  
     }
   }
 
   public async getExportFunction<T extends Function = Function>(
+    scope:string,
     typeName: string,
-    functionName?: string
+    functionName: string
   ) {
-    const moduleFunction = await this.getExport(typeName, functionName);
+    const type = this.typeMap.getNodeValue(scope, typeName);
+    if (type == null) {
+      return;
+    }
+    const moduleFunction = await this.getExport(type, functionName);
     if (typeof moduleFunction !== "function") {
       throw new Error(`export '${functionName}' from type '${typeName}' not a function`);
     }
     return moduleFunction as T;
   }
 
-  public async getExport(typeName: string, name: string = "default") {
-    const type = this.scopedTypeMap.get(typeName) ?? this.typeMap.get(typeName);
-    if (type == null) {
-      throw new Error(`type with name: '${typeName}' not found`);
-    }
+  public async getExport(type: Type, name: string) {
     let moduleInfo = type.module;
     let exportName = name;
     const redirect = type.exportMap?.[name];
@@ -61,26 +52,31 @@ export class TypeRepo {
       `version=${type.version}`,
       this.baseUrl
     );
-    return module[exportName];
+    if(moduleInfo.nameSpace){
+      return module[moduleInfo.nameSpace][exportName];
+    }else{
+      return module[exportName];
+    }
   }
 
-  public getTypes(scoped?: boolean): Type[] {
-    let map = this.getMap(scoped);
-    return Array.from(map.values());
+  public getTypes(scopeId:string): Type[] {
+    return this.typeMap.getFromPath(false, scopeId);
   }
 
-  public getType(typeName: string, scoped?: boolean): Type {
-    let map = this.getMap(scoped);
-    const type = map.get(typeName);
+  public getAllTypes(): Type[] {
+    return this.typeMap.getAll();
+  }
+
+  public getType(scopeId:string, typeName: string): Type {
+    const type = this.typeMap.getNodeValue(scopeId, typeName);
     if (type == null) {
-      throw new Error(`type with name: '${typeName}', not found`);
+      throw new Error(`type with name: '${typeName}', not found on scope: '${scopeId}'`);
     }
     return type;
   }
 
-  public hasType(typeName: string, scoped?: boolean): boolean {
-    let map = this.getMap(scoped);
-    const type = map.get(typeName);
+  public hasType(scopeId:string, typeName: string): boolean {
+    const type = this.typeMap.getNodeValue(scopeId, typeName);
     if (type == null) {
       return false;
     } else {
@@ -88,20 +84,12 @@ export class TypeRepo {
     }
   }
 
-  public deleteType(typeName: string, scoped?: boolean) {
-    let map = this.getMap(scoped);
-    return map.delete(typeName);
+  public deleteType(scopeId:string, typeName: string) {;
+    return this.typeMap.deleteNode(scopeId, typeName);
   }
 
-  public addType(type: Type, scoped?: boolean) {
-    let map = this.getMap(scoped);
-    if (map.has(type.name)) {
-      throw new Error(`type with name: '${type.name}' exists`);
-    }
-    map.set(type.name, type);
-  }
-
-  private getMap(scoped?: boolean) {
-    return scoped ? this.scopedTypeMap : this.typeMap;
+  public addType(scopeId:string, type: Type) {
+    type.scope = scopeId || ROOT_SCOPE;
+    this.typeMap.setNodeValue(type, type.scope, type.name);
   }
 }

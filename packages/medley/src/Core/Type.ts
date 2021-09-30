@@ -1,8 +1,5 @@
 import { Module } from "./Module";
-
-export interface TypeName {
-  name: string;
-}
+import { Scoped } from "./Scoped";
 
 export interface TypeVersion {
   version: string;
@@ -20,4 +17,6 @@ export interface TypeVersion {
   };
 }
 
-export interface Type extends TypeName, TypeVersion {}
+export interface Type extends TypeVersion, Scoped{
+  name: string;
+}
