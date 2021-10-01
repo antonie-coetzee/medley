@@ -29,11 +29,6 @@ export class TreeMap<T> {
     }
   }
 
-  public findLastNodeValue(nodeId:string, ...searchPath: string[]): T | undefined {
-    this.checkPath(searchPath);
-    return this.findLastMatch(this.rootNode, nodeId, searchPath);
-  }
-
   public deleteNode(...path: string[]) {
     this.checkPath(path);
     if (path.length === 1) {
@@ -127,31 +122,5 @@ export class TreeMap<T> {
       }
     }
     return currentNode;
-  }
-
-  private findLastMatch(
-    rootNode: TreeMapNode<T>,
-    nodeId: string,
-    path: string[],
-  ): T | undefined {
-    let currentMatch: T | undefined;
-    let currentNode: TreeMapNode<T> = rootNode;
-    for (let i = 0; i < path.length; i++) {
-      let tempNode = currentNode[path[i]];
-      if (tempNode == null) {
-        return currentMatch;
-      }
-      if(tempNode.tmap){
-        currentMatch = tempNode.tmap[nodeId]?.value
-      }
-      if (i === path.length - 1) {
-        currentNode = tempNode;
-      } else if (tempNode.tmap) {
-        currentNode = tempNode.tmap;
-      } else {
-        return currentMatch;
-      }
-    }
-    return currentMatch;
   }
 }

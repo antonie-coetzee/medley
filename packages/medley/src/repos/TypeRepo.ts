@@ -49,7 +49,7 @@ export class TypeRepo {
     }
     const module = await this.loader.importModule(
       moduleInfo,
-      `version=${type.version}`,
+      type.version,
       this.baseUrl
     );
     if(moduleInfo.nameSpace){

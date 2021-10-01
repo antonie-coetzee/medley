@@ -25,18 +25,18 @@ export class Medley<
   private flowEngine: FlowEngine<TNode, TType, TLink>;
 
   public readonly logger: Logger;
-  public nodes: NodesApi<TNode, TType, TLink>;
-  public types: TypesApi<TType>;
-  public links: LinksApi<TLink>;
-  public graph: GraphApi<TNode, TType, TLink>;
+  public readonly nodes: NodesApi<TNode, TType, TLink>;
+  public readonly types: TypesApi<TType>;
+  public readonly links: LinksApi<TLink>;
+  public readonly graph: GraphApi<TNode, TType, TLink>;
 
   public constructor(
-    public options: MedleyOptions<TNode, TType, TLink>,
-    public parentInstance?: Medley<TNode, TType, TLink>
+    public readonly options: MedleyOptions<TNode, TType, TLink>,
+    public readonly parentInstance?: Medley<TNode, TType, TLink>
   ) {
     const scopeId = options.scopeId || ROOT_SCOPE;
     this.logger = options.logger || nullLogger;
-    this.flowEngine = new FlowEngine<TNode, TType, TLink>(this, options.cache);
+
     this.types = new TypesApi<TType>(
       scopeId,
       options.typeRepo,
@@ -55,6 +55,9 @@ export class Medley<
       this.types,
       this.links
     );
+
+    this.flowEngine = new FlowEngine<TNode, TType, TLink>(this, options.cache);
+    
     options.onConstruct?.call(this);
   }
 

@@ -134,7 +134,7 @@ export class FlowEngine<
       }
 
       const executionContext = port.context
-        ? { ...context, ...port.context }
+        ? { ...port.context, ...context }
         : context;
 
       if (isSingle) {

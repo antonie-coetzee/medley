@@ -1,16 +1,16 @@
 import { NF, Input, Type, Node, Medley } from "medley";
 
-export const nodeFunction: NF<{}, Node<{outputId:string}>> = (cntx) => {
+export const nodeFunction: NF<{}, Node<{ outputId: string }>> = (cntx) => {
   const { node, medley, input } = cntx;
-  
+
   const childScope = Medley.newChildInstance(medley.getRootInstance(), node.id);
 
   const inputType = getInputType(input);
   childScope.types.addType(inputType);
   const outputType = getOutputType();
   childScope.types.addType(outputType);
-  
-  if(node.value?.outputId){
+
+  if (node.value?.outputId) {
     const outputId = node.value.outputId;
     const result = childScope.runNode(cntx, outputId);
     return result;
@@ -24,7 +24,7 @@ function getInputType(input: Input): Type {
       input: string;
     }>
   > = ({ node }) => {
-    if(node.value?.input){
+    if (node.value?.input) {
       return input({
         name: node.value.input,
       });
@@ -36,9 +36,10 @@ function getInputType(input: Input): Type {
     version: "",
     volatile: true,
     module: {
-      import: () => Promise.resolve({
-        nodeFunction,
-      }),
+      import: () =>
+        Promise.resolve({
+          nodeFunction,
+        }),
     },
   };
 }
@@ -55,9 +56,10 @@ function getOutputType(): Type {
     version: "",
     volatile: true,
     module: {
-      import: () => Promise.resolve({
-        nodeFunction,
-      }),
+      import: () =>
+        Promise.resolve({
+          nodeFunction,
+        }),
     },
   };
 }

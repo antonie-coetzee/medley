@@ -1,10 +1,8 @@
 import {
   EsmModule,
   Module,
-  ModuleType,
   SystemModule,
-  toCustomModule,
-  CustomModule,
+  toCustomModule
 } from "./Module";
 
 export type ImportFunction = (
@@ -12,10 +10,6 @@ export type ImportFunction = (
   version: string,
   baseUrl?: URL
 ) => Promise<any>;
-
-export interface LoaderOptions {
-  import: ImportFunction;
-}
 
 export class Loader {
   constructor(private importer?: ImportFunction) {}
