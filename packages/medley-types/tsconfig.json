@@ -16,5 +16,6 @@
     "baseUrl": "src",
     "outDir": "./dist"
   },
-  "include": ["./src/**/*.ts", "./src/**/*.tsx"]
+  "include": ["./src/**/*.ts", "./src/**/*.tsx"],
+  "exclude": ["./src/**/*.stories.tsx", "./src/**/*.stories.ts","./src/**/*.sb.ts", "./src/**/*.sb.tsx"]
 }

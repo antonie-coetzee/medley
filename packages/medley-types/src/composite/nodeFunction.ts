@@ -1,18 +1,17 @@
-import { NF, Node, Input, Type } from "medley";
-import { CompositeNode } from "./types";
+import { NF, Node, Input, Type, Medley, NodeFunction } from "medley";
+import { CompositeNode } from "./node";
 
-export const nodeFunction: NF<{}, Node<{outputId:string}>> = (cntx) => {
+export const nodeFunction: NF<{}, CompositeNode> = (cntx) => {
   const { node, medley, input } = cntx;
-  const childScope = medley.newChild({ parent: node.id });
-
+  const childScope = Medley.newChildInstance(medley.getRootInstance(), node.id);
   const inputType = getInputType(input);
-  childScope.types.addType(inputType, true);
+  childScope.types.addType(inputType);
   const outputType = getOutputType();
-  childScope.types.addType(outputType, true);
-  
-  if(node.value?.outputId){
-    const outputId = node.value.outputId;
-    const result = childScope.nodes.runNode(cntx, outputId);
+  childScope.types.addType(outputType);
+
+  if(node.value?.outputNode){
+    const outputId = node.value.outputNode.id;
+    const result = childScope.runNode(cntx, outputId);
     return result;
   }
 };
@@ -34,6 +33,7 @@ function getInputType(input: Input): Type {
   return {
     name: "$input",
     version: "",
+    volatile: true,
     module: {
       import: () => Promise.resolve({
         nodeFunction,
@@ -52,6 +52,7 @@ function getOutputType(): Type {
   return {
     name: "$output",
     version: "",
+    volatile: true,
     module: {
       import: () => Promise.resolve({
         nodeFunction,

@@ -1,24 +1,28 @@
-import React from "react";
-import { BasicContext, Link, Medley, Node, Port, Type } from "medley";
+import React, { ReactNode } from "react";
+import { BaseContext, Link, Node, Port, Type } from "medley";
 
-export type EditNodeComponentProps<TNode extends Node = Node> = BasicContext<TNode> & {
+export type NodeEditComponentProps<TNode extends Node = Node> = BaseContext<TNode> & {
   onSave: (saveCallback: () => void) => void;
   isChanged: () => void;
 };
 
-export type EditNodeComponent<TNode extends Node = Node> = React.FC<
-  EditNodeComponentProps<TNode>
+export type NodeEditComponent<TNode extends Node = Node> = React.FC<
+  NodeEditComponentProps<TNode>
 >;
 
-export interface GetEditNodeComponent<TNode extends Node = Node> {
-  (): EditNodeComponent<TNode>;
+export interface GetNodeEditComponent<TNode extends Node = Node> {
+  (): NodeEditComponent<TNode>;
 }
 
-export interface getPorts<
+export interface GetNodeComponent {
+  (): ReactNode;
+}
+
+export interface GetPorts<
   TNode extends Node = Node,
   TPort extends Port = Port
 > {
-  (context: BasicContext<TNode>): TPort[];
+  (context: BaseContext<TNode>): TPort[];
 }
 
 export type MType = {
@@ -30,15 +34,15 @@ export interface getPortType<
   TNode extends Node = Node,
   TPort extends Port = Port
 > {
-  (context: BasicContext<TNode>, port: TPort): MType;
+  (context: BaseContext<TNode>, port: TPort): MType;
 }
 
 export interface getNodeType<TNode extends Node = Node> {
-  (context: BasicContext<TNode>): MType;
+  (context: BaseContext<TNode>): MType;
 }
 
 export interface compareTypes<TNode extends Node = Node> {
-  (context: BasicContext<TNode>, type1: MType, type2: MType): boolean;
+  (context: BaseContext<TNode>, type1: MType, type2: MType): boolean;
 }
 
 export type EventResult = {
@@ -49,20 +53,20 @@ export interface onAddLink<
   TNode extends Node = Node,
   TLink extends Link = Link
 > {
-  (context: BasicContext<TNode, Type, TLink>, link: TLink): EventResult;
+  (context: BaseContext<TNode, Type, TLink>, link: TLink): EventResult;
 }
 
 export interface onDeleteLink<
   TNode extends Node = Node,
   TLink extends Link = Link
 > {
-  (context: BasicContext<TNode, Type, TLink>, link: TLink): EventResult;
+  (context: BaseContext<TNode, Type, TLink>, link: TLink): EventResult;
 }
 
 export interface onAddNode<TNode extends Node = Node> {
-  (context: BasicContext<TNode>): EventResult;
+  (context: BaseContext<TNode>): EventResult;
 }
 
 export interface onDeleteNode<TNode extends Node = Node> {
-  (context: BasicContext<TNode>): EventResult;
+  (context: BaseContext<TNode>): EventResult;
 }

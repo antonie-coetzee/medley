@@ -1,4 +1,4 @@
-import { Node, Type, Logger, nullLogger, Link, ROOT_SCOPE } from "./core";
+import { Node, Type, Logger, nullLogger, Link, ROOT_SCOPE, Loader } from "./core";
 import { TypeRepo, NodeRepo, LinkRepo } from "./repos";
 import { FlowEngine } from "./FlowEngine";
 import { GraphApi, TypesApi, NodesApi, LinksApi } from "./api";
@@ -24,6 +24,7 @@ export class Medley<
 > {
   private flowEngine: FlowEngine<TNode, TType, TLink>;
 
+  public readonly options: MedleyOptions<TNode, TType, TLink>
   public readonly logger: Logger;
   public readonly nodes: NodesApi<TNode, TType, TLink>;
   public readonly types: TypesApi<TType>;
@@ -31,21 +32,31 @@ export class Medley<
   public readonly graph: GraphApi<TNode, TType, TLink>;
 
   public constructor(
-    public readonly options: MedleyOptions<TNode, TType, TLink>,
+    options?: MedleyOptions<TNode, TType, TLink>,
     public readonly parentInstance?: Medley<TNode, TType, TLink>
   ) {
-    const scopeId = options.scopeId || ROOT_SCOPE;
-    this.logger = options.logger || nullLogger;
+    if(options == null){
+      this.options = {
+        linkRepo: new LinkRepo(),
+        typeRepo: new TypeRepo(new Loader()),
+        nodeRepo: new NodeRepo(),
+      }
+    }else{
+      this.options = options;
+    }
+    
+    const scopeId = this.options.scopeId || ROOT_SCOPE;
+    this.logger = this.options.logger || nullLogger;
 
     this.types = new TypesApi<TType>(
       scopeId,
-      options.typeRepo,
+      this.options.typeRepo,
       parentInstance?.types
     );
-    this.links = new LinksApi<TLink>(scopeId, options.linkRepo);
+    this.links = new LinksApi<TLink>(scopeId, this.options.linkRepo);
     this.nodes = new NodesApi<TNode, TType, TLink>(
       scopeId,
-      options.nodeRepo,
+      this.options.nodeRepo,
       this.types,
       this.links,
       parentInstance?.nodes
@@ -56,9 +67,9 @@ export class Medley<
       this.links
     );
 
-    this.flowEngine = new FlowEngine<TNode, TType, TLink>(this, options.cache);
+    this.flowEngine = new FlowEngine<TNode, TType, TLink>(this, this.options.cache);
     
-    options.onConstruct?.call(this);
+    this.options.onConstruct?.call(this);
   }
 
   public runNode<T>(
