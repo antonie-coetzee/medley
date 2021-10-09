@@ -1,21 +1,34 @@
 import { Story } from "@storybook/react";
 import { Medley } from "medley";
-import React, { ReactElement } from "react";
+import React, { FC, Fragment, ReactElement } from "react";
 
 export interface StoryWithLoaders extends Story {
   loaders: [() => Promise<any>];
 }
 
 export const componentStory = (
-  componentFactory: () => Promise<ReactElement>
+  componentFactory: () => Promise<FC>,
+  containerFactory?: () => Promise<FC>
 ): StoryWithLoaders => {
-  const story: StoryWithLoaders = (args, { loaded: { Component } }) => (
-    <Component {...args}/>
+  const story: StoryWithLoaders = (
+    args,
+    { loaded: { Component, Container} }
+  ) => (
+    <Fragment>
+      {Container == null ? (
+        <Component {...args} />
+      ) : (
+        <Container>
+          <Component {...args} />
+        </Container>
+      )}
+    </Fragment>
   );
 
   story.loaders = [
     async () => ({
       Component: await componentFactory(),
+      Container: containerFactory && (await containerFactory())
     }),
   ];
   return story;

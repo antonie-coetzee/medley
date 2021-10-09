@@ -1,5 +1,5 @@
 // runtime exports
-export * as composite from "./composite"
+export * as composite from "./nodes/composite"
 
 // compiletime exports
-export * from "./composite/type"
+export * from "./nodes/composite/type"

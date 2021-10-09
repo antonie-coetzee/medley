@@ -1,6 +1,7 @@
 export const DnD_Node = "NODE";
 
-export const getEditComponent = "getEditComponent";
+export const getNodeEditComponent = "getNodeEditComponent";
+export const getNodeComponent = "getNodeComponent";
 export const getPorts = "getPorts";
 export const getPortType = "getPortType";
 export const getNodeType = "getNodeType";

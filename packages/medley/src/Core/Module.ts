@@ -31,18 +31,6 @@ export const isModule = (module: any): module is Module => {
   );
 };
 
-export const toEsmModule = (module: Module): EsmModule | undefined => {
-  if((module as EsmModule).esm !== undefined){
-      return module as EsmModule;
-  }
-};
-
-export const toSystemModule = (module: Module): SystemModule | undefined => {
-  if((module as SystemModule).system !== undefined){
-      return module as SystemModule;
-  }
-};
-
 export const toCustomModule = (module: Module): CustomModule | undefined => {
     if((module as CustomModule).import !== undefined){
         return module as CustomModule;

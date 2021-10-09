@@ -1,4 +1,5 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "esnext",
     "lib": ["dom", "esnext"],
@@ -13,8 +14,12 @@
     "module": "esnext",
     "moduleResolution": "node",
     "isolatedModules": true,
-    "baseUrl": "src",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["./*"]
+    }
   },
   "include": ["./src/**/*.ts", "./src/**/*.tsx"],
   "exclude": ["./src/**/*.stories.tsx", "./src/**/*.stories.ts","./src/**/*.sb.ts", "./src/**/*.sb.tsx"]
