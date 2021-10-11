@@ -1,155 +1,134 @@
-import React, { ReactNode } from "react";
-import ReactFlow, { Controls, FlowElement, MiniMap } from "react-flow-renderer";
+import React, { memo, ReactNode, useContext, useState, VFC } from "react";
+import ReactFlow, {
+  addEdge,
+  Connection,
+  Controls,
+  Edge,
+  Elements,
+  MiniMap,
+  Node as RFNode,
+  Position,
+} from "react-flow-renderer";
+import { BaseContext, NodeContext } from "medley";
 import {
+  CLink,
+  CNode,
   constants,
+  CType,
   GetNodeComponent,
   GetNodeEditComponent,
+  NodeComponentProps,
 } from "medley-common";
-
 import { CompositeNode } from "./node";
-import { BaseContext, Medley } from "medley";
 
-const elements = [
-  {
-    id: "horizontal-1",
-    sourcePosition: "right",
-    type: "input",
-    className: "dark-node",
-    data: { label: "Input" },
-    position: { x: 0, y: 80 },
-  },
-  {
-    id: "horizontal-2",
-    sourcePosition: "right",
-    targetPosition: "left",
-    data: { label: "A Node" },
-    position: { x: 250, y: 0 },
-  },
-  {
-    id: "horizontal-3",
-    sourcePosition: "right",
-    targetPosition: "left",
-    data: { label: "Node 3" },
-    position: { x: 250, y: 160 },
-  },
-  {
-    id: "horizontal-4",
-    sourcePosition: "right",
-    targetPosition: "left",
-    data: { label: "Node 4" },
-    position: { x: 500, y: 0 },
-  },
-  {
-    id: "horizontal-5",
-    sourcePosition: "top",
-    targetPosition: "bottom",
-    data: { label: "Node 5" },
-    position: { x: 500, y: 100 },
-  },
-  {
-    id: "horizontal-6",
-    sourcePosition: "bottom",
-    targetPosition: "top",
-    data: { label: "Node 6" },
-    position: { x: 500, y: 230 },
-  },
-  {
-    id: "horizontal-7",
-    sourcePosition: "right",
-    targetPosition: "left",
-    data: { label: "Node 7" },
-    position: { x: 750, y: 50 },
-  },
-  {
-    id: "horizontal-8",
-    sourcePosition: "right",
-    targetPosition: "left",
-    data: { label: "Node 8" },
-    position: { x: 750, y: 300 },
-  },
-
-  {
-    id: "horizontal-e1-2",
-    source: "horizontal-1",
-    type: "smoothstep",
-    target: "horizontal-2",
-    animated: true,
-  },
-  {
-    id: "horizontal-e1-3",
-    source: "horizontal-1",
-    type: "smoothstep",
-    target: "horizontal-3",
-    animated: true,
-  },
-  {
-    id: "horizontal-e1-4",
-    source: "horizontal-2",
-    type: "smoothstep",
-    target: "horizontal-4",
-    label: "edge label",
-  },
-  {
-    id: "horizontal-e3-5",
-    source: "horizontal-3",
-    type: "smoothstep",
-    target: "horizontal-5",
-    animated: true,
-  },
-  {
-    id: "horizontal-e3-6",
-    source: "horizontal-3",
-    type: "smoothstep",
-    target: "horizontal-6",
-    animated: true,
-  },
-  {
-    id: "horizontal-e5-7",
-    source: "horizontal-5",
-    type: "smoothstep",
-    target: "horizontal-7",
-    animated: true,
-  },
-  {
-    id: "horizontal-e6-8",
-    source: "horizontal-6",
-    type: "smoothstep",
-    target: "horizontal-8",
-    animated: true,
-  },
-] as FlowElement<any>[];
-
-export const getNodeEditComponent: GetNodeEditComponent<CompositeNode> = async (cntx) => {
-
-  return () => (
+export const getNodeEditComponent: GetNodeEditComponent<CompositeNode> = async (
+  contex: NodeContext<CompositeNode, CNode, CType, CLink>
+) => {
+  const reactFlowTypes = await getReactFlowNodeTypes(contex);
+  const reactFlowNodes = getReactFlowNodes(contex);
+  const reactFlowEdges = getReactFlowEdges(contex);
+  const initialElements = [...reactFlowNodes, ...reactFlowEdges];
+  return () => {
+    const [elements, setElements] = useState<Elements>(initialElements);
+    contex.medley.links.events.onChange = links => {
+      const reactFlowNodes = getReactFlowNodes(contex);
+      const reactFlowEdges = getReactFlowEdges(contex);
+      setElements([...reactFlowNodes, ...reactFlowEdges]);
+    }
+    contex.medley.nodes.events.onChange = nodes => {
+      const reactFlowNodes = getReactFlowNodes(contex);
+      const reactFlowEdges = getReactFlowEdges(contex);
+      setElements([...reactFlowNodes, ...reactFlowEdges]);
+    }
+    const onConnect = (edge: Connection | Edge) => contex.medley.links.addLink({source:edge.source || "", target:edge.target || "", port: edge.targetHandle || "" , scope: contex.node.id});
+    return (
     <div style={{ height: 600 }}>
-      <ReactFlow elements={elements}>
+      <ReactFlow
+        elements={elements}
+        nodeTypes={reactFlowTypes}
+        onConnect={onConnect}
+        onNodeDragStop={(_, rfNode)=>{
+          const mNode = contex.medley.nodes.getNode(rfNode.id);
+          if(mNode){
+            mNode.position = rfNode.position;           
+          }     
+        }}
+      >
         <MiniMap />
         <Controls />
       </ReactFlow>
     </div>
-  );
+    )
+  };
 };
 
 async function getReactFlowNodeTypes(
-  context: BaseContext
+  contex: BaseContext<CNode>
 ): Promise<{ [index: string]: ReactNode }> {
-  const typeNames = context.medley.nodes.getUsedTypes();
+  const typeNames = contex.medley.nodes.getUsedTypes();
   const nodeTypes = await Promise.all(
     typeNames.map(async (typeName) => {
       const getNodeComponent:
         | GetNodeComponent
-        | undefined = await context.medley.types.getExportFunction(
+        | undefined = await contex.medley.types.getExportFunction(
         typeName,
         constants.getNodeComponent
       );
-      return { typeName, nodeComponent: getNodeComponent?.(context) };
+      return { typeName, nodeComponent: await getNodeComponent?.(contex) };
     })
   );
-  return nodeTypes.reduce((acc,crnt)=>{
-    if(crnt.nodeComponent){
-      acc[crnt.typeName] = crnt.nodeComponent
+  return nodeTypes.reduce((acc, crnt) => {
+    if (crnt.nodeComponent) {
+      acc[crnt.typeName] = wrapNodeComponent((contex as unknown) as BaseContext, crnt.nodeComponent);
     }
     return acc;
-  }, {} as { [index: string]: ReactNode })
+  }, {} as { [index: string]: ReactNode });
+}
+
+function wrapNodeComponent(
+  contex: BaseContext,
+  NodeComponent: React.VFC<NodeComponentProps>
+) {
+  const nodeWrapper: VFC<{
+    id: string;
+    data: any;
+    selected: boolean;
+    sourcePosition: string;
+    targetPosition: string;
+  }> = memo((props) => {
+    const node = contex.medley.nodes.getNode(props.id);
+    return node ? (
+      <NodeComponent
+        logger={contex.logger}
+        medley={contex.medley}
+        node={node}
+        {...props}
+      />
+    ) : null;
+  });
+  return nodeWrapper;
+}
+
+function getReactFlowNodes(context: BaseContext<CNode>): RFNode[] {
+  const mNodes = context.medley.nodes.getNodes();
+  return mNodes.map((mNode) => ({
+    id: mNode.id,
+    position: { x: mNode.position?.x || 0, y: mNode.position?.y || 0 },
+    type: mNode.type,
+    selectable: true,
+    draggable: true,
+    connectable: true,
+    sourcePosition: Position.Right,
+    targetPosition: Position.Left,
+  }));
+}
+
+function getReactFlowEdges(context: BaseContext<CNode>): Edge[] {
+  const mLinks = context.medley.links.getLinks();
+  return mLinks.map((mLink) => ({
+    id: `${mLink.scope}${mLink.source}${mLink.target}${mLink.port}`,
+    source: mLink.source,
+    target: mLink.target,
+    animated: true
+  }));
 }

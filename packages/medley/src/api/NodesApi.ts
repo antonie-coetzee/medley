@@ -1,6 +1,5 @@
 import { TypesApi, LinksApi } from ".";
-import { Type, Node, Link, ROOT_SCOPE } from "../core";
-import { FlowEngine } from "../FlowEngine";
+import { Type, Node, Link, Events } from "../core";
 import { NodeRepo } from "../repos";
 
 export class NodesApi<
@@ -8,16 +7,21 @@ export class NodesApi<
   TType extends Type = Type,
   TLink extends Link = Link
 > {
+  public events: Partial<Events<TNode>> = {};
+
   constructor(
     private scopeId: string,
     private nodeRepo: NodeRepo,
     private typesApi: TypesApi<TType>,
     private linksApi: LinksApi<TLink>,
-    private parentNodes?: NodesApi<TNode>
+    private parentNodes?: NodesApi<TNode, TType, TLink>
   ) {}
 
   public load(nodes: Node[]) {
     this.nodeRepo.load(nodes);
+    if (this.events.onLoad) {
+      this.events.onLoad(this.getAllNodes());
+    }
   }
 
   public getNode(id: string): TNode | undefined {
@@ -52,29 +56,26 @@ export class NodesApi<
     return scopeNodes;
   }
 
-  public getNodes(): Node[] {
+  public getNodes(): TNode[] {
     const scopeNodes = this.nodeRepo.getNodes(this.scopeId) as TNode[];
-    if (this.parentNodes) {
-      const parentNodes = this.parentNodes.getNodes();
-      return [...parentNodes, ...scopeNodes];
-    }
     return scopeNodes;
   }
 
-  public getAllNodes(): Node[] {
+  public getAllNodes(): TNode[] {
     return this.nodeRepo.getAllNodes() as TNode[];
   }
 
   public getUsedTypes(): string[] {
     const scopeTypes = this.nodeRepo.getUsedTypes(this.scopeId);
-    if (this.parentNodes) {
-      const parentTypes = this.parentNodes.getUsedTypes();
-      return [...new Set([...parentTypes, ...scopeTypes])];
-    }
     return scopeTypes;
   }
 
-  public upsertNode(node: Partial<Node>, type?: TType): TNode {
+  public getScopedUsedTypes(): string[] {
+    const scopeTypes = this.nodeRepo.getUsedTypes(this.scopeId);
+    return scopeTypes;
+  }
+
+  public upsertNode(node: Partial<TNode>, type?: TType): TNode {
     let nodeType: TType;
     if (type) {
       const hasType = this.typesApi.hasType(type.name);
@@ -91,15 +92,24 @@ export class NodesApi<
     } else {
       throw new Error("either type or node.type must be provided");
     }
-    const outNode = this.nodeRepo.upsertNode(this.scopeId, {
+    const [added, outNode] = this.nodeRepo.upsertNode(this.scopeId, {
       ...node,
       type: nodeType.name,
     });
+    if (added && this.events.onItemAdd) {
+      this.events.onItemAdd(outNode as TNode);
+    }
+    if (added === false && this.events.onItemChange) {
+      this.events.onItemChange(outNode as TNode);
+    }
+    if (added && this.events.onChange) {
+      this.events.onChange(this.getNodes());
+    }
     return outNode as TNode;
   }
 
-  public copyNode(node: Node) {
-    const nodeCopy = JSON.parse(JSON.stringify(node)) as Partial<Node>;
+  public copyNode(node: TNode) {
+    const nodeCopy = JSON.parse(JSON.stringify(node)) as Partial<TNode>;
     delete nodeCopy.id;
     nodeCopy.scope = this.scopeId;
     return this.upsertNode(nodeCopy) as TNode;
@@ -111,12 +121,21 @@ export class NodesApi<
       throw new Error(`type name for node with id: '${nodeId}', not found`);
     }
 
-    const sourceLinks = this.linksApi.getAllLinks().filter(l=>l.source===nodeId);
+    const sourceLinks = this.linksApi
+      .getAllLinks()
+      .filter((l) => l.source === nodeId);
     if (sourceLinks && sourceLinks.length > 0) {
       throw new Error(
         `node with id: '${nodeId}' is a source and cannot be deleted`
       );
     }
-    this.nodeRepo.deleteNode(this.scopeId, nodeId);
+    const node = this.nodeRepo.getNode(this.scopeId, nodeId);
+    const wasDeleted = this.nodeRepo.deleteNode(this.scopeId, nodeId);
+    if (node && wasDeleted && this.events.onItemDelete) {
+      this.events.onItemDelete(node as TNode);
+    }
+    if (wasDeleted && this.events.onChange) {
+      this.events.onChange(this.getNodes());
+    }
   }
 }

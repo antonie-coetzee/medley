@@ -5,9 +5,7 @@ export class TypeRepo {
   private typeMap: TreeMap<Type> = new TreeMap();
   private baseUrl?: URL;
 
-  constructor(private loader: Loader, onConstruct?: (this: TypeRepo) => void) {
-    onConstruct?.call(this);
-  }
+  constructor(private loader: Loader) {}
 
   public load(types: Type[], baseUrl: URL) {
     this.baseUrl = baseUrl;
@@ -67,12 +65,8 @@ export class TypeRepo {
     return this.typeMap.getAll();
   }
 
-  public getType(scopeId:string, typeName: string): Type {
-    const type = this.typeMap.getNodeValue(scopeId, typeName);
-    if (type == null) {
-      throw new Error(`type with name: '${typeName}', not found on scope: '${scopeId}'`);
-    }
-    return type;
+  public getType(scopeId:string, typeName: string): Type | undefined {
+    return this.typeMap.getNodeValue(scopeId, typeName);
   }
 
   public hasType(scopeId:string, typeName: string): boolean {
@@ -90,6 +84,6 @@ export class TypeRepo {
 
   public addType(scopeId:string, type: Type) {
     type.scope = scopeId || ROOT_SCOPE;
-    this.typeMap.setNodeValue(type, type.scope, type.name);
+    return this.typeMap.setNodeValue(type, type.scope, type.name);
   }
 }

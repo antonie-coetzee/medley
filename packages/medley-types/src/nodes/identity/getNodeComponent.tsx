@@ -1,10 +1,10 @@
-import React from "react";
-
-import { GetNodeComponent } from "medley-common";
+import React, { memo } from "react";
 import { Handle, Position } from "react-flow-renderer";
+import { GetNodeComponent } from "medley-common";
+import { IdentityNode } from "./node";
 
 export const getNodeComponent: GetNodeComponent = async () => {
-  return () => {
+  return ({node}) => {
     return (
       <>
         <Handle
@@ -14,18 +14,13 @@ export const getNodeComponent: GetNodeComponent = async () => {
           onConnect={(params) => console.log("handle onConnect", params)}
           isConnectable={true}
         />
-        <div>
-          Custom Color Picker Node:
+        <div style={ {border: '1px solid #777', padding: 10} }>
+          {node.name}
         </div>
-        <input
-          className="nodrag"
-          type="color"
-        />
         <Handle
           type="source"
           position={Position.Right}
-          id="a"
-          style={{ top: 10, background: "#555" }}
+          style={{ background: "#555" }}
           isConnectable={true}
         />
       </>

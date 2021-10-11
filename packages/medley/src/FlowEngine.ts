@@ -24,7 +24,7 @@ export class FlowEngine<
     // use closure to capture nodeEngine on initial invocation
     const flowEngine = this;
     const getNodeFunction = async function (
-      context: ExecutionContext<TNode, TType, TLink>
+      context: ExecutionContext<TNode, TNode, TType, TLink>
     ) {
       const nodeFuction = await FlowEngine.buildNodeFunction(
         context,
@@ -35,7 +35,7 @@ export class FlowEngine<
     };
 
     const nodeFunction = await getNodeFunction(
-      context as ExecutionContext<TNode, TType, TLink>
+      context as ExecutionContext<TNode, TNode, TType, TLink>
     );
     return nodeFunction(...args);
   };
@@ -45,12 +45,12 @@ export class FlowEngine<
     TType extends Type = Type,
     TLink extends Link = Link
   >(
-    context: ExecutionContext<TNode, TType, TLink> | void,
+    context: ExecutionContext<TNode, TNode, TType, TLink> | void,
     flowEngine: FlowEngine<TNode, TType, TLink>,
     nodeId: string
   ) {
     const runNodeFunction = async function <T>(
-      parentContext: ExecutionContext<TNode, TType, TLink> | undefined,
+      parentContext: ExecutionContext<TNode, TNode, TType, TLink> | undefined,
       nodeId: string,
       ...args: any[]
     ): Promise<T> {
@@ -63,14 +63,14 @@ export class FlowEngine<
     };
 
     const node = flowEngine.medley.nodes.getNode(nodeId);
-    if(node == null){
+    if (node == null) {
       throw new Error(`node with id: '${nodeId}', not found`);
     }
     const nodeFunction = await flowEngine.medley.types.getExportFunction<
-      NodeFunction<{}, TNode, TType, TLink>
+      NodeFunction<{}, TNode, TNode, TType, TLink>
     >(node.type, nodeFunctionExportName);
 
-    if(nodeFunction == null){
+    if (nodeFunction == null) {
       throw new Error(`node function for type: '${node.type}', not valid`);
     }
     const childContext = flowEngine.createContext(
@@ -91,10 +91,10 @@ export class FlowEngine<
   }
 
   private createContext(
-    parentContext: ExecutionContext<TNode, TType, TLink> | void,
+    parentContext: ExecutionContext<TNode, TNode, TType, TLink> | void,
     medley: Medley<TNode, TType, TLink>,
     node: TNode
-  ): ExecutionContext<TNode, TType, TLink> {
+  ): ExecutionContext<TNode, TNode, TType, TLink> {
     const logger = medley.logger.child({
       typeName: node.type,
       nodeId: node.id,
@@ -107,14 +107,14 @@ export class FlowEngine<
       logger,
     };
 
-    return childContext as ExecutionContext<TNode, TType, TLink>;
+    return childContext as ExecutionContext<TNode, TNode, TType, TLink>;
   }
 
   private buildPortInputFunction(
     node: Node,
-    context: ExecutionContext<TNode, TType, TLink>,
+    context: ExecutionContext<TNode, TNode, TType, TLink>,
     runNodeFunction: <T>(
-      context: ExecutionContext<TNode, TType, TLink>,
+      context: ExecutionContext<TNode, TNode, TType, TLink>,
       nodeId: string,
       ...args: any[]
     ) => Promise<T>

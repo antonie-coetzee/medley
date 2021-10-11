@@ -1,15 +1,20 @@
-import { Type } from "../core";
+import { Events, Type } from "../core";
 import { TypeRepo } from "../repos";
 
 export class TypesApi<TType extends Type = Type> {
+  public events: Partial<Events<TType>> = {};
+
   constructor(
     private scopeId: string,
     private typeRepo: TypeRepo,
-    private parentTypes?: TypesApi<TType>
+    private parentTypes?: TypesApi<TType>,
   ) {}
 
   public load(types: TType[], baseUrl: URL): void {
     this.typeRepo.load(types, baseUrl);
+    if(this.events.onLoad){
+      this.events.onLoad(this.getAllTypes());
+    }
   }
 
   public async getExportFunction<T extends Function = Function>(
@@ -71,6 +76,13 @@ export class TypesApi<TType extends Type = Type> {
   }
 
   public addType(type: TType) {
-    this.typeRepo.addType(this.scopeId, type);
+    let wasAdded = false;
+    wasAdded = this.typeRepo.addType(this.scopeId, type);
+    if(wasAdded && this.events.onItemAdd){
+      this.events.onItemAdd(type);
+    }
+    if(wasAdded && this.events.onChange){
+      this.events.onChange(this.getTypes());
+    }
   }
 }

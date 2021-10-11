@@ -6,15 +6,17 @@ export const nodeFunctionExportName = "nodeFunction";
 export interface NodeFunction<
   TContext extends {} = {},
   TNode extends Node = Node,
-  TType extends Type = Type,
-  TLink extends Link = Link
+  MNode extends Node = Node,
+  MType extends Type = Type,
+  MLink extends Link = Link
 > {
-  (context: TContext & ExecutionContext<TNode, TType, TLink>, ...args: any[]): any;
+  (context: TContext & ExecutionContext<TNode, MNode, MType, MLink>, ...args: any[]): any;
 }
 
 export type NF<
   TContext extends {} = {},
   TNode extends Node = Node,
-  TType extends Type = Type,
-  TLink extends Link = Link
-> = NodeFunction<TContext, TNode, TType, TLink>;
+  MNode extends Node = Node,
+  MType extends Type = Type,
+  MLink extends Link = Link
+> = NodeFunction<TContext, TNode, MNode, MType, MLink>;

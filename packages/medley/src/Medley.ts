@@ -14,7 +14,6 @@ export interface MedleyOptions<
   cache?: Map<string, unknown>;
   logger?: Logger;
   scopeId?: string;
-  onConstruct?: (this: Medley<TNode, TType, TLink>) => void;
 }
 
 export class Medley<
@@ -61,15 +60,13 @@ export class Medley<
       this.links,
       parentInstance?.nodes
     );
-    this.graph = new GraphApi(
+    this.graph = new GraphApi<TNode, TType, TLink>(
       this.nodes,
       this.types,
       this.links
     );
 
     this.flowEngine = new FlowEngine<TNode, TType, TLink>(this, this.options.cache);
-    
-    this.options.onConstruct?.call(this);
   }
 
   public runNode<T>(

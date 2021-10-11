@@ -9,8 +9,7 @@ export class LinkRepo {
   /* scope -> source -> target -> port -> link */
   private sourceMap: TreeMap<Link>;
 
-  constructor(onConstruct?: (this: LinkRepo) => void) {
-    onConstruct?.call(this);
+  constructor() {
     this.targetMap = new TreeMap();
     this.sourceMap = new TreeMap();
   }
@@ -40,11 +39,13 @@ export class LinkRepo {
   }
 
   public addLink(newLink: Link) {
-    this.addToTargetMap(newLink);
+    let wasAdded = false;
+    wasAdded = this.addToTargetMap(newLink);
     this.updateSourceMap = true;
+    return wasAdded;
   }
 
-  public getLinks(scopeId:string) {
+  public getLinks(scopeId: string) {
     return this.targetMap.getFromPath(true, scopeId);
   }
 
@@ -53,18 +54,20 @@ export class LinkRepo {
   }
 
   public deleteLink(link: Link) {
-    this.targetMap.deleteNode(
+    let wasDeleted = false;
+    wasDeleted = this.targetMap.deleteNode(
       link.scope || ROOT_SCOPE,
       link.port,
       link.target,
       link.source
     );
     this.updateSourceMap = true;
+    return wasDeleted;
   }
 
   private addToTargetMap(link: Link) {
     let scope = link.scope || ROOT_SCOPE;
-    this.targetMap.setNodeValue(
+    return this.targetMap.setNodeValue(
       link,
       scope,
       link.port,

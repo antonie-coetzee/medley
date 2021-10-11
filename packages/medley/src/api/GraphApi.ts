@@ -9,9 +9,9 @@ export class GraphApi<
   private graph?: Graph<TNode, TType, TLink>;
 
   constructor(
-    private nodesApi: NodesApi,
-    private typesApi: TypesApi,
-    private linksApi: LinksApi,
+    private nodesApi: NodesApi<TNode, TType, TLink>,
+    private typesApi: TypesApi<TType>,
+    private linksApi: LinksApi<TLink>,
   ) {}
 
   public setGraph(graph: Graph<TNode, TType, TLink>, baseUrl: URL) {

@@ -4,10 +4,6 @@ export class NodeRepo {
   public nodeIndex: Map<string,Node> = new Map();
   public nodeTreeMap: TreeMap<Node> = new TreeMap();
 
-  constructor(onConstruct?: (this: NodeRepo) => void) {
-    onConstruct?.call(this);
-  }
-
   public load(nodes: Node[]): void {
     this.nodeTreeMap.clear();
     this.nodeIndex.clear();
@@ -57,7 +53,7 @@ export class NodeRepo {
     return Array.from(usedTypes.keys());
   }
 
-  public upsertNode(scopeId: string, node: Partial<Node>) {
+  public upsertNode(scopeId: string, node: Partial<Node>): [boolean, Node] {
     if (node.type == null) {
       throw new Error(`node requires typeName to be defined`);
     }
@@ -70,7 +66,7 @@ export class NodeRepo {
       const nodeCpy = { ...node, type: node.type, id: newId, scope: scopeId } as Node;
       this.nodeTreeMap.setNodeValue(nodeCpy, scopeId, nodeCpy.id);
       this.nodeIndex.set(nodeCpy.id, nodeCpy);    
-      return nodeCpy;
+      return [true, nodeCpy];
     } else {
       // existing node
       const existingNode = this.nodeTreeMap.getNodeValue(scopeId, node.id);
@@ -80,13 +76,13 @@ export class NodeRepo {
       const updatedNode = { ...existingNode, ...node, scope: scopeId } as Node;
       this.nodeTreeMap.setNodeValue(updatedNode, scopeId, node.id);
       this.nodeIndex.set(node.id, updatedNode);  
-      return updatedNode;
+      return [false, updatedNode];
     }
   }
 
   public deleteNode(scopeId: string, id: string) {
     this.nodeIndex.delete(id);
-    this.nodeTreeMap.deleteNode(scopeId, id);
+    return this.nodeTreeMap.deleteNode(scopeId, id);
   }
 }
 

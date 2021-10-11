@@ -18,7 +18,9 @@ export class TreeMap<T> {
     const nodeAtPath = this.getNodeFromPath(this.rootNode, true, path);
     if (nodeAtPath) {
       nodeAtPath.value = node;
+      return true;
     }
+    return false;
   }
 
   public getNodeValue(...path: string[]): T | undefined {
@@ -30,14 +32,18 @@ export class TreeMap<T> {
   }
 
   public deleteNode(...path: string[]) {
+    let wasDeleted = false;
     this.checkPath(path);
     if (path.length === 1) {
       delete this.rootNode[path[0]];
+      wasDeleted = true;
     }
     const parentNode = this.getNodeFromPath(this.rootNode, false, path.slice(0, -1));
     if (parentNode && parentNode.tmap) {
       delete parentNode.tmap[path[path.length - 1]];
+      wasDeleted = true;
     }
+    return wasDeleted;
   }
 
   public getFromPath(recursive: boolean, ...path: string[]): T[] {

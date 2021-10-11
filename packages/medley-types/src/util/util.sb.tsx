@@ -7,8 +7,8 @@ export interface StoryWithLoaders extends Story {
 }
 
 export const componentStory = (
-  componentFactory: () => Promise<FC>,
-  containerFactory?: () => Promise<FC>
+  componentFactory: () => Promise<FC<any>>,
+  containerFactory?: () => Promise<FC<any>>
 ): StoryWithLoaders => {
   const story: StoryWithLoaders = (
     args,

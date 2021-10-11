@@ -25,19 +25,28 @@ export type Input = <TypedPort extends Port>(
   : Promise<Unwrap<TypeOfPort<TypedPort>> | undefined>;
 
 export type BaseContext<
-  TNode extends Node = Node,
-  TType extends Type = Type,
-  TLink extends Link = Link
+  MNode extends Node = Node,
+  MType extends Type = Type,
+  MLink extends Link = Link
 > = {
-  medley: Medley<TNode, TType, TLink>;
+  medley: Medley<MNode, MType, MLink>;
   logger: Logger;
+};
+
+export type NodeContext<
+TNode extends Node = Node,
+MNode extends Node = Node,
+MType extends Type = Type,
+MLink extends Link = Link
+> = BaseContext<MNode, MType, MLink> & {
   node: TNode;
 };
 
 export type ExecutionContext<
   TNode extends Node = Node,
-  TType extends Type = Type,
-  TLink extends Link = Link
-> = BaseContext<TNode, TType, TLink> & {
+  MNode extends Node = Node,
+  MType extends Type = Type,
+  MLink extends Link = Link
+> = NodeContext<TNode, MNode, MType, MLink> & {
   input: Input;
 };

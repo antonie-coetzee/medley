@@ -1,4 +1,5 @@
 export * from "./getNodeEditComponent"
 export * from "./nodeFunction"
+export * from "./getNodeComponent"
 export * from "./getPorts"
 export * from "./node"
