@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "esnext"
+    ],
+    "target": "ESNext",                          
+    "module": "esnext",                     
+    "strict": true,                          
+    "esModuleInterop": true,                 
+    "skipLibCheck": true,                     
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist/test",
+    "rootDir": "./test",
+  },
+  "include": ["./test/**/*.ts"]
+}

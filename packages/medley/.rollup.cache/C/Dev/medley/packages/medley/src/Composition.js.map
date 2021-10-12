@@ -1,1 +1,0 @@
-{"version":3,"file":"Composition.js","sourceRoot":"","sources":["Composition.ts"],"names":[],"mappings":"","sourcesContent":["import { ModelsOfType } from \"./Models\";\nimport { TypeTree } from \"./Types\";\n\nexport interface Composition {\n  types: URL | TypeTree;\n  modelsByType: ModelsOfType[];\n}\n"]}

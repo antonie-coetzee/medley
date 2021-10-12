@@ -1,23 +1,20 @@
 {
   "folders": [
     {
-      "name": "@medley/medley",
-      "path": "./packages/medley"
+      "name": "@medley-js/core",
+      "path": "./packages/core"
     },
     {
-      "name": "@medley/medley-composer",
-      "path": "./packages/medley-composer"
+      "name": "@medley-js/composer",
+      "path": "./packages/composer"
     },
     {
-      "name": "@medley/medley-common",
-      "path": "./packages/medley-common"
+      "name": "@medley-js/common",
+      "path": "./packages/common"
     },
     {
-      "name": "@medley/medley-types",
-      "path": "./packages/medley-types"
+      "name": "@medley-js/nodes",
+      "path": "./packages/nodes"
     },    
-  ],
-  "settings": {
-    "livePreview.defaultPreviewPath": "c:\\Dev\\medley\\packages\\medley-composer\\dist\\index.html"
-  }
+  ]
 }

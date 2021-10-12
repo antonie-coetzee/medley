@@ -3,9 +3,9 @@
   "name": "medley",
   "version": "1.0.0",
   "license": "MIT",
-  "scripts": {
-  },
+  "scripts": {},
   "workspaces": [
     "packages/**"
-  ]
+  ],
+  "packageManager": "yarn@3.0.2"
 }

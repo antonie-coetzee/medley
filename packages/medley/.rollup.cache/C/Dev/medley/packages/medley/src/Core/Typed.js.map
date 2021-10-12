@@ -1,1 +1,0 @@
-{"version":3,"file":"Typed.js","sourceRoot":"","sources":["Typed.ts"],"names":[],"mappings":"","sourcesContent":["export interface Typed {\n  typeId: string;\n}\n"]}
