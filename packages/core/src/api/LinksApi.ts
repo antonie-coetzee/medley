@@ -1,4 +1,4 @@
-import { Events, EventType, Link, MEvent } from "../core";
+import { EventType, Link, MedleyEvent } from "../core";
 import { LinkRepo } from "../repos";
 
 export class LinksApi<TLink extends Link = Link> extends EventTarget {
@@ -9,7 +9,7 @@ export class LinksApi<TLink extends Link = Link> extends EventTarget {
 
   public load(links: Link[]) {
     this.linkRepo.load(links);
-    this.dispatchEvent(new MEvent(EventType.OnLoad));
+    this.dispatchEvent(new MedleyEvent(EventType.OnLoad));
   }
 
   public getPortLinks(port: string, target: string): TLink[] {
@@ -21,11 +21,11 @@ export class LinksApi<TLink extends Link = Link> extends EventTarget {
   }
 
   public addLink(newLink: TLink): void {
-    const allowed = this.dispatchEvent(MEvent.createCancelable(EventType.OnItemAdd, newLink));
+    const allowed = this.dispatchEvent(MedleyEvent.createCancelable(EventType.OnItemAdd, newLink));
     if (allowed) {
       const wasAdded = this.linkRepo.addLink(newLink);
       if (wasAdded) {
-        this.dispatchEvent(MEvent.create(EventType.OnChange));
+        this.dispatchEvent(MedleyEvent.create(EventType.OnChange));
       }
     }
   }
@@ -39,12 +39,12 @@ export class LinksApi<TLink extends Link = Link> extends EventTarget {
   }
 
   public deleteLink(link: TLink): void {
-    const allowed = this.dispatchEvent(MEvent.createCancelable(EventType.OnItemDelete, link));
+    const allowed = this.dispatchEvent(MedleyEvent.createCancelable(EventType.OnItemDelete, link));
     if (allowed) {
       let wasDeleted = false;
       wasDeleted = this.linkRepo.deleteLink(link);
       if (wasDeleted) {
-        this.dispatchEvent(MEvent.create(EventType.OnChange));
+        this.dispatchEvent(MedleyEvent.create(EventType.OnChange));
       }
     }
   }

@@ -1,4 +1,4 @@
-import { Events, EventType, MEvent, Type } from "../core";
+import { EventType, MedleyEvent, Type } from "../core";
 import { TypeRepo } from "../repos";
 
 export class TypesApi<TType extends Type = Type> extends EventTarget {
@@ -13,7 +13,7 @@ export class TypesApi<TType extends Type = Type> extends EventTarget {
 
   public load(types: TType[], baseUrl: URL): void {
     this.typeRepo.load(types, baseUrl);
-    this.dispatchEvent(new MEvent(EventType.OnLoad));
+    this.dispatchEvent(new MedleyEvent(EventType.OnLoad));
   }
 
   public async getExportFunction<T extends Function = Function>(
@@ -75,12 +75,12 @@ export class TypesApi<TType extends Type = Type> extends EventTarget {
   }
 
   public addType(type: TType) {
-    const allowed = this.dispatchEvent(MEvent.createCancelable(EventType.OnItemAdd, type));
+    const allowed = this.dispatchEvent(MedleyEvent.createCancelable(EventType.OnItemAdd, type));
     if (allowed === false) {
       return;
     }
     if (this.typeRepo.addType(this.scopeId, type)) {
-      this.dispatchEvent(MEvent.create(EventType.OnChange));
+      this.dispatchEvent(MedleyEvent.create(EventType.OnChange));
     }
   }
 }

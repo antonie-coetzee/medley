@@ -1,5 +1,5 @@
 import { TypesApi, LinksApi } from ".";
-import { Type, Node, Link, MEvent, EventType } from "../core";
+import { Type, Node, Link, MedleyEvent, EventType } from "../core";
 import { NodeRepo } from "../repos";
 
 export class NodesApi<
@@ -20,7 +20,7 @@ export class NodesApi<
 
   public load(nodes: Node[]) {
     this.nodeRepo.load(nodes);
-    this.dispatchEvent(new MEvent(EventType.OnLoad));
+    this.dispatchEvent(new MedleyEvent(EventType.OnLoad));
   }
 
   public getNode(id: string): TNode | undefined {
@@ -96,10 +96,10 @@ export class NodesApi<
       type: nodeType.name,
     });
     if (added) {
-      this.dispatchEvent(MEvent.create(EventType.OnItemAdd, outNode));
-      this.dispatchEvent(MEvent.create(EventType.OnChange));
+      this.dispatchEvent(MedleyEvent.create(EventType.OnItemAdd, outNode));
+      this.dispatchEvent(MedleyEvent.create(EventType.OnChange));
     }else{
-      this.dispatchEvent(MEvent.create(EventType.OnItemUpdate, outNode));
+      this.dispatchEvent(MedleyEvent.create(EventType.OnItemUpdate, outNode));
     }
     return outNode as TNode;
   }
@@ -128,8 +128,8 @@ export class NodesApi<
     const node = this.nodeRepo.getNode(this.scopeId, nodeId);
     const wasDeleted = this.nodeRepo.deleteNode(this.scopeId, nodeId);
     if (node && wasDeleted) {
-      this.dispatchEvent(MEvent.create(EventType.OnItemDelete, node));
-      this.dispatchEvent(MEvent.create(EventType.OnChange));
+      this.dispatchEvent(MedleyEvent.create(EventType.OnItemDelete, node));
+      this.dispatchEvent(MedleyEvent.create(EventType.OnChange));
     }
   }
 }
