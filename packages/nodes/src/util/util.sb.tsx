@@ -1,5 +1,5 @@
 import { Story } from "@storybook/react";
-import { Medley } from "medley";
+import { Medley } from "@medley-js/core";
 import React, { FC, Fragment, ReactElement } from "react";
 
 export interface StoryWithLoaders extends Story {

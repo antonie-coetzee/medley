@@ -2,12 +2,13 @@ import { Node, Type, Logger, nullLogger, Link, ROOT_SCOPE, Loader } from "./core
 import { TypeRepo, NodeRepo, LinkRepo } from "./repos";
 import { FlowEngine } from "./FlowEngine";
 import { GraphApi, TypesApi, NodesApi, LinksApi } from "./api";
+import { ExternalInputs, NodeContext } from ".";
 
 export interface MedleyOptions<
-  TNode extends Node = Node,
-  TType extends Type = Type,
-  TLink extends Link = Link
-> {
+  MNode extends Node = Node,
+  MType extends Type = Type,
+  MLink extends Link = Link
+  > {
   typeRepo: TypeRepo;
   nodeRepo: NodeRepo;
   linkRepo: LinkRepo;
@@ -17,56 +18,56 @@ export interface MedleyOptions<
 }
 
 export class Medley<
-  TNode extends Node = Node,
-  TType extends Type = Type,
-  TLink extends Link = Link
-> {
-  private flowEngine: FlowEngine<TNode, TType, TLink>;
+  MNode extends Node = Node,
+  MType extends Type = Type,
+  MLink extends Link = Link
+  > {
+  private flowEngine: FlowEngine<MNode, MType, MLink>;
 
-  public readonly options: MedleyOptions<TNode, TType, TLink>
+  public readonly options: MedleyOptions<MNode, MType, MLink>
   public readonly logger: Logger;
-  public readonly nodes: NodesApi<TNode, TType, TLink>;
-  public readonly types: TypesApi<TType>;
-  public readonly links: LinksApi<TLink>;
-  public readonly graph: GraphApi<TNode, TType, TLink>;
+  public readonly nodes: NodesApi<MNode, MType, MLink>;
+  public readonly types: TypesApi<MType>;
+  public readonly links: LinksApi<MLink>;
+  public readonly graph: GraphApi<MNode, MType, MLink>;
 
   public constructor(
-    options?: MedleyOptions<TNode, TType, TLink>,
-    public readonly parentInstance?: Medley<TNode, TType, TLink>
+    options?: MedleyOptions<MNode, MType, MLink>,
+    public readonly parentInstance?: Medley<MNode, MType, MLink>
   ) {
-    if(options == null){
+    if (options == null) {
       this.options = {
         linkRepo: new LinkRepo(),
         typeRepo: new TypeRepo(new Loader()),
         nodeRepo: new NodeRepo(),
       }
-    }else{
+    } else {
       this.options = options;
     }
-    
+
     const scopeId = this.options.scopeId || ROOT_SCOPE;
     this.logger = this.options.logger || nullLogger;
 
-    this.types = new TypesApi<TType>(
+    this.types = new TypesApi<MType>(
       scopeId,
       this.options.typeRepo,
       parentInstance?.types
     );
-    this.links = new LinksApi<TLink>(scopeId, this.options.linkRepo);
-    this.nodes = new NodesApi<TNode, TType, TLink>(
+    this.links = new LinksApi<MLink>(scopeId, this.options.linkRepo);
+    this.nodes = new NodesApi<MNode, MType, MLink>(
       scopeId,
       this.options.nodeRepo,
       this.types,
       this.links,
       parentInstance?.nodes
     );
-    this.graph = new GraphApi<TNode, TType, TLink>(
+    this.graph = new GraphApi<MNode, MType, MLink>(
       this.nodes,
       this.types,
       this.links
     );
 
-    this.flowEngine = new FlowEngine<TNode, TType, TLink>(this, this.options.cache);
+    this.flowEngine = new FlowEngine<MNode, MType, MLink>(this, this.options.cache);
   }
 
   public runNode<T>(
@@ -74,13 +75,22 @@ export class Medley<
     nodeId: string,
     ...args: any[]
   ): Promise<T> {
-    return this.flowEngine.runNodeFunction(context, nodeId, ...args);
+    return this.flowEngine.runNodeFunction(context, nodeId, null, ...args);
   }
 
-  public getRootInstance(): Medley<TNode, TType, TLink>{
-    if(this.parentInstance){
+  public runNodeWithInputs<T, TNode extends Node = Node>(
+      context: {} | null,
+      nodeId: string,
+      inputs: ExternalInputs<TNode, MNode, MType, MLink>,
+      ...args: any[]
+    ): Promise<T> {
+    return this.flowEngine.runNodeFunction(context, nodeId, inputs, ...args);
+  }
+
+  public getRootInstance(): Medley<MNode, MType, MLink> {
+    if (this.parentInstance) {
       return this.parentInstance.getRootInstance();
-    }else{
+    } else {
       return this;
     }
   }

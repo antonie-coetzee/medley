@@ -1,4 +1,4 @@
-import { Node } from "medley";
+import { Node } from "@medley-js/core";
 
 export type CNode<T extends unknown = unknown> = Node<T> & {
   name: string;

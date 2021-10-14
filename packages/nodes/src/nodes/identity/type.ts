@@ -1,4 +1,4 @@
-import { Type } from "medley";
+import { Type } from "@medley-js/core";
 
 import * as exports from "./index";
 

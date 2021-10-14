@@ -1,6 +1,6 @@
 import React from "react";
 
-import { GetNodeComponent } from "medley-common";
+import { GetNodeComponent } from "@medley-js/common";
 import { Handle, Position } from "react-flow-renderer";
 
 export const getNodeComponent: GetNodeComponent = async () => {

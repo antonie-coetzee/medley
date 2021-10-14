@@ -1,10 +1,12 @@
 import React, { memo } from "react";
 import { Handle, Position } from "react-flow-renderer";
-import { GetNodeComponent } from "medley-common";
+import { GetNodeComponent } from "@medley-js/common";
 import { IdentityNode } from "./node";
+import { Info } from '@material-ui/icons';
+import { Avatar, Card, CardContent, CardHeader, Typography } from "@material-ui/core";
 
 export const getNodeComponent: GetNodeComponent = async () => {
-  return ({node}) => {
+  return ({ node }) => {
     return (
       <>
         <Handle
@@ -14,9 +16,17 @@ export const getNodeComponent: GetNodeComponent = async () => {
           onConnect={(params) => console.log("handle onConnect", params)}
           isConnectable={true}
         />
-        <div style={ {border: '1px solid #777', padding: 10} }>
-          {node.name}
-        </div>
+        <Card style={{ maxWidth: "200px" }}>
+          <CardHeader style={{ backgroundColor: "#b7dbff" }} title={"Identity"} subheader={node.name} avatar={
+            <Info />
+          }>
+          </CardHeader>
+          <CardContent>
+            <Typography color="textSecondary" gutterBottom variant="caption">
+              Identity node that passes input unchanged to the output
+            </Typography>
+          </CardContent>
+        </Card>
         <Handle
           type="source"
           position={Position.Right}

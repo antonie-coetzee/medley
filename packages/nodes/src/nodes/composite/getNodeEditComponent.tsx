@@ -9,7 +9,7 @@ import ReactFlow, {
   Node as RFNode,
   Position,
 } from "react-flow-renderer";
-import { BaseContext, NodeContext } from "medley";
+import { BaseContext, EventType, NodeContext } from "@medley-js/core";
 import {
   CLink,
   CNode,
@@ -18,7 +18,7 @@ import {
   GetNodeComponent,
   GetNodeEditComponent,
   NodeComponentProps,
-} from "medley-common";
+} from "@medley-js/common";
 import { CompositeNode } from "./node";
 
 export const getNodeEditComponent: GetNodeEditComponent<CompositeNode> = async (
@@ -30,16 +30,16 @@ export const getNodeEditComponent: GetNodeEditComponent<CompositeNode> = async (
   const initialElements = [...reactFlowNodes, ...reactFlowEdges];
   return () => {
     const [elements, setElements] = useState<Elements>(initialElements);
-    contex.medley.links.events.onChange = links => {
+    contex.medley.links.addEventListener(EventType.OnChange, e => {
       const reactFlowNodes = getReactFlowNodes(contex);
       const reactFlowEdges = getReactFlowEdges(contex);
       setElements([...reactFlowNodes, ...reactFlowEdges]);
-    }
-    contex.medley.nodes.events.onChange = nodes => {
+    });
+    contex.medley.nodes.addEventListener(EventType.OnChange, e => {
       const reactFlowNodes = getReactFlowNodes(contex);
       const reactFlowEdges = getReactFlowEdges(contex);
       setElements([...reactFlowNodes, ...reactFlowEdges]);
-    }
+    });
     const onConnect = (edge: Connection | Edge) => contex.medley.links.addLink({source:edge.source || "", target:edge.target || "", port: edge.targetHandle || "" , scope: contex.node.id});
     return (
     <div style={{ height: 600 }}>

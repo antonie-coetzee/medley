@@ -10,7 +10,7 @@ const external = [
   "react",
   "mobx",
   "mobx-react",
-  "medley",
+  "@medley-js/core",
   "notistack",
   "@material-ui/styles",
   "@material-ui/core",

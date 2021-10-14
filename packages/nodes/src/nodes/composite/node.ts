@@ -1,4 +1,4 @@
-import { CNode, CPort } from "medley-common";
+import { CNode, CPort } from "@medley-js/common";
 
 export type CompositeNode = CNode<{
   outputNode: CNode;

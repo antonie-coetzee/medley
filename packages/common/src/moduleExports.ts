@@ -1,5 +1,5 @@
 import { ReactNode, VFC } from "react";
-import { BaseContext, NodeContext } from "medley";
+import { BaseContext, NodeContext } from "@medley-js/core";
 import { CLink, CNode, CType, CPort } from "primitives";
 
 export type NodeEditComponentProps<TNode extends CNode = CNode> = NodeContext<
