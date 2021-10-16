@@ -4,7 +4,7 @@ export class NodeRepo {
   public nodeIndex: Map<string,Node> = new Map();
   public nodeTreeMap: TreeMap<Node> = new TreeMap();
 
-  public load(nodes: Node[]): void {
+  public set(nodes: Node[]): void {
     this.nodeTreeMap.clear();
     this.nodeIndex.clear();
     nodes.forEach((node) => {

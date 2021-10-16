@@ -7,9 +7,9 @@ export class LinksApi<TLink extends Link = Link> extends EventTarget {
     super();
   }
 
-  public load(links: Link[]) {
-    this.linkRepo.load(links);
-    this.dispatchEvent(new MedleyEvent(EventType.OnLoad));
+  public setLinks(links: Link[]) {
+    this.linkRepo.set(links);
+    this.dispatchEvent(new MedleyEvent(EventType.OnChange));
   }
 
   public getPortLinks(port: string, target: string): TLink[] {

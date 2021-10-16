@@ -1,134 +1,34 @@
-import React, { memo, ReactNode, useContext, useState, VFC } from "react";
-import ReactFlow, {
-  addEdge,
-  Connection,
-  Controls,
-  Edge,
-  Elements,
-  MiniMap,
-  Node as RFNode,
-  Position,
-} from "react-flow-renderer";
-import { BaseContext, EventType, NodeContext } from "@medley-js/core";
-import {
-  CLink,
-  CNode,
-  constants,
-  CType,
-  GetNodeComponent,
-  GetNodeEditComponent,
-  NodeComponentProps,
-} from "@medley-js/common";
+import React from "react";
+import ReactFlow, { Controls, MiniMap } from "react-flow-renderer";
+import { EventType, NodeContext } from "@medley-js/core";
+import { CLink, CNode, CType, GetNodeEditComponent } from "@medley-js/common";
 import { CompositeNode } from "./node";
+import { getReactFlowElements } from "./util/getReactFlowElements";
+import { getReactFlowNodeTypes } from "./util/getReactFlowNodeTypes";
+import { getReactFlowEvents } from "./util/getReactFlowEvents";
+import { useCompositeNodeState } from "./hooks/useCompositeNodeState";
+import useContextMenu from "./hooks/useContextMenu";
+import { getContextMenu } from "./util/getContextMenu";
 
 export const getNodeEditComponent: GetNodeEditComponent<CompositeNode> = async (
-  contex: NodeContext<CompositeNode, CNode, CType, CLink>
+  context: NodeContext<CompositeNode, CNode, CType, CLink>
 ) => {
-  const reactFlowTypes = await getReactFlowNodeTypes(contex);
-  const reactFlowNodes = getReactFlowNodes(contex);
-  const reactFlowEdges = getReactFlowEdges(contex);
-  const initialElements = [...reactFlowNodes, ...reactFlowEdges];
-  return () => {
-    const [elements, setElements] = useState<Elements>(initialElements);
-    contex.medley.links.addEventListener(EventType.OnChange, e => {
-      const reactFlowNodes = getReactFlowNodes(contex);
-      const reactFlowEdges = getReactFlowEdges(contex);
-      setElements([...reactFlowNodes, ...reactFlowEdges]);
-    });
-    contex.medley.nodes.addEventListener(EventType.OnChange, e => {
-      const reactFlowNodes = getReactFlowNodes(contex);
-      const reactFlowEdges = getReactFlowEdges(contex);
-      setElements([...reactFlowNodes, ...reactFlowEdges]);
-    });
-    const onConnect = (edge: Connection | Edge) => contex.medley.links.addLink({source:edge.source || "", target:edge.target || "", port: edge.targetHandle || "" , scope: contex.node.id});
+  const elements = await getReactFlowElements(context);
+  const nodeTypes = await getReactFlowNodeTypes(context);
+
+  return ({edit}) => {
+    const events = getReactFlowEvents(context, edit);
+    const rfState = useCompositeNodeState(context, { elements, nodeTypes });
+    const {ContextMenu, handleContextMenu} = useContextMenu(getContextMenu(context));
     return (
-    <div style={{ height: 600 }}>
-      <ReactFlow
-        elements={elements}
-        nodeTypes={reactFlowTypes}
-        onConnect={onConnect}
-        onNodeDragStop={(_, rfNode)=>{
-          const mNode = contex.medley.nodes.getNode(rfNode.id);
-          if(mNode){
-            mNode.position = rfNode.position;           
-          }     
-        }}
-      >
-        <MiniMap />
-        <Controls />
-      </ReactFlow>
-    </div>
-    )
+      <div style={{ height: 600 }}>
+        <ReactFlow {...rfState} {...events} onPaneContextMenu={handleContextMenu}
+          elementsSelectable={true}>
+          <MiniMap />
+          <Controls />
+        </ReactFlow>
+        {ContextMenu}
+      </div>
+    );
   };
 };
-
-async function getReactFlowNodeTypes(
-  contex: BaseContext<CNode>
-): Promise<{ [index: string]: ReactNode }> {
-  const typeNames = contex.medley.nodes.getUsedTypes();
-  const nodeTypes = await Promise.all(
-    typeNames.map(async (typeName) => {
-      const getNodeComponent:
-        | GetNodeComponent
-        | undefined = await contex.medley.types.getExportFunction(
-        typeName,
-        constants.getNodeComponent
-      );
-      return { typeName, nodeComponent: await getNodeComponent?.(contex) };
-    })
-  );
-  return nodeTypes.reduce((acc, crnt) => {
-    if (crnt.nodeComponent) {
-      acc[crnt.typeName] = wrapNodeComponent((contex as unknown) as BaseContext, crnt.nodeComponent);
-    }
-    return acc;
-  }, {} as { [index: string]: ReactNode });
-}
-
-function wrapNodeComponent(
-  contex: BaseContext,
-  NodeComponent: React.VFC<NodeComponentProps>
-) {
-  const nodeWrapper: VFC<{
-    id: string;
-    data: any;
-    selected: boolean;
-    sourcePosition: string;
-    targetPosition: string;
-  }> = memo((props) => {
-    const node = contex.medley.nodes.getNode(props.id);
-    return node ? (
-      <NodeComponent
-        logger={contex.logger}
-        medley={contex.medley}
-        node={node}
-        {...props}
-      />
-    ) : null;
-  });
-  return nodeWrapper;
-}
-
-function getReactFlowNodes(context: BaseContext<CNode>): RFNode[] {
-  const mNodes = context.medley.nodes.getNodes();
-  return mNodes.map((mNode) => ({
-    id: mNode.id,
-    position: { x: mNode.position?.x || 0, y: mNode.position?.y || 0 },
-    type: mNode.type,
-    selectable: true,
-    draggable: true,
-    connectable: true,
-    sourcePosition: Position.Right,
-    targetPosition: Position.Left,
-  }));
-}
-
-function getReactFlowEdges(context: BaseContext<CNode>): Edge[] {
-  const mLinks = context.medley.links.getLinks();
-  return mLinks.map((mLink) => ({
-    id: `${mLink.scope}${mLink.source}${mLink.target}${mLink.port}`,
-    source: mLink.source,
-    target: mLink.target,
-    animated: true
-  }));
-}

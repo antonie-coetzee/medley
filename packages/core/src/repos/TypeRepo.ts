@@ -7,7 +7,7 @@ export class TypeRepo {
 
   constructor(private loader: Loader) {}
 
-  public load(types: Type[], baseUrl: URL) {
+  public set(types: Type[], baseUrl: URL) {
     this.baseUrl = baseUrl;
     this.typeMap.clear();
     for (const type of types) {
@@ -25,9 +25,6 @@ export class TypeRepo {
       return;
     }
     const moduleFunction = await this.getExport(type, functionName);
-    if (typeof moduleFunction !== "function") {
-      throw new Error(`export '${functionName}' from type '${typeName}' not a function`);
-    }
     return moduleFunction as T;
   }
 

@@ -14,7 +14,7 @@ export class LinkRepo {
     this.sourceMap = new TreeMap();
   }
 
-  public load(links: Link[]) {
+  public set(links: Link[]) {
     this.targetMap.clear();
     this.sourceMap.clear();
     for (const link of links) {

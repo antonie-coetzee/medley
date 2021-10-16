@@ -2,31 +2,33 @@ import { LinksApi, NodesApi, TypesApi } from ".";
 import { Graph, Link, Type, Node } from "../core";
 
 export class GraphApi<
-  TNode extends Node = Node,
-  TType extends Type = Type,
-  TLink extends Link = Link
-> {
-  private graph?: Graph<TNode, TType, TLink>;
+  MNode extends Node = Node,
+  MType extends Type = Type,
+  MLink extends Link = Link
+> extends EventTarget {
+  private graph?: Graph<MNode, MType, MLink>;
 
   constructor(
-    private nodesApi: NodesApi<TNode, TType, TLink>,
-    private typesApi: TypesApi<TType>,
-    private linksApi: LinksApi<TLink>,
-  ) {}
+    private nodesApi: NodesApi<MNode, MType, MLink>,
+    private typesApi: TypesApi<MType>,
+    private linksApi: LinksApi<MLink>,
+  ) { 
+    super();
+  }
 
-  public setGraph(graph: Graph<TNode, TType, TLink>, baseUrl: URL) {
-    this.typesApi.load(graph.types, baseUrl);
-    this.nodesApi.load(graph.nodes);
-    this.linksApi.load(graph.links);
+  public setGraph(graph: Graph<MNode, MType, MLink>, baseUrl: URL) {
+    this.typesApi.setTypes(graph.types, baseUrl);
+    this.nodesApi.setNodes(graph.nodes);
+    this.linksApi.setLinks(graph.links);
     this.graph = graph;
   }
 
   public getGraph() {
     const types = this.typesApi
       .getAllTypes()
-      .filter((t) => t.volatile == null || t.volatile === false) as TType[];
-    const nodes = this.nodesApi.getAllNodes() as TNode[];
-    const links = this.linksApi.getAllLinks() as TLink[];
+      .filter((t) => t.volatile == null || t.volatile === false) as MType[];
+    const nodes = this.nodesApi.getAllNodes() as MNode[];
+    const links = this.linksApi.getAllLinks() as MLink[];
     return {
       ...this.graph,
       types,

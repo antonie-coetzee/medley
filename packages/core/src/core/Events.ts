@@ -1,5 +1,4 @@
 export enum EventType {
-  OnLoad = "OnLoad",
   OnChange = "OnChange",
   OnItemUpdate = "OnItemUpdate",
   OnItemAdd = "OnItemAdd",

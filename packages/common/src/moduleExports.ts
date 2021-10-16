@@ -1,4 +1,4 @@
-import { ReactNode, VFC } from "react";
+import { CSSProperties, ReactNode, VFC } from "react";
 import { BaseContext, NodeContext } from "@medley-js/core";
 import { CLink, CNode, CType, CPort } from "primitives";
 
@@ -8,12 +8,15 @@ export type NodeEditComponentProps<TNode extends CNode = CNode> = NodeContext<
   CType,
   CLink
 > & {
-  onSave: (saveCallback: () => void) => void;
-  stateChanged: () => void;
+  edit: {
+    onSave?: (saveCallback: () => void) => void;
+    openEditComponent?: (nodeId: string) => void;
+    stateChanged?: () => void;
+  };
 };
 
 export type GetNodeEditComponent<TNode extends CNode = CNode> = (
-  context: NodeContext<TNode, CNode, CType, CLink> 
+  context: NodeContext<TNode, CNode, CType, CLink>
 ) => Promise<VFC<NodeEditComponentProps<TNode>>>;
 
 export type NodeComponentProps<TNode extends CNode = CNode> = NodeContext<
@@ -22,31 +25,63 @@ export type NodeComponentProps<TNode extends CNode = CNode> = NodeContext<
   CType,
   CLink
 > & {
-  selected: boolean,
-  sourcePosition: string,
-  targetPosition: string
+  selected: boolean;
+  sourcePosition: string;
+  targetPosition: string;
 };
 
-export type GetNodeComponent = (
+export type GetNodeComponent<TNode extends CNode = CNode> = (
   context: BaseContext<CNode, CType, CLink>
-) => Promise<VFC<NodeComponentProps<CNode>>>;
+) => Promise<VFC<NodeComponentProps<TNode>>>;
 
-export type GetNodeModifiers<TNode extends CNode = CNode> = (
+export declare type CPosition = "left" | "top" | "right" | "bottom";
+
+export type GetNodeComponentProps<TNode extends CNode = CNode> = (
   context: NodeContext<TNode, CNode, CType, CLink>
-) => Promise<ReactNode>;
+) => Promise<{
+  selectable: boolean;
+  draggable: boolean;
+  connectable: boolean;
+  sourcePosition: CPosition;
+  targetPosition: CPosition;
+}>;
 
-export interface GetPorts<TNode extends CNode = CNode> {
-  (context: NodeContext<TNode, CNode, CType, CLink>): CPort[];
-}
+export type GetLinkComponentProps<TNode extends CNode = CNode> = (
+  context: NodeContext<TNode, CNode, CType, CLink>
+) => Promise<{
+  label?: string | ReactNode;
+  labelStyle?: CSSProperties;
+  labelShowBg?: boolean;
+  labelBgStyle?: CSSProperties;
+  labelBgPadding?: [number, number];
+  labelBgBorderRadius?: number;
+  style?: CSSProperties;
+  animated?: boolean;
+  isHidden?: boolean;
+  className?: string;
+}>;
+
+export type GetPorts<TNode extends CNode = CNode> = (
+  context: NodeContext<TNode, CNode, CType, CLink>
+) => CPort[];
+
+export type OnNodeCreate<TNode extends CNode = CNode> = (
+  context: NodeContext<TNode, CNode, CType, CLink>
+) => Promise<void>;
+
+export type OnNodeDelete<TNode extends CNode = CNode> = (
+  context: NodeContext<TNode, CNode, CType, CLink>
+) => Promise<void>;
 
 export type MType = {
   typeSystem: string;
   type: unknown;
 };
 
-export interface GetPortType<TNode extends CNode> {
-  (context: NodeContext<TNode, CNode, CType, CLink>, port: CPort): MType;
-}
+export type GetPortType<TNode extends CNode> = (
+  context: NodeContext<TNode, CNode, CType, CLink>,
+  port: CPort
+) => MType;
 
 export interface GetNodeType<TNode extends CNode> {
   (context: NodeContext<TNode, CNode, CType, CLink>): MType;

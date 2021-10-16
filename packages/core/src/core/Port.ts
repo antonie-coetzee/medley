@@ -1,5 +1,6 @@
 export interface Port {
   name: string;
+  required?:boolean;
   multiArity?: boolean;
   context?: {}
 }

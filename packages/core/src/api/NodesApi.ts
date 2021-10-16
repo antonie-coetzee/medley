@@ -18,9 +18,9 @@ export class NodesApi<
     super();
   }
 
-  public load(nodes: Node[]) {
-    this.nodeRepo.load(nodes);
-    this.dispatchEvent(new MedleyEvent(EventType.OnLoad));
+  public setNodes(nodes: Node[]) {
+    this.nodeRepo.set(nodes);
+    this.dispatchEvent(new MedleyEvent(EventType.OnChange));
   }
 
   public getNode(id: string): TNode | undefined {

@@ -3,7 +3,7 @@ import { Link, Node, Type, Port } from "./core";
 import { Input, ExecutionContext, NodeContext } from "./Context";
 import { NodeFunction, nodeFunctionExportName } from "./NodeFunction";
 
-export type ExternalInputs<
+export type InputProvider<
 TNode extends Node = Node,
 MNode extends Node = Node,
 MType extends Type = Type,
@@ -30,7 +30,7 @@ export class FlowEngine<
   public async runNodeFunction<T, TNode extends Node = Node>(
     context: {} | null,
     nodeId: string,
-    externalInputs: ExternalInputs<TNode, MNode, MType, MLink> | null,
+    externalInputs: InputProvider<TNode, MNode, MType, MLink> | null,
     ...args: any[]
   ): Promise<T> {
     // use closure to capture nodeEngine on initial invocation
@@ -62,12 +62,12 @@ export class FlowEngine<
     context: ExecutionContext<TNode, MNode, MType, MLink> | void,
     flowEngine: FlowEngine<MNode, MType, MLink>,
     nodeId: string,
-    externalInputs: ExternalInputs<TNode, MNode, MType, MLink> | null
+    externalInputs: InputProvider<TNode, MNode, MType, MLink> | null
   ) {
     const runNodeFunction = async function <T>(
       parentContext: ExecutionContext<TNode, MNode, MType, MLink> | undefined,
       nodeId: string,
-      externalInputs: ExternalInputs<TNode, MNode, MType, MLink> | null,
+      externalInputs: InputProvider<TNode, MNode, MType, MLink> | null,
       ...args: any[]
     ): Promise<T> {
       const nodeFunction = await FlowEngine.buildNodeFunction<TNode, MNode, MType, MLink>(
@@ -131,7 +131,7 @@ export class FlowEngine<
   private buildPortInputFunction<TNode extends Node = Node>(
     node: TNode,
     context: ExecutionContext<TNode, MNode, MType, MLink>,
-    externalInputs: ExternalInputs<TNode, MNode, MType, MLink> | null,
+    externalInputs: InputProvider<TNode, MNode, MType, MLink> | null,
     runNodeFunction: <T>(
       context: ExecutionContext<TNode, MNode, MType, MLink>,
       nodeId: string,
@@ -144,7 +144,11 @@ export class FlowEngine<
       ...args: any[]
     ): Promise<T | T[] | undefined> {
       if(externalInputs){
-        return externalInputs[port.name]?.(context);
+        const inputFunction = externalInputs[port.name];
+        if(inputFunction == null && port.required){
+          throw new Error(`port: '${port.name}' requires input`)
+        }
+        return inputFunction == null ? null : inputFunction(context);
       }
       let links = flowEngine.medley.links.getPortLinks(port.name, node.id);
       if (links == null || links.length === 0) {

@@ -60,16 +60,19 @@ describe("Medley", function () {
       return xml(xmlString, { indentation: "  " });
     };
 
-    const res = await medley.runNode<string>(
+    // const res = await medley.runNode<string>(
+    //   { xmlFormatter: formatter } /* used by typeOne */,
+    //   "nodeOne",
+    //   "testArg"
+    // );
+
+    const res2 = await medley.runNodeWithInputs<string>(
       { xmlFormatter: formatter } /* used by typeOne */,
-      "nodeOne",
+      "nodeNested",
+      {"typeNested-input-port": async ()=>"test input"},
       "testArg"
     );
-
-    //console.log(res);
-    // expect(res).toEqual(
-    //   '<moduleOne-typeOne>\r\n  <moduleTwo-typeTwo>\r\n    <moduleTwo-typeFive>\r\n      <moduleFour-typeFour context="type two context value"></moduleFour-typeFour>\r\n    </moduleTwo-typeFive>\r\n  </moduleTwo-typeTwo>\r\n  <moduleThree-typeThree context="testArg"></moduleThree-typeThree>\r\n</moduleOne-typeOne>'
-    // );
+    console.log(res2);
   });
   it("should return the active composition", async function () {
     const options: MedleyOptions = {

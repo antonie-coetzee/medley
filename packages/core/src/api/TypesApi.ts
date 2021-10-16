@@ -11,9 +11,9 @@ export class TypesApi<TType extends Type = Type> extends EventTarget {
     super();
   }
 
-  public load(types: TType[], baseUrl: URL): void {
-    this.typeRepo.load(types, baseUrl);
-    this.dispatchEvent(new MedleyEvent(EventType.OnLoad));
+  public setTypes(types: TType[], baseUrl: URL): void {
+    this.typeRepo.set(types, baseUrl);
+    this.dispatchEvent(new MedleyEvent(EventType.OnChange));
   }
 
   public async getExportFunction<T extends Function = Function>(

@@ -2,7 +2,7 @@ import { Node, Type, Logger, nullLogger, Link, ROOT_SCOPE, Loader } from "./core
 import { TypeRepo, NodeRepo, LinkRepo } from "./repos";
 import { FlowEngine } from "./FlowEngine";
 import { GraphApi, TypesApi, NodesApi, LinksApi } from "./api";
-import { ExternalInputs, NodeContext } from ".";
+import { InputProvider, NodeContext } from ".";
 
 export interface MedleyOptions<
   MNode extends Node = Node,
@@ -81,7 +81,7 @@ export class Medley<
   public runNodeWithInputs<T, TNode extends Node = Node>(
       context: {} | null,
       nodeId: string,
-      inputs: ExternalInputs<TNode, MNode, MType, MLink>,
+      inputs: InputProvider<TNode, MNode, MType, MLink>,
       ...args: any[]
     ): Promise<T> {
     return this.flowEngine.runNodeFunction(context, nodeId, inputs, ...args);

@@ -1,12 +1,12 @@
-import React, { memo } from "react";
+import React from "react";
 import { Handle, Position } from "react-flow-renderer";
 import { GetNodeComponent } from "@medley-js/common";
-import { IdentityNode } from "./node";
-import { Info } from '@material-ui/icons';
-import { Avatar, Card, CardContent, CardHeader, Typography } from "@material-ui/core";
+
+import Info  from "@mui/icons-material/Info";
+import { Card, CardContent, CardHeader, Typography } from "@mui/material";
 
 export const getNodeComponent: GetNodeComponent = async () => {
-  return ({ node }) => {
+  return ({ node, selected }) => {
     return (
       <>
         <Handle
@@ -16,11 +16,13 @@ export const getNodeComponent: GetNodeComponent = async () => {
           onConnect={(params) => console.log("handle onConnect", params)}
           isConnectable={true}
         />
-        <Card style={{ maxWidth: "200px" }}>
-          <CardHeader style={{ backgroundColor: "#b7dbff" }} title={"Identity"} subheader={node.name} avatar={
-            <Info />
-          }>
-          </CardHeader>
+        <Card style={{ maxWidth: "200px" }} variant="outlined" sx={selected ? {boxShadow: 3} : undefined}>
+          <CardHeader
+            style={{ backgroundColor: "#b7dbff" }}
+            title={"Identity"}
+            subheader={node.name}
+            avatar={<Info />}
+          ></CardHeader>
           <CardContent>
             <Typography color="textSecondary" gutterBottom variant="caption">
               Identity node that passes input unchanged to the output
