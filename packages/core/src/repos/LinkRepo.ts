@@ -45,12 +45,29 @@ export class LinkRepo {
     return wasAdded;
   }
 
+  public getLink(scopeId: string, port: string, target: string, source: string) {
+    const links = this.targetMap.getFromPath(true, scopeId, port, target, source);
+    if(links.length > 0){
+      return links[0]
+    }
+  }
+
   public getLinks(scopeId: string) {
     return this.targetMap.getFromPath(true, scopeId);
   }
 
   public getAllLinks() {
     return this.targetMap.getAll();
+  }
+
+  public deleteLinks(links: Link[]) {
+    let wasDeleted = false;
+    for (const l of links) {
+      if(this.deleteLink(l)){
+        wasDeleted = true;
+      }
+    }
+    return wasDeleted;
   }
 
   public deleteLink(link: Link) {

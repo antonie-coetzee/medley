@@ -12,11 +12,20 @@ export const getNodeComponent: GetNodeComponent = async () => {
         <Handle
           type="target"
           position={Position.Left}
-          style={{ background: "#555" }}
+          style={{ background: "#555", top: '50%' }}
           onConnect={(params) => console.log("handle onConnect", params)}
           isConnectable={true}
+          id="input"
         />
-        <Card style={{ maxWidth: "200px" }} variant="outlined" sx={selected ? {boxShadow: 3} : undefined}>
+        <Handle
+          type="target"
+          position={Position.Left}
+          style={{ background: "#555", top: '70%' }}
+          onConnect={(params) => console.log("handle onConnect", params)}
+          isConnectable={true}
+          id="input2"
+        />
+        <Card style={{ maxWidth: "200px" }} variant="outlined" sx={selected ? {boxShadow: 2} : undefined}>
           <CardHeader
             style={{ backgroundColor: "#b7dbff" }}
             title={"Identity"}

@@ -68,6 +68,7 @@ async function getReactFlowEdges(context: BaseContext<CNode>): Promise<Edge[]> {
         id: `${mLink.scope}${mLink.source}${mLink.target}${mLink.port}`,
         source: mLink.source,
         target: mLink.target,
+        targetHandle: mLink.port,
         ...linkProps,
       };
     })

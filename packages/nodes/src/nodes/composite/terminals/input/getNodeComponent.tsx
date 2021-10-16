@@ -9,7 +9,7 @@ export const getNodeComponent: GetNodeComponent<InputNode> = async () => {
   return ({node, selected}) => {
     return (
       <>
-        <Chip icon={<ExitToApp />} label={node.name} color={"primary"} variant={selected ? "outlined" : undefined}/>
+        <Chip icon={<ExitToApp />} label={node.name} color={"primary"} variant={!selected ? "outlined" : undefined} style={{borderWidth: "2px"}}/>
         <Handle
           type="source"
           position={Position.Right}

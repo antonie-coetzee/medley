@@ -30,6 +30,10 @@ export class LinksApi<TLink extends Link = Link> extends EventTarget {
     }
   }
 
+  public getLink(port: string, target: string, source: string): TLink {
+    return this.linkRepo.getLink(this.scopeId, port, target, source) as TLink;
+  }
+
   public getLinks(): TLink[] {
     return this.linkRepo.getLinks(this.scopeId) as TLink[];
   }

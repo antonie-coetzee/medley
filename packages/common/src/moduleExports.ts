@@ -63,7 +63,7 @@ export type GetLinkComponentProps<TNode extends CNode = CNode> = (
 
 export type GetPorts<TNode extends CNode = CNode> = (
   context: NodeContext<TNode, CNode, CType, CLink>
-) => CPort[];
+) => Promise<CPort[]>;
 
 export type OnNodeCreate<TNode extends CNode = CNode> = (
   context: NodeContext<TNode, CNode, CType, CLink>

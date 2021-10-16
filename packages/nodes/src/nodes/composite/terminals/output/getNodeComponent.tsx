@@ -6,15 +6,22 @@ import ExitToApp from "@mui/icons-material/ExitToApp";
 import { OutputNode } from "./node";
 
 export const getNodeComponent: GetNodeComponent<OutputNode> = async () => {
-  return ({node}) => {
+  return ({ node, selected }) => {
     return (
       <>
-        <Chip icon={<ExitToApp />} label={node.name} color="secondary" />
+        <Chip
+          icon={<ExitToApp />}
+          label={node.name}
+          color="secondary"
+          variant={!selected ? "outlined" : undefined}
+          style={{ borderWidth: "2px" }}
+        />
         <Handle
           type="target"
           position={Position.Left}
           style={{ background: "#555" }}
           isConnectable={true}
+          id="output"
         />
       </>
     );

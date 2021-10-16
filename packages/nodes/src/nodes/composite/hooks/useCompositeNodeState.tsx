@@ -5,6 +5,7 @@ import { CompositeNode } from "../node";
 import { Edge, Node as RFNode } from "react-flow-renderer";
 import { getReactFlowElements } from "../util/getReactFlowElements";
 import { getReactFlowNodeTypes } from "../util/getReactFlowNodeTypes";
+import { debounce } from "@mui/material";
 
 export function useCompositeNodeState(
   contex: NodeContext<CompositeNode, CNode, CType, CLink>,
@@ -14,18 +15,19 @@ export function useCompositeNodeState(
   }
 ) {
   const [rfState, setRfState] = useState(initialState);
-
+  
   useEffect(() => {
-    contex.medley.nodes.addEventListener(EventType.OnChange, async (e) => {
+    const debouncedUpdateState = debounce(async ()=>{
       const elements = await getReactFlowElements(contex);
       const nodeTypes = await getReactFlowNodeTypes(contex);
       setRfState({ elements, nodeTypes });
+    }, 50)
+    contex.medley.nodes.addEventListener(EventType.OnChange, async (e) => {
+      debouncedUpdateState();
     });
 
     contex.medley.links.addEventListener(EventType.OnChange, async (e) => {
-      const elements = await getReactFlowElements(contex);
-      const nodeTypes = await getReactFlowNodeTypes(contex);
-      setRfState({ elements, nodeTypes });
+      debouncedUpdateState();
     });
   }, []);
 

@@ -2,7 +2,10 @@ import { NodeContext } from "@medley-js/core";
 import {
   CLink,
   CNode,
+  constants,
+  CPort,
   CType,
+  GetPorts,
   NodeEditComponentProps,
 } from "@medley-js/common";
 import React from "react";
@@ -13,13 +16,14 @@ export function getReactFlowEvents(
   context: NodeContext<CompositeNode, CNode, CType, CLink>,
   edit?: NodeEditComponentProps["edit"]
 ) {
-  const onConnect = (edge: Connection | Edge) =>
+  const onConnect = (edge: Connection | Edge) => {
     context.medley.links.addLink({
       source: edge.source || "",
       target: edge.target || "",
       port: edge.targetHandle || "",
       scope: context.node.id,
     });
+  }
 
   const onNodeDragStop: (
     event: React.MouseEvent<Element, MouseEvent>,
@@ -35,14 +39,24 @@ export function getReactFlowEvents(
     if(node && edit?.openEditComponent){
         edit.openEditComponent(node.id);
     }
-    console.log(`node double clicked: ${node.id}`);
+    console.log(JSON.stringify(context.medley.graph.getGraph(),null, 2));
   }
 
   const onElementsRemove : ((elements: Elements<any>) => void) = (elements) => {
     if(elements){
-      elements.forEach(el=>{
+      elements.forEach(async el=>{
         if((el as Edge).source){
         }else{
+          const node = context.medley.nodes.getNode(el.id);
+          if(node == null){
+            return;
+          }
+          const links  = context.medley.links.getLinks()
+          for (const l of links) {
+            if(l.source === node.id || l.target === node.id){
+              context.medley.links.deleteLink(l);
+            }
+          }
           context.medley.nodes.deleteNode(el.id);
         }
       })
