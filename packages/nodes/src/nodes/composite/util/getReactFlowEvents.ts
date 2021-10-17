@@ -45,7 +45,12 @@ export function getReactFlowEvents(
   const onElementsRemove : ((elements: Elements<any>) => void) = (elements) => {
     if(elements){
       elements.forEach(async el=>{
-        if((el as Edge).source){
+        const edge = (el as Edge);
+        if(edge.source){
+          const link  = context.medley.links.getLink(edge.targetHandle || "", edge.target, edge.source);
+          if(link){
+            context.medley.links.deleteLink(link);
+          }
         }else{
           const node = context.medley.nodes.getNode(el.id);
           if(node == null){

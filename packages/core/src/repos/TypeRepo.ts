@@ -1,6 +1,7 @@
-import { Type, Loader, isModule, TreeMap, ROOT_SCOPE } from "../core";
+import { Type, Loader, isModule, TreeMap, ROOT_SCOPE, Module } from "../core";
 
 export class TypeRepo {
+  private moduleCache: Map<string, any> = new Map();
   /* scope -> type */
   private typeMap: TreeMap<Type> = new TreeMap();
   private baseUrl?: URL;
@@ -42,11 +43,18 @@ export class TypeRepo {
         moduleInfo = redirect;
       }
     }
-    const module = await this.loader.importModule(
-      moduleInfo,
-      type.version,
-      this.baseUrl
-    );
+    let module:any;
+    if(this.moduleCache.has(`${type.name}${type.version}`)){
+      module = this.moduleCache.get(`${type.name}${type.version}`);
+    }else{
+      module = await this.loader.importModule(
+        moduleInfo,
+        type.version,
+        this.baseUrl
+      ); 
+      this.moduleCache.set(`${type.name}${type.version}`, module);   
+    }
+
     if(moduleInfo.nameSpace){
       return module[moduleInfo.nameSpace][exportName];
     }else{

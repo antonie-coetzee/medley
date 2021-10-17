@@ -38,28 +38,29 @@ export declare type CPosition = "left" | "top" | "right" | "bottom";
 
 export type GetNodeComponentProps<TNode extends CNode = CNode> = (
   context: NodeContext<TNode, CNode, CType, CLink>
-) => Promise<{
+) => Promise<Partial<{
   selectable: boolean;
   draggable: boolean;
   connectable: boolean;
   sourcePosition: CPosition;
   targetPosition: CPosition;
-}>;
+  dragHandle: string;
+}>>;
 
 export type GetLinkComponentProps<TNode extends CNode = CNode> = (
   context: NodeContext<TNode, CNode, CType, CLink>
-) => Promise<{
-  label?: string | ReactNode;
-  labelStyle?: CSSProperties;
-  labelShowBg?: boolean;
-  labelBgStyle?: CSSProperties;
-  labelBgPadding?: [number, number];
-  labelBgBorderRadius?: number;
-  style?: CSSProperties;
-  animated?: boolean;
-  isHidden?: boolean;
-  className?: string;
-}>;
+) => Promise<Partial<{
+  label: string | ReactNode;
+  labelStyle: CSSProperties;
+  labelShowBg: boolean;
+  labelBgStyle: CSSProperties;
+  labelBgPadding: [number, number];
+  labelBgBorderRadius: number;
+  style: CSSProperties;
+  animated: boolean;
+  isHidden: boolean;
+  className: string;
+}>>;
 
 export type GetPorts<TNode extends CNode = CNode> = (
   context: NodeContext<TNode, CNode, CType, CLink>

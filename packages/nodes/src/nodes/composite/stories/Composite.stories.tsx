@@ -62,6 +62,7 @@ export const Edit = componentStory(async () => {
     position: { x: 1400, y: 50 },
     type: OutputType.name,
   });
+
   childScope.links.addLink({
     source: id_0.id,
     target: id_1.id,
@@ -75,9 +76,15 @@ export const Edit = componentStory(async () => {
     scope: compNode.id,
   });
   childScope.links.addLink({
+    source: id_2.id,
+    target: id_3.id,
+    port: "input",
+    scope: compNode.id,
+  });
+  childScope.links.addLink({
     source: id_3.id,
     target: id_4.id,
-    port: "input",
+    port: "output",
     scope: compNode.id,
   });
   

@@ -3,17 +3,17 @@ import { Type, Node, Link, MedleyEvent, EventType } from "../core";
 import { NodeRepo } from "../repos";
 
 export class NodesApi<
-  TNode extends Node = Node,
-  TType extends Type = Type,
-  TLink extends Link = Link
+  MNode extends Node = Node,
+  MType extends Type = Type,
+  MLink extends Link = Link
   > extends EventTarget {
 
   constructor(
     private scopeId: string,
     private nodeRepo: NodeRepo,
-    private typesApi: TypesApi<TType>,
-    private linksApi: LinksApi<TLink>,
-    private parentNodes?: NodesApi<TNode, TType, TLink>
+    private typesApi: TypesApi<MType>,
+    private linksApi: LinksApi<MLink>,
+    private parentNodes?: NodesApi<MNode, MType, MLink>
   ) {
     super();
   }
@@ -23,10 +23,10 @@ export class NodesApi<
     this.dispatchEvent(new MedleyEvent(EventType.OnChange));
   }
 
-  public getNode(id: string): TNode | undefined {
+  public getNode(id: string): MNode | undefined {
     const node = this.nodeRepo.getNode(this.scopeId, id);
     if (node) {
-      return node as TNode;
+      return node as MNode;
     }
     if (this.parentNodes) {
       return this.parentNodes.getNode(id);
@@ -43,11 +43,11 @@ export class NodesApi<
     }
   }
 
-  public getNodesByType(typeName: string): TNode[] {
+  public getNodesByType(typeName: string): MNode[] {
     const scopeNodes = this.nodeRepo.getNodesByType(
       this.scopeId,
       typeName
-    ) as TNode[];
+    ) as MNode[];
     if (this.parentNodes) {
       const parentNodes = this.parentNodes.getNodesByType(typeName);
       return [...parentNodes, ...scopeNodes];
@@ -55,13 +55,13 @@ export class NodesApi<
     return scopeNodes;
   }
 
-  public getNodes(): TNode[] {
-    const scopeNodes = this.nodeRepo.getNodes(this.scopeId) as TNode[];
+  public getNodes(): MNode[] {
+    const scopeNodes = this.nodeRepo.getNodes(this.scopeId) as MNode[];
     return scopeNodes;
   }
 
-  public getAllNodes(): TNode[] {
-    return this.nodeRepo.getAllNodes() as TNode[];
+  public getAllNodes(): MNode[] {
+    return this.nodeRepo.getAllNodes() as MNode[];
   }
 
   public getUsedTypes(): string[] {
@@ -74,8 +74,8 @@ export class NodesApi<
     return scopeTypes;
   }
 
-  public upsertNode(node: Partial<TNode>, type?: TType): TNode {
-    let nodeType: TType;
+  public upsertNode(node: Partial<MNode>, type?: MType): MNode {
+    let nodeType: MType;
     if (type) {
       const hasType = this.typesApi.hasType(type.name);
       if (hasType === false) {
@@ -101,14 +101,14 @@ export class NodesApi<
     }else{
       this.dispatchEvent(MedleyEvent.create(EventType.OnItemUpdate, outNode));
     }
-    return outNode as TNode;
+    return outNode as MNode;
   }
 
-  public copyNode(node: TNode) {
-    const nodeCopy = JSON.parse(JSON.stringify(node)) as Partial<TNode>;
+  public copyNode(node: MNode) {
+    const nodeCopy = JSON.parse(JSON.stringify(node)) as Partial<MNode>;
     delete nodeCopy.id;
     nodeCopy.scope = this.scopeId;
-    return this.upsertNode(nodeCopy) as TNode;
+    return this.upsertNode(nodeCopy) as MNode;
   }
 
   public deleteNode(nodeId: string) {

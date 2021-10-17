@@ -1,7 +1,7 @@
 import { Medley } from "./Medley";
 import { Link, Node, Type, Port } from "./core";
 import { Input, ExecutionContext, NodeContext } from "./Context";
-import { NodeFunction, nodeFunctionExportName } from "./NodeFunction";
+import { NodeFunction, nodeFunctionExport } from "./nodeExports";
 
 export type InputProvider<
 TNode extends Node = Node,
@@ -38,7 +38,7 @@ export class FlowEngine<
     const getNodeFunction = async function (
       context: ExecutionContext<TNode, MNode, MType, MLink>
     ) {
-      const nodeFuction = await FlowEngine.buildNodeFunction<TNode, MNode, MType, MLink>(
+      const nodeFuction = FlowEngine.buildNodeFunction<TNode, MNode, MType, MLink>(
         context,
         flowEngine,
         nodeId,
@@ -85,7 +85,7 @@ export class FlowEngine<
     }
     const nodeFunction = await flowEngine.medley.types.getExportFunction<
       NodeFunction<{}, TNode, MNode, MType, MLink>
-    >(node.type, nodeFunctionExportName);
+    >(node.type, nodeFunctionExport);
 
     if (nodeFunction == null) {
       throw new Error(`node function for type: '${node.type}', not valid`);
@@ -135,6 +135,7 @@ export class FlowEngine<
     runNodeFunction: <T>(
       context: ExecutionContext<TNode, MNode, MType, MLink>,
       nodeId: string,
+      externalInputs: InputProvider<TNode, MNode, MType, MLink> | null,
       ...args: any[]
     ) => Promise<T>
   ) {
@@ -169,7 +170,7 @@ export class FlowEngine<
         if (cacheItem && cacheItem.result) {
           return cacheItem.result as T;
         }
-        const result = runNodeFunction<T>(executionContext, link.source, args);
+        const result = runNodeFunction<T>(executionContext, link.source, null, args);
         if (cacheItem && cacheItem.addToCache && cacheItem.key) {
           flowEngine.addToCache(cacheItem.key, result);
         }
@@ -180,7 +181,7 @@ export class FlowEngine<
           return cacheItem.result as T[];
         }
         const results = await Promise.all(
-          links.map((l) => runNodeFunction<T>(executionContext, l.source, args))
+          links.map((l) => runNodeFunction<T>(executionContext, l.source, null, args))
         );
         if (results) {
           const validResults = results.filter((e) => e !== undefined);

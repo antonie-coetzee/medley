@@ -1,7 +1,7 @@
 import { NF, Node, Input, Type, Medley, NodeFunction } from "@medley-js/core";
 import { CompositeNode } from "./node";
 
-export const nodeFunction: NF<{}, CompositeNode> = (cntx) => {
+export const nodeFunction: NF<{}, CompositeNode> = async (cntx) => {
   const { node, medley, input } = cntx;
   const childScope = Medley.newChildInstance(medley.getRootInstance(), node.id);
   const inputType = getInputType(input);
@@ -9,9 +9,11 @@ export const nodeFunction: NF<{}, CompositeNode> = (cntx) => {
   const outputType = getOutputType();
   childScope.types.addType(outputType);
 
-  if(node.value?.outputNode){
-    const outputId = node.value.outputNode.id;
-    const result = childScope.runNode(cntx, outputId);
+  const outputNodes = childScope.nodes.getNodesByType("$output");
+
+  if(outputNodes && outputNodes.length > 0){
+    const outputNode = outputNodes[0];
+    const result = childScope.runNode(cntx, outputNode.id);
     return result;
   }
 };
@@ -23,11 +25,16 @@ function getInputType(input: Input): Type {
       input: string;
     }>
   > = ({ node }) => {
-    if(node.value?.input){
-      return input({
-        name: node.value.input,
-      });
-    }
+    // if(node.value?.input){
+    //   return input({
+    //     name: node.value.input,
+    //   });
+    // }
+
+    return input({
+      name: "input",
+    });
+    
   };
 
   return {

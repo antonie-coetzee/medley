@@ -46,6 +46,7 @@ async function getReactFlowNodes(
         connectable: props.connectable,
         sourcePosition: props.sourcePosition as Position,
         targetPosition: props.targetPosition as Position,
+        dragHandle: props.dragHandle
       };
     })
   );

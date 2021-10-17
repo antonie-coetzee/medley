@@ -3,10 +3,12 @@ import { CLink, CNode, CType, NodeEditComponentProps } from "@medley-js/common";
 import React from "react";
 import { CompositeNode } from "../node";
 import { Connection, Edge, Node as RFNode } from "react-flow-renderer";
-import { Chip, ListItemIcon, MenuItem } from "@mui/material";
+import { Button, Chip, Divider, ListItemIcon, MenuItem } from "@mui/material";
 import { InputType } from "../terminals/input/type";
-import { ExitToApp } from "@mui/icons-material";
+import { ExitToApp, Info } from "@mui/icons-material";
 import { OutputType } from "../terminals/output/type";
+import { IdentityType } from "../../identity/type";
+import DirectionsRunIcon from "@mui/icons-material/DirectionsRun";
 
 function getAddInputNode(
   context: NodeContext<CompositeNode, CNode, CType, CLink>
@@ -67,8 +69,76 @@ function getAddOutputNode(
   };
 }
 
+function getAddIdentityNode(
+  context: NodeContext<CompositeNode, CNode, CType, CLink>
+): React.VFC<{ close: () => void; mouseX?: number; mouseY?: number }> {
+  return ({ close, mouseX, mouseY }) => {
+    const addIdentity = () => {
+      const node = context.medley.nodes.upsertNode({
+        name: "Identity",
+        type: IdentityType.name,
+      });
+      if (mouseX && mouseY) {
+        node.position = { x: mouseX, y: mouseY };
+      }
+
+      close();
+    };
+    return (
+      <MenuItem onClick={addIdentity}>
+        {" "}
+        <Chip
+          icon={<Info />}
+          label="Identity"
+          color="primary"
+          variant="outlined"
+          style={{ borderWidth: "2px" }}
+        />
+      </MenuItem>
+    );
+  };
+}
+
+function getRunOption(
+  context: NodeContext<CompositeNode, CNode, CType, CLink>
+): React.VFC<{ close: () => void; mouseX?: number; mouseY?: number }> {
+  return ({ close, mouseX, mouseY }) => {
+    const run = async () => {
+      const rootInstance = context.medley.getRootInstance();
+      const nodes = rootInstance.nodes.getNodes();
+
+      try{
+        if(nodes == null || nodes.length === 0){
+          return 
+        }
+        const compositeNode = nodes[0];
+        const res = await rootInstance.runNodeWithInputs(null, compositeNode.id, {"input": async ()=>"Test"});      
+        console.log(res);
+      }catch(e){
+        console.log(e);
+      }finally{
+        close();
+      }   
+    };
+    return (
+      <MenuItem onClick={run}>
+        <Button variant="contained" endIcon={<DirectionsRunIcon />}>
+          Run
+        </Button>
+      </MenuItem>
+    );
+  };
+}
+
 export function getContextMenu(
   context: NodeContext<CompositeNode, CNode, CType, CLink>
 ) {
-  return [getAddInputNode(context), getAddOutputNode(context)];
+  return [
+    getAddInputNode(context),
+    getAddOutputNode(context),
+    () => <Divider />,
+    getAddIdentityNode(context),
+    () => <Divider />,
+    getRunOption(context),
+  ];
 }
