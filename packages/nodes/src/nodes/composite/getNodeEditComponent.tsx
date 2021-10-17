@@ -21,7 +21,7 @@ export const getNodeEditComponent: GetNodeEditComponent<CompositeNode> = async (
     const rfState = useCompositeNodeState(context, { elements, nodeTypes });
     const {ContextMenu, handleContextMenu} = useContextMenu(getContextMenu(context));
     return (
-      <div style={{ height: 600 }}>
+      <div style={{ height: 800 }}>
         <ReactFlow {...rfState} {...events} onPaneContextMenu={handleContextMenu}
           elementsSelectable={true}>
           <MiniMap />
