@@ -17,6 +17,7 @@ import {
   Slider,
   Typography,
 } from "@mui/material";
+import { IdentityNode } from "./node";
 
 const labelStyle = {
   display: 'flex',
@@ -32,11 +33,13 @@ const dragHandleStyle = {
   borderRadius: '50%',
 };
 
-export const getNodeComponent: GetNodeComponent = async () => {
+export const getNodeComponent: GetNodeComponent<IdentityNode> = async () => {
   return ({ node, selected }) => {
     const [age, setAge] = React.useState('');
     const handleChange = (event: SelectChangeEvent) => {
-      setAge(event.target.value as string);
+      const newAge = event.target.value as string;
+      setAge(newAge);
+      node.value = {age:newAge}
     };
     return (
       <>
@@ -44,9 +47,15 @@ export const getNodeComponent: GetNodeComponent = async () => {
           type="target"
           position={Position.Left}
           style={{ background: "#555", top: "50%" }}
-          onConnect={(params) => console.log("handle onConnect", params)}
           isConnectable={true}
-          id="input"
+          id="input1"
+        />
+        <Handle
+          type="target"
+          position={Position.Left}
+          style={{ background: "#555", top: "75%" }}
+          isConnectable={true}
+          id="input2"
         />
         <Card
           style={{ maxWidth: "200px" }}
@@ -56,14 +65,14 @@ export const getNodeComponent: GetNodeComponent = async () => {
           <DragIndicatorIcon className="drag-handle" style={{position:"absolute", right:0}} />
           <CardHeader
             style={{ backgroundColor: "#b7dbff" }}
-            title={"Identity"}
-            subheader={node.name}
+            title={"Test"}
+            subheader={`Name: ${node.name}`}
             avatar={<Info />}
           >        
           </CardHeader>
           <CardContent>
             <Typography color="textSecondary" gutterBottom variant="caption">
-              Identity node that passes input unchanged to the output
+              Test component
             </Typography>
             <Slider
               size="small"

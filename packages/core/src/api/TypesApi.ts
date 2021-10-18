@@ -1,6 +1,14 @@
 import { EventType, MedleyEvent, Type } from "../core";
 import { TypeRepo } from "../repos";
 
+type Unwrap<T> = T extends Promise<infer U>
+  ? U
+  : T extends (...args: any) => Promise<infer U>
+  ? U
+  : T extends (...args: any) => infer U
+  ? U
+  : T;
+
 export class TypesApi<TType extends Type = Type> extends EventTarget {
 
   constructor(
@@ -14,6 +22,18 @@ export class TypesApi<TType extends Type = Type> extends EventTarget {
   public setTypes(types: TType[], baseUrl: URL): void {
     this.typeRepo.set(types, baseUrl);
     this.dispatchEvent(new MedleyEvent(EventType.OnChange));
+  }
+
+  public async runExportFunction<T extends (...args: any) => any>(
+    typeName: string,
+    functionName: string,
+    ...params: Parameters<T>
+  ): Promise<Unwrap<ReturnType<T>> | undefined> {
+    const exportFunc = await this.getExportFunction(typeName, functionName) as T;
+    if(exportFunc == null){
+      return;
+    }
+    return exportFunc(params)
   }
 
   public async getExportFunction<T extends Function = Function>(

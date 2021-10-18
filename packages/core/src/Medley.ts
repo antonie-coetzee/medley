@@ -1,6 +1,6 @@
 import { Node, Type, Logger, nullLogger, Link, ROOT_SCOPE, Loader } from "./core";
 import { TypeRepo, NodeRepo, LinkRepo } from "./repos";
-import { FlowEngine } from "./FlowEngine";
+import { Composer } from "./Composer";
 import { GraphApi, TypesApi, NodesApi, LinksApi } from "./api";
 import { InputProvider, NodeContext } from ".";
 
@@ -22,7 +22,7 @@ export class Medley<
   MType extends Type = Type,
   MLink extends Link = Link
   > {
-  private flowEngine: FlowEngine<MNode, MType, MLink>;
+  private composer: Composer<MNode, MType, MLink>;
 
   public readonly options: MedleyOptions<MNode, MType, MLink>
   public readonly logger: Logger;
@@ -67,7 +67,7 @@ export class Medley<
       this.links
     );
 
-    this.flowEngine = new FlowEngine<MNode, MType, MLink>(this, this.options.cache);
+    this.composer = new Composer<MNode, MType, MLink>(this, this.options.cache);
   }
 
   public runNode<T>(
@@ -75,7 +75,7 @@ export class Medley<
     nodeId: string,
     ...args: any[]
   ): Promise<T> {
-    return this.flowEngine.runNodeFunction(context, nodeId, null, ...args);
+    return this.composer.runNodeFunction(context, nodeId, null, ...args);
   }
 
   public runNodeWithInputs<T, TNode extends Node = Node>(
@@ -84,7 +84,7 @@ export class Medley<
       inputs: InputProvider<TNode, MNode, MType, MLink>,
       ...args: any[]
     ): Promise<T> {
-    return this.flowEngine.runNodeFunction(context, nodeId, inputs, ...args);
+    return this.composer.runNodeFunction(context, nodeId, inputs, ...args);
   }
 
   public getRootInstance(): Medley<MNode, MType, MLink> {

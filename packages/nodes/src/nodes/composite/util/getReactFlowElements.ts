@@ -24,11 +24,17 @@ async function getReactFlowNodes(
   const mNodes = context.medley.nodes.getNodes();
   return Promise.all(
     mNodes.map(async (node) => {
-      const getNodeProps = await context.medley.types.getExportFunction<GetNodeComponentProps>(
-        node.type,
-        constants.getNodeComponentProps
-      );
-      const nodeProps = await getNodeProps?.({ ...context, ...{ node } });
+      // const getNodeProps = await context.medley.types.getExportFunction<GetNodeComponentProps>(
+      //   node.type,
+      //   constants.getNodeComponentProps
+      // );
+      // const nodeProps = await getNodeProps?.({ ...context, ...{ node } });
+      const nodeProps = await context.medley.types.runExportFunction<
+        GetNodeComponentProps<CNode>
+      >(node.type, constants.getNodeComponentProps, {
+        ...context,
+        ...{ node },
+      });
       const props = {
         selectable: true,
         draggable: true,
@@ -46,7 +52,7 @@ async function getReactFlowNodes(
         connectable: props.connectable,
         sourcePosition: props.sourcePosition as Position,
         targetPosition: props.targetPosition as Position,
-        dragHandle: props.dragHandle
+        dragHandle: props.dragHandle,
       };
     })
   );

@@ -1,3 +1,5 @@
 import { CNode, CPort } from "@medley-js/common";
 
-export type IdentityNode = CNode;
+export type IdentityNode = CNode<{
+    age?:string
+}>

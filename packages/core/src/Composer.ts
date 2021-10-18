@@ -1,7 +1,7 @@
 import { Medley } from "./Medley";
 import { Link, Node, Type, Port } from "./core";
 import { Input, ExecutionContext, NodeContext } from "./Context";
-import { NodeFunction, nodeFunctionExport } from "./nodeExports";
+import { NodeFunction, nodeFunctionExport } from "./NodeFunction";
 
 export type InputProvider<
 TNode extends Node = Node,
@@ -14,7 +14,7 @@ MLink extends Link = Link
   ) => Promise<any>;
 };
 
-export class FlowEngine<
+export class Composer<
   MNode extends Node = Node,
   MType extends Type = Type,
   MLink extends Link = Link
@@ -30,19 +30,19 @@ export class FlowEngine<
   public async runNodeFunction<T, TNode extends Node = Node>(
     context: {} | null,
     nodeId: string,
-    externalInputs: InputProvider<TNode, MNode, MType, MLink> | null,
+    inputProvider: InputProvider<TNode, MNode, MType, MLink> | null,
     ...args: any[]
   ): Promise<T> {
     // use closure to capture nodeEngine on initial invocation
-    const flowEngine = this;
+    const composer = this;
     const getNodeFunction = async function (
       context: ExecutionContext<TNode, MNode, MType, MLink>
     ) {
-      const nodeFuction = FlowEngine.buildNodeFunction<TNode, MNode, MType, MLink>(
+      const nodeFuction = Composer.buildNodeFunction<TNode, MNode, MType, MLink>(
         context,
-        flowEngine,
+        composer,
         nodeId,
-        externalInputs
+        inputProvider
       );
       return nodeFuction;
     };
@@ -60,46 +60,46 @@ export class FlowEngine<
     MLink extends Link = Link
   >(
     context: ExecutionContext<TNode, MNode, MType, MLink> | void,
-    flowEngine: FlowEngine<MNode, MType, MLink>,
+    composer: Composer<MNode, MType, MLink>,
     nodeId: string,
-    externalInputs: InputProvider<TNode, MNode, MType, MLink> | null
+    inputProvider: InputProvider<TNode, MNode, MType, MLink> | null
   ) {
     const runNodeFunction = async function <T>(
       parentContext: ExecutionContext<TNode, MNode, MType, MLink> | undefined,
       nodeId: string,
-      externalInputs: InputProvider<TNode, MNode, MType, MLink> | null,
+      inputProvider: InputProvider<TNode, MNode, MType, MLink> | null,
       ...args: any[]
     ): Promise<T> {
-      const nodeFunction = await FlowEngine.buildNodeFunction<TNode, MNode, MType, MLink>(
+      const nodeFunction = await Composer.buildNodeFunction<TNode, MNode, MType, MLink>(
         parentContext,
-        flowEngine,
+        composer,
         nodeId,
-        externalInputs
+        inputProvider
       );
       return nodeFunction(...args);
     };
 
-    const node = flowEngine.medley.nodes.getNode(nodeId) as unknown as TNode;
+    const node = composer.medley.nodes.getNode(nodeId) as unknown as TNode;
     if (node == null) {
       throw new Error(`node with id: '${nodeId}', not found`);
     }
-    const nodeFunction = await flowEngine.medley.types.getExportFunction<
+    const nodeFunction = await composer.medley.types.getExportFunction<
       NodeFunction<{}, TNode, MNode, MType, MLink>
     >(node.type, nodeFunctionExport);
 
     if (nodeFunction == null) {
       throw new Error(`node function for type: '${node.type}', not valid`);
     }
-    const childContext = flowEngine.createContext(
+    const childContext = composer.createContext(
       context,
-      flowEngine.medley,
+      composer.medley,
       node
     );
 
-    const portInput = flowEngine.buildPortInputFunction(
+    const portInput = composer.buildPortInputFunction(
       node,
       childContext,
-      externalInputs,
+      inputProvider,
       runNodeFunction
     );
 
@@ -131,27 +131,27 @@ export class FlowEngine<
   private buildPortInputFunction<TNode extends Node = Node>(
     node: TNode,
     context: ExecutionContext<TNode, MNode, MType, MLink>,
-    externalInputs: InputProvider<TNode, MNode, MType, MLink> | null,
+    inputProvider: InputProvider<TNode, MNode, MType, MLink> | null,
     runNodeFunction: <T>(
       context: ExecutionContext<TNode, MNode, MType, MLink>,
       nodeId: string,
-      externalInputs: InputProvider<TNode, MNode, MType, MLink> | null,
+      inputProvider: InputProvider<TNode, MNode, MType, MLink> | null,
       ...args: any[]
     ) => Promise<T>
   ) {
-    const flowEngine = this;
+    const composer = this;
     const portInputFunction = async function <T>(
       port: Port,
       ...args: any[]
     ): Promise<T | T[] | undefined> {
-      if(externalInputs){
-        const inputFunction = externalInputs[port.name];
+      if(inputProvider){
+        const inputFunction = inputProvider[port.name];
         if(inputFunction == null && port.required){
           throw new Error(`port: '${port.name}' requires input`)
         }
         return inputFunction == null ? null : inputFunction(context);
       }
-      let links = flowEngine.medley.links.getPortLinks(port.name, node.id);
+      let links = composer.medley.links.getPortLinks(port.name, node.id);
       if (links == null || links.length === 0) {
         return;
       }
@@ -166,17 +166,17 @@ export class FlowEngine<
 
       if (isSingle) {
         const link = links[0];
-        const cacheItem = flowEngine.checkCache(node.id, args);
+        const cacheItem = composer.checkCache(node.id, args);
         if (cacheItem && cacheItem.result) {
           return cacheItem.result as T;
         }
         const result = runNodeFunction<T>(executionContext, link.source, null, args);
         if (cacheItem && cacheItem.addToCache && cacheItem.key) {
-          flowEngine.addToCache(cacheItem.key, result);
+          composer.addToCache(cacheItem.key, result);
         }
         return result;
       } else {
-        const cacheItem = flowEngine.checkCache(node.id, args);
+        const cacheItem = composer.checkCache(node.id, args);
         if (cacheItem && cacheItem.result) {
           return cacheItem.result as T[];
         }
@@ -186,7 +186,7 @@ export class FlowEngine<
         if (results) {
           const validResults = results.filter((e) => e !== undefined);
           if (cacheItem && cacheItem.addToCache && cacheItem.key) {
-            flowEngine.addToCache(cacheItem.key, validResults);
+            composer.addToCache(cacheItem.key, validResults);
           }
           return validResults;
         }

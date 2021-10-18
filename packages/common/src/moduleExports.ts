@@ -66,13 +66,23 @@ export type GetPorts<TNode extends CNode = CNode> = (
   context: NodeContext<TNode, CNode, CType, CLink>
 ) => Promise<CPort[]>;
 
-export type OnNodeCreate<TNode extends CNode = CNode> = (
-  context: NodeContext<TNode, CNode, CType, CLink>
-) => Promise<void>;
+export const onNodeCreateExport = "onNodeCreate";
 
-export type OnNodeDelete<TNode extends CNode = CNode> = (
-  context: NodeContext<TNode, CNode, CType, CLink>
-) => Promise<void>;
+export interface OnNodeCreate<TNode extends CNode = CNode> {
+  (context: NodeContext<TNode, CNode, CType, CLink>): void;
+}
+
+export const onNodeUpdateExport = "onNodeUpdate";
+
+export interface OnNodeUpdate<TNode extends CNode = CNode> {
+  (context: NodeContext<TNode, CNode, CType, CLink>, update: Partial<TNode>): void;
+}
+
+export const onNodeDeleteExport = "onNodeDelete";
+
+export interface OnNodeDelete<TNode extends CNode = CNode> {
+  (context: NodeContext<TNode, CNode, CType, CLink>): void;
+}
 
 export type MType = {
   typeSystem: string;

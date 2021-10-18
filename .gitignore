@@ -6,3 +6,4 @@ packages/medley/coverage
 packages/medley/test/fixtures
 packages/medley-types/storybook-static/*
 
+packages/nodes/storybook-static/*

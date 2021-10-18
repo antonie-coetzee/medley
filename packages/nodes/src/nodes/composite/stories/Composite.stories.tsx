@@ -43,17 +43,20 @@ export const Edit = componentStory(async () => {
   });
 
   const id_1 = childScope.nodes.upsertNode({
-    name: "IDENTITY_1",
+    name: "Test_1",
+    cache: true,
     position: { x: 200, y: 50 },
     type: IdentityType.name,
   });
   const id_2 = childScope.nodes.upsertNode({
-    name: "IDENTITY_2",
+    name: "Test_2",
+    cache: true,
     position: { x: 600, y: 50 },
     type: IdentityType.name,
   });
   const id_3 = childScope.nodes.upsertNode({
-    name: "IDENTITY_3",
+    name: "Test_3",
+    cache: true,
     position: { x: 1000, y: 300 },
     type: IdentityType.name,
   });
@@ -66,19 +69,19 @@ export const Edit = componentStory(async () => {
   childScope.links.addLink({
     source: id_0.id,
     target: id_1.id,
-    port: "input",
+    port: "input1",
     scope: compNode.id,
   });
   childScope.links.addLink({
     source: id_1.id,
     target: id_2.id,
-    port: "input",
+    port: "input1",
     scope: compNode.id,
   });
   childScope.links.addLink({
     source: id_2.id,
     target: id_3.id,
-    port: "input",
+    port: "input1",
     scope: compNode.id,
   });
   childScope.links.addLink({
