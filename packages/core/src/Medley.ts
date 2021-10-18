@@ -23,17 +23,18 @@ export class Medley<
   MLink extends Link = Link
   > {
   private composer: Composer<MNode, MType, MLink>;
+  private options: MedleyOptions<MNode, MType, MLink>
 
-  public readonly options: MedleyOptions<MNode, MType, MLink>
-  public readonly logger: Logger;
-  public readonly nodes: NodesApi<MNode, MType, MLink>;
-  public readonly types: TypesApi<MType>;
-  public readonly links: LinksApi<MLink>;
-  public readonly graph: GraphApi<MNode, MType, MLink>;
+  public logger: Logger;
+  public nodes: NodesApi<MNode, MType, MLink>;
+  public types: TypesApi<MType>;
+  public links: LinksApi<MLink>;
+  public graph: GraphApi<MNode, MType, MLink>;
+  public scopeId: string;
 
   public constructor(
     options?: MedleyOptions<MNode, MType, MLink>,
-    public readonly parentInstance?: Medley<MNode, MType, MLink>
+    public parentInstance?: Medley<MNode, MType, MLink>
   ) {
     if (options == null) {
       this.options = {
@@ -45,17 +46,17 @@ export class Medley<
       this.options = options;
     }
 
-    const scopeId = this.options.scopeId || ROOT_SCOPE;
+    this.scopeId = this.options.scopeId || ROOT_SCOPE;
     this.logger = this.options.logger || nullLogger;
 
     this.types = new TypesApi<MType>(
-      scopeId,
+      this.scopeId,
       this.options.typeRepo,
       parentInstance?.types
     );
-    this.links = new LinksApi<MLink>(scopeId, this.options.linkRepo);
+    this.links = new LinksApi<MLink>(this.scopeId, this.options.linkRepo);
     this.nodes = new NodesApi<MNode, MType, MLink>(
-      scopeId,
+      this.scopeId,
       this.options.nodeRepo,
       this.types,
       this.links,

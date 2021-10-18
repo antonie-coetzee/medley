@@ -200,7 +200,7 @@ export class Composer<
     if (node == null || node.cache == null || node.cache === false) {
       return null;
     }
-    const key = `${node.id}${JSON.stringify(args)}`;
+    const key = `${this.medley.scopeId}${node.id}${args && JSON.stringify(args)}`;
     if (this.resultCache.has(key)) {
       return {
         addToCache: false,
