@@ -33,7 +33,7 @@ export class TypesApi<TType extends Type = Type> extends EventTarget {
     if(exportFunc == null){
       return;
     }
-    return exportFunc(params)
+    return exportFunc(...(params as any[]))
   }
 
   public async getExportFunction<T extends Function = Function>(
@@ -95,7 +95,7 @@ export class TypesApi<TType extends Type = Type> extends EventTarget {
   }
 
   public addType(type: TType) {
-    const allowed = this.dispatchEvent(MedleyEvent.createCancelable(EventType.OnItemAdd, type));
+    const allowed = this.dispatchEvent(MedleyEvent.createCancelable(EventType.OnItemCreate, type));
     if (allowed === false) {
       return;
     }

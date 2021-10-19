@@ -75,8 +75,8 @@ export const getNodeComponent: GetNodeComponent<IdentityNode> = async () => {
               Test component
             </Typography>
             <Slider
+              key={"slider-" + node.id}
               size="small"
-              defaultValue={70}
               aria-label="Small"
               valueLabelDisplay="auto"
             />

@@ -1,5 +1,12 @@
 import { NodeContext } from "@medley-js/core";
-import { CLink, CNode, CType, NodeEditComponentProps } from "@medley-js/common";
+import {
+  CLink,
+  CNode,
+  constants,
+  CType,
+  NodeEditComponentProps,
+  OnNodeCreate,
+} from "@medley-js/common";
 import React from "react";
 import { CompositeNode } from "../node";
 import { Connection, Edge, Node as RFNode } from "react-flow-renderer";
@@ -73,15 +80,25 @@ function getAddIdentityNode(
   context: NodeContext<CompositeNode, CNode, CType, CLink>
 ): React.VFC<{ close: () => void; mouseX?: number; mouseY?: number }> {
   return ({ close, mouseX, mouseY }) => {
-    const addIdentity = () => {
-      const node = context.medley.nodes.upsertNode({
+    const addIdentity = async () => {
+      const identityNode: Partial<CNode> = {
         name: "Identity",
         type: IdentityType.name,
-      });
+      }
+      try {
+        identityNode.value = await context.medley.types.runExportFunction<OnNodeCreate<CNode>>(
+          IdentityType.name,
+          constants.onNodeCreate,
+          { ...context}
+        );
+      } catch (e) {
+        context.logger.error(e);
+        return
+      }
+      const node = context.medley.nodes.upsertNode(identityNode);
       if (mouseX && mouseY) {
         node.position = { x: mouseX, y: mouseY };
       }
-
       close();
     };
     return (
@@ -107,18 +124,22 @@ function getRunOption(
       const rootInstance = context.medley.getRootInstance();
       const nodes = rootInstance.nodes.getNodes();
 
-      try{
-        if(nodes == null || nodes.length === 0){
-          return 
+      try {
+        if (nodes == null || nodes.length === 0) {
+          return;
         }
         const compositeNode = nodes[0];
-        const res = await rootInstance.runNodeWithInputs(null, compositeNode.id, {"input": async ()=>"Test"});      
+        const res = await rootInstance.runNodeWithInputs(
+          null,
+          compositeNode.id,
+          { input: async () => "Test" }
+        );
         console.log(res);
-      }catch(e){
+      } catch (e) {
         console.log(e);
-      }finally{
+      } finally {
         close();
-      }   
+      }
     };
     return (
       <MenuItem onClick={run}>

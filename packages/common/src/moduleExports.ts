@@ -19,6 +19,19 @@ export type GetNodeEditComponent<TNode extends CNode = CNode> = (
   context: NodeContext<TNode, CNode, CType, CLink>
 ) => Promise<VFC<NodeEditComponentProps<TNode>>>;
 
+export type NodeCreateComponentProps<TNode extends CNode = CNode> = NodeContext<
+  TNode,
+  CNode,
+  CType,
+  CLink
+> & {
+  create: (node:TNode) => void;
+};
+
+export type GetNodeCreateComponent<TNode extends CNode = CNode> = (
+  context: NodeContext<TNode, CNode, CType, CLink>
+) => Promise<VFC<NodeCreateComponentProps<TNode>>>;
+
 export type NodeComponentProps<TNode extends CNode = CNode> = NodeContext<
   TNode,
   CNode,
@@ -66,22 +79,16 @@ export type GetPorts<TNode extends CNode = CNode> = (
   context: NodeContext<TNode, CNode, CType, CLink>
 ) => Promise<CPort[]>;
 
-export const onNodeCreateExport = "onNodeCreate";
-
 export interface OnNodeCreate<TNode extends CNode = CNode> {
-  (context: NodeContext<TNode, CNode, CType, CLink>): void;
+  (context: BaseContext<CNode, CType, CLink>): Promise<TNode["value"]>;
 }
-
-export const onNodeUpdateExport = "onNodeUpdate";
 
 export interface OnNodeUpdate<TNode extends CNode = CNode> {
-  (context: NodeContext<TNode, CNode, CType, CLink>, update: Partial<TNode>): void;
+  (context: NodeContext<TNode, CNode, CType, CLink>): Promise<void>;
 }
 
-export const onNodeDeleteExport = "onNodeDelete";
-
 export interface OnNodeDelete<TNode extends CNode = CNode> {
-  (context: NodeContext<TNode, CNode, CType, CLink>): void;
+  (context: NodeContext<TNode, CNode, CType, CLink>): Promise<void>;
 }
 
 export type MType = {

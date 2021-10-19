@@ -1,9 +1,10 @@
-export const DnD_Node = "NODE";
-
 export const getNodeEditComponent = "getNodeEditComponent";
 export const getNodeComponent = "getNodeComponent";
+export const getNodeComponentProps = "getNodeComponentProps";
+export const getLinkComponentProps = "getLinkComponentProps";
+export const onNodeCreate = "onNodeCreate";
+export const onNodeUpdate = "onNodeUpdate";
+export const onNodeDelete = "onNodeDelete";
 export const getPorts = "getPorts";
 export const getPortType = "getPortType";
 export const getNodeType = "getNodeType";
-export const getNodeComponentProps = "getNodeComponentProps";
-export const getLinkComponentProps = "getLinkComponentProps";

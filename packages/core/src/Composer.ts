@@ -2,12 +2,13 @@ import { Medley } from "./Medley";
 import { Link, Node, Type, Port } from "./core";
 import { Input, ExecutionContext, NodeContext } from "./Context";
 import { NodeFunction, nodeFunctionExport } from "./NodeFunction";
+import { CacheStrategy } from "./core/CacheStrategy";
 
 export type InputProvider<
-TNode extends Node = Node,
-MNode extends Node = Node,
-MType extends Type = Type,
-MLink extends Link = Link
+  TNode extends Node = Node,
+  MNode extends Node = Node,
+  MType extends Type = Type,
+  MLink extends Link = Link
 > = {
   [index: string]: (
     context: NodeContext<TNode, MNode, MType, MLink>
@@ -38,12 +39,12 @@ export class Composer<
     const getNodeFunction = async function (
       context: ExecutionContext<TNode, MNode, MType, MLink>
     ) {
-      const nodeFuction = Composer.buildNodeFunction<TNode, MNode, MType, MLink>(
-        context,
-        composer,
-        nodeId,
-        inputProvider
-      );
+      const nodeFuction = Composer.buildNodeFunction<
+        TNode,
+        MNode,
+        MType,
+        MLink
+      >(context, composer, nodeId, inputProvider);
       return nodeFuction;
     };
 
@@ -51,7 +52,7 @@ export class Composer<
       context as ExecutionContext<TNode, MNode, MType, MLink>
     );
     return nodeFunction(...args);
-  };
+  }
 
   private static async buildNodeFunction<
     TNode extends Node = Node,
@@ -70,16 +71,16 @@ export class Composer<
       inputProvider: InputProvider<TNode, MNode, MType, MLink> | null,
       ...args: any[]
     ): Promise<T> {
-      const nodeFunction = await Composer.buildNodeFunction<TNode, MNode, MType, MLink>(
-        parentContext,
-        composer,
-        nodeId,
-        inputProvider
-      );
+      const nodeFunction = await Composer.buildNodeFunction<
+        TNode,
+        MNode,
+        MType,
+        MLink
+      >(parentContext, composer, nodeId, inputProvider);
       return nodeFunction(...args);
     };
 
-    const node = composer.medley.nodes.getNode(nodeId) as unknown as TNode;
+    const node = (composer.medley.nodes.getNode(nodeId) as unknown) as TNode;
     if (node == null) {
       throw new Error(`node with id: '${nodeId}', not found`);
     }
@@ -90,11 +91,7 @@ export class Composer<
     if (nodeFunction == null) {
       throw new Error(`node function for type: '${node.type}', not valid`);
     }
-    const childContext = composer.createContext(
-      context,
-      composer.medley,
-      node
-    );
+    const childContext = composer.createContext(context, composer.medley, node);
 
     const portInput = composer.buildPortInputFunction(
       node,
@@ -144,10 +141,10 @@ export class Composer<
       port: Port,
       ...args: any[]
     ): Promise<T | T[] | undefined> {
-      if(inputProvider){
+      if (inputProvider) {
         const inputFunction = inputProvider[port.name];
-        if(inputFunction == null && port.required){
-          throw new Error(`port: '${port.name}' requires input`)
+        if (inputFunction == null && port.required) {
+          throw new Error(`port: '${port.name}' requires input`);
         }
         return inputFunction == null ? null : inputFunction(context);
       }
@@ -166,41 +163,61 @@ export class Composer<
 
       if (isSingle) {
         const link = links[0];
-        const cacheItem = composer.checkCache(node.id, args);
-        if (cacheItem && cacheItem.result) {
-          return cacheItem.result as T;
-        }
-        const result = runNodeFunction<T>(executionContext, link.source, null, args);
-        if (cacheItem && cacheItem.addToCache && cacheItem.key) {
-          composer.addToCache(cacheItem.key, result);
-        }
-        return result;
+        return composer.cacheRunner(link.source, args, () =>
+          runNodeFunction<T>(executionContext, link.source, null, args)
+        );
       } else {
-        const cacheItem = composer.checkCache(node.id, args);
-        if (cacheItem && cacheItem.result) {
-          return cacheItem.result as T[];
-        }
         const results = await Promise.all(
-          links.map((l) => runNodeFunction<T>(executionContext, l.source, null, args))
+          links.map((l) =>
+            composer.cacheRunner(l.source, args, () =>
+              runNodeFunction<T>(executionContext, l.source, null, args)
+            )
+          )
         );
         if (results) {
-          const validResults = results.filter((e) => e !== undefined);
-          if (cacheItem && cacheItem.addToCache && cacheItem.key) {
-            composer.addToCache(cacheItem.key, validResults);
-          }
-          return validResults;
+          return results.filter((e) => e !== undefined);
         }
       }
     };
     return portInputFunction;
   }
 
+  private async cacheRunner<T>(
+    nodeId: string,
+    args: any[],
+    func: () => Promise<T>
+  ) {
+    const cacheItem = this.checkCache(nodeId, args);
+    if (cacheItem && cacheItem.result) {
+      return cacheItem.result as T;
+    }
+    const result = func();
+    if (cacheItem && cacheItem.addToCache && cacheItem.key) {
+      this.resultCache.set(cacheItem.key, result);
+    }
+    return result;
+  }
+
   private checkCache(sourceId: string, ...args: any[]) {
     const node = this.medley.nodes.getNode(sourceId);
-    if (node == null || node.cache == null || node.cache === false) {
+    if (
+      node == null ||
+      node.cache == null ||
+      node.cache === CacheStrategy.none
+    ) {
       return null;
     }
-    const key = `${this.medley.scopeId}${node.id}${args && JSON.stringify(args)}`;
+    let key = "";
+    switch (node.cache) {
+      case CacheStrategy.scope:
+        key = `${this.medley.scopeId}${node.id}${args && JSON.stringify(args)}`;
+        break;
+      case CacheStrategy.global:
+        key = `${node.id}${args && JSON.stringify(args)}`;
+        break;
+      default:
+        return null;
+    }
     if (this.resultCache.has(key)) {
       return {
         addToCache: false,
@@ -208,9 +225,5 @@ export class Composer<
       };
     }
     return { addToCache: true, key };
-  }
-
-  private addToCache(key: string, result: any) {
-    this.resultCache.set(key, result);
   }
 }

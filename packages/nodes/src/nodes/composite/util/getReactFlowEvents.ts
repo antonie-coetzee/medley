@@ -7,10 +7,16 @@ import {
   CType,
   GetPorts,
   NodeEditComponentProps,
+  OnNodeDelete,
 } from "@medley-js/common";
 import React from "react";
 import { CompositeNode } from "../node";
-import { Connection, Edge, Elements, Node as RFNode } from "react-flow-renderer";
+import {
+  Connection,
+  Edge,
+  Elements,
+  Node as RFNode,
+} from "react-flow-renderer";
 
 export function getReactFlowEvents(
   context: NodeContext<CompositeNode, CNode, CType, CLink>,
@@ -23,7 +29,7 @@ export function getReactFlowEvents(
       port: edge.targetHandle || "",
       scope: context.node.id,
     });
-  }
+  };
 
   const onNodeDragStop: (
     event: React.MouseEvent<Element, MouseEvent>,
@@ -35,38 +41,45 @@ export function getReactFlowEvents(
     }
   };
 
-  const onNodeDoubleClick: (event: React.MouseEvent<Element, MouseEvent>, node: RFNode<any>) => void = (_,node) => {
-    if(node && edit?.openEditComponent){
-        edit.openEditComponent(node.id);
+  const onNodeDoubleClick: (
+    event: React.MouseEvent<Element, MouseEvent>,
+    node: RFNode<any>
+  ) => void = (_, node) => {
+    if (node && edit?.openEditComponent) {
+      edit.openEditComponent(node.id);
     }
-    console.log(JSON.stringify(context.medley.graph.getGraph(),null, 2));
-  }
+    console.log(JSON.stringify(context.medley.graph.getGraph(), null, 2));
+  };
 
-  const onElementsRemove : ((elements: Elements<any>) => void) = (elements) => {
-    if(elements){
-      elements.forEach(async el=>{
-        const edge = (el as Edge);
-        if(edge.source){
-          const link  = context.medley.links.getLink(edge.targetHandle || "", edge.target, edge.source);
-          if(link){
+  const onElementsRemove: (elements: Elements<any>) => void = (elements) => {
+    if (elements) {
+      elements.forEach(async (el) => {
+        const edge = el as Edge;
+        if (edge.source) {
+          const link = context.medley.links.getLink(
+            edge.targetHandle || "",
+            edge.target,
+            edge.source
+          );
+          if (link) {
             context.medley.links.deleteLink(link);
           }
-        }else{
+        } else {
           const node = context.medley.nodes.getNode(el.id);
-          if(node == null){
+          if (node == null) {
             return;
           }
-          const links  = context.medley.links.getLinks()
+          const links = context.medley.links.getLinks();
           for (const l of links) {
-            if(l.source === node.id || l.target === node.id){
+            if (l.source === node.id || l.target === node.id) {
               context.medley.links.deleteLink(l);
             }
           }
           context.medley.nodes.deleteNode(el.id);
         }
-      })
+      });
     }
-  }
+  };
 
-  return { onConnect, onNodeDragStop, onNodeDoubleClick , onElementsRemove};
+  return { onConnect, onNodeDragStop, onNodeDoubleClick, onElementsRemove };
 }

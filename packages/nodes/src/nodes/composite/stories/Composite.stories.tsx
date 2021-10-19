@@ -1,6 +1,6 @@
 import React from "react";
 import { Meta } from "@storybook/react";
-import { Medley } from "@medley-js/core";
+import { CacheStrategy, Medley } from "@medley-js/core";
 import {
   CLink,
   CNode,
@@ -44,19 +44,19 @@ export const Edit = componentStory(async () => {
 
   const id_1 = childScope.nodes.upsertNode({
     name: "Test_1",
-    cache: true,
+    cache: CacheStrategy.scope,
     position: { x: 200, y: 50 },
     type: IdentityType.name,
   });
   const id_2 = childScope.nodes.upsertNode({
     name: "Test_2",
-    cache: true,
+    cache: CacheStrategy.scope,
     position: { x: 600, y: 50 },
     type: IdentityType.name,
   });
   const id_3 = childScope.nodes.upsertNode({
     name: "Test_3",
-    cache: true,
+    cache: CacheStrategy.scope,
     position: { x: 1000, y: 300 },
     type: IdentityType.name,
   });

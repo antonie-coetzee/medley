@@ -91,12 +91,12 @@ export class NodesApi<
     } else {
       throw new Error("either type or node.type must be provided");
     }
-    const [added, outNode] = this.nodeRepo.upsertNode(this.scopeId, {
+    const [created, outNode] = this.nodeRepo.upsertNode(this.scopeId, {
       ...node,
       type: nodeType.name,
     });
-    if (added) {
-      this.dispatchEvent(MedleyEvent.create(EventType.OnItemAdd, outNode));
+    if (created) {
+      this.dispatchEvent(MedleyEvent.create(EventType.OnItemCreate, outNode));
       this.dispatchEvent(MedleyEvent.create(EventType.OnChange));
     }else{
       this.dispatchEvent(MedleyEvent.create(EventType.OnItemUpdate, outNode));

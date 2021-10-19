@@ -21,7 +21,7 @@ export class LinksApi<TLink extends Link = Link> extends EventTarget {
   }
 
   public addLink(newLink: TLink): void {
-    const allowed = this.dispatchEvent(MedleyEvent.createCancelable(EventType.OnItemAdd, newLink));
+    const allowed = this.dispatchEvent(MedleyEvent.createCancelable(EventType.OnItemCreate, newLink));
     if (allowed) {
       const wasAdded = this.linkRepo.addLink(newLink);
       if (wasAdded) {
