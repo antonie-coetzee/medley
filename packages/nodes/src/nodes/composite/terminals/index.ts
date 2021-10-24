@@ -1,1 +1,2 @@
-export * from "./input"
+export * as input from "./input"
+export * as output from "./output"

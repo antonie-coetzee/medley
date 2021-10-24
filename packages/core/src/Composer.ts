@@ -1,8 +1,8 @@
 import { Medley } from "./Medley";
 import { Link, Node, Type, Port } from "./core";
 import { Input, ExecutionContext, NodeContext } from "./Context";
-import { NodeFunction, nodeFunctionExport } from "./NodeFunction";
-import { CacheStrategy } from "./core/CacheStrategy";
+import { NodeFunction, nodeFunction as nodeFunctionExportName } from "./NodeFunction";
+import { Cache } from "./core/Cache";
 
 export type InputProvider<
   TNode extends Node = Node,
@@ -86,7 +86,7 @@ export class Composer<
     }
     const nodeFunction = await composer.medley.types.getExportFunction<
       NodeFunction<{}, TNode, MNode, MType, MLink>
-    >(node.type, nodeFunctionExport);
+    >(node.type, nodeFunctionExportName);
 
     if (nodeFunction == null) {
       throw new Error(`node function for type: '${node.type}', not valid`);
@@ -198,22 +198,22 @@ export class Composer<
     return result;
   }
 
-  private checkCache(sourceId: string, ...args: any[]) {
-    const node = this.medley.nodes.getNode(sourceId);
+  private checkCache(nodeId: string, ...args: any[]) {
+    const node = this.medley.nodes.getNode(nodeId);
     if (
       node == null ||
       node.cache == null ||
-      node.cache === CacheStrategy.none
+      node.cache === Cache.none
     ) {
       return null;
     }
     let key = "";
     switch (node.cache) {
-      case CacheStrategy.scope:
-        key = `${this.medley.scopeId}${node.id}${args && JSON.stringify(args)}`;
+      case Cache.scope:
+        key = `${this.medley.scopeId}${node.id}${args !== [] && JSON.stringify(args)}`;
         break;
-      case CacheStrategy.global:
-        key = `${node.id}${args && JSON.stringify(args)}`;
+      case Cache.global:
+        key = `${node.id}${args !== [] && JSON.stringify(args)}`;
         break;
       default:
         return null;

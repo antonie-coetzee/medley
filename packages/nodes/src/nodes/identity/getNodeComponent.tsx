@@ -36,10 +36,11 @@ const dragHandleStyle = {
 export const getNodeComponent: GetNodeComponent<IdentityNode> = async () => {
   return ({ node, selected }) => {
     const [age, setAge] = React.useState('');
+    const [slider, setSlider] = React.useState(node.value?.slider || 0);
     const handleChange = (event: SelectChangeEvent) => {
       const newAge = event.target.value as string;
       setAge(newAge);
-      node.value = {age:newAge}
+      node.value = {...node.value, age:newAge}
     };
     return (
       <>
@@ -79,6 +80,12 @@ export const getNodeComponent: GetNodeComponent<IdentityNode> = async () => {
               size="small"
               aria-label="Small"
               valueLabelDisplay="auto"
+              value={slider}
+              onChange={(_,v)=>{
+                const n = v as number;
+                setSlider(n) ;
+                node.value = {...node.value, slider:n}
+              }}
             />
             <FormControl fullWidth>
               <InputLabel id="demo-simple-select-label">Age</InputLabel>

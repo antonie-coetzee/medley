@@ -7,7 +7,6 @@ import {
   CType,
   GetPorts,
   NodeEditComponentProps,
-  OnNodeDelete,
 } from "@medley-js/common";
 import React from "react";
 import { CompositeNode } from "../node";
@@ -75,7 +74,7 @@ export function getReactFlowEvents(
               context.medley.links.deleteLink(l);
             }
           }
-          context.medley.nodes.deleteNode(el.id);
+          context.medley.nodes.deleteNode(node);
         }
       });
     }

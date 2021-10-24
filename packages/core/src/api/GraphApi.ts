@@ -11,8 +11,8 @@ export class GraphApi<
   constructor(
     private nodesApi: NodesApi<MNode, MType, MLink>,
     private typesApi: TypesApi<MType>,
-    private linksApi: LinksApi<MLink>,
-  ) { 
+    private linksApi: LinksApi<MLink>
+  ) {
     super();
   }
 
@@ -26,9 +26,13 @@ export class GraphApi<
   public getGraph() {
     const types = this.typesApi
       .getAllTypes()
-      .filter((t) => t.volatile == null || t.volatile === false) as MType[];
-    const nodes = this.nodesApi.getAllNodes() as MNode[];
-    const links = this.linksApi.getAllLinks() as MLink[];
+      .filter((t) => t.volatile == null || t.volatile === false);
+    const nodes = this.nodesApi
+      .getAllNodes()
+      .filter((n) => n.volatile == null || n.volatile === false);
+    const links = this.linksApi
+      .getAllLinks()
+      .filter((l) => l.volatile == null || l.volatile === false);
     return {
       ...this.graph,
       types,

@@ -22,7 +22,7 @@ function getAddInputNode(
 ): React.VFC<{ close: () => void; mouseX?: number; mouseY?: number }> {
   return ({ close, mouseX, mouseY }) => {
     const addInput = () => {
-      const node = context.medley.nodes.upsertNode({
+      const node = context.medley.nodes.insertNode({
         name: "INPUT",
         type: InputType.name,
       });
@@ -51,7 +51,7 @@ function getAddOutputNode(
 ): React.VFC<{ close: () => void; mouseX?: number; mouseY?: number }> {
   return ({ close, mouseX, mouseY }) => {
     const addOutput = () => {
-      const node = context.medley.nodes.upsertNode({
+      const node = context.medley.nodes.insertNode<>({
         name: "OUTPUT",
         type: OutputType.name,
       });
@@ -81,7 +81,7 @@ function getAddIdentityNode(
 ): React.VFC<{ close: () => void; mouseX?: number; mouseY?: number }> {
   return ({ close, mouseX, mouseY }) => {
     const addIdentity = async () => {
-      const identityNode: Partial<CNode> = {
+      const identityNode: Omit<CNode, "id"> = {
         name: "Identity",
         type: IdentityType.name,
       }
@@ -95,7 +95,7 @@ function getAddIdentityNode(
         context.logger.error(e);
         return
       }
-      const node = context.medley.nodes.upsertNode(identityNode);
+      const node = context.medley.nodes.insertNode(identityNode);
       if (mouseX && mouseY) {
         node.position = { x: mouseX, y: mouseY };
       }

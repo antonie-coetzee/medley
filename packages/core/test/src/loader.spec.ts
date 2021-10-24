@@ -1,9 +1,12 @@
-import { Loader, Module } from "../../src/index";
+import {
+  Loader,
+  Module
+} from "../../src/index";
 
 describe("Loader", function () {
   it("should load a systemjs module without a baseUrl", async function () {
     const importFn = jest.fn((url: string) => Promise.resolve(true)); 
-    const importer = Loader.SystemImportWrapper(async (url) => {
+    const importer = Loader.SystemImportWrapper(async (url:string) => {
       const module = await importFn(url);
       return module;
     })
@@ -16,7 +19,7 @@ describe("Loader", function () {
   });
   it("should load an esm module without a baseUrl", async function () {
     const importFn = jest.fn((url: string) => Promise.resolve(true)); 
-    const importer = Loader.ESMImportWrapper(async (url) => {
+    const importer = Loader.ESMImportWrapper(async (url:string) => {
       const module = await importFn(url);
       return module;
     })

@@ -1,33 +1,32 @@
-import { memo, ReactNode, VFC } from 'react';
+import { memo, ReactNode, VFC } from "react";
 import { BaseContext } from "@medley-js/core";
 import {
   CNode,
-  constants, GetNodeComponent, NodeComponentProps
+  constants,
+  GetNodeComponent,
+  NodeComponentProps,
 } from "@medley-js/common";
-import React from 'react';
+import React from "react";
+import { getNodes } from ".";
 
 export async function getReactFlowNodeTypes(
-  contex: BaseContext<CNode>): Promise<{ [index: string]: ReactNode; }> {
-  const typeNames = contex.medley.nodes.getUsedTypes();
+  context: BaseContext<CNode>
+): Promise<{ [index: string]: ReactNode }> {
+  const typeNames = [...new Set(getNodes(context).map((n) => n.type))];
   const nodeTypes = await Promise.all(
     typeNames.map(async (typeName) => {
-      const getNodeComponent: GetNodeComponent |
-        undefined = await contex.medley.types.getExportFunction(
-          typeName,
-          constants.getNodeComponent
-        );
-      return { typeName, nodeComponent: await getNodeComponent?.(contex) };
+      const nodeComponent = await context.medley.types.runExportFunction<
+        GetNodeComponent<CNode>
+      >(typeName, constants.getNodeComponent, context);
+      return { typeName, nodeComponent };
     })
   );
   return nodeTypes.reduce((acc, crnt) => {
     if (crnt.nodeComponent) {
-      acc[crnt.typeName] = wrapNodeComponent(
-        contex,
-        crnt.nodeComponent
-      );
+      acc[crnt.typeName] = wrapNodeComponent(context, crnt.nodeComponent);
     }
     return acc;
-  }, {} as { [index: string]: ReactNode; });
+  }, {} as { [index: string]: ReactNode });
 }
 
 export function wrapNodeComponent(
@@ -43,12 +42,12 @@ export function wrapNodeComponent(
   }> = memo((props) => {
     const node = contex.medley.nodes.getNode(props.id);
     return node ? (
-        <NodeComponent
-          logger={contex.logger}
-          medley={contex.medley}
-          node={node}
-          {...props}
-        />
+      <NodeComponent
+        logger={contex.logger}
+        medley={contex.medley}
+        node={node}
+        {...props}
+      />
     ) : null;
   });
   return nodeWrapper;

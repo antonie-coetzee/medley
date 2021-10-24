@@ -9,6 +9,7 @@ import {
 } from "@medley-js/common";
 import { CompositeNode } from "../node";
 import { Edge, Node as RFNode, Position } from "react-flow-renderer";
+import { getNodes } from "./getNodes";
 
 export async function getReactFlowElements(
   contex: NodeContext<CompositeNode, CNode, CType, CLink>
@@ -19,9 +20,10 @@ export async function getReactFlowElements(
 }
 
 async function getReactFlowNodes(
-  context: BaseContext<CNode>
+  context: BaseContext<CNode, CType, CLink>
 ): Promise<RFNode[]> {
-  const mNodes = context.medley.nodes.getNodes();
+  const mNodes = getNodes(context);
+  /* combine props with node type's props */
   return Promise.all(
     mNodes.map(async (node) => {
       const nodeProps = await context.medley.types.runExportFunction<

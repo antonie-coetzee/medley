@@ -1,106 +1,151 @@
-import { Link, ROOT_SCOPE, TreeMap } from "../core";
-
-export type LinkRepoOptions = {};
+import {
+  Link,
+  ROOT_SCOPE,
+  TreeMap,
+  PortLink,
+} from "../core";
 
 export class LinkRepo {
+  private updateSourceToPortMap: boolean = false;
+
   /* scope -> port -> target -> source -> link */
-  private targetMap: TreeMap<Link>;
-  private updateSourceMap: boolean = false;
+  private portToSourceMap: TreeMap<PortLink<Link>>;
   /* scope -> source -> target -> port -> link */
-  private sourceMap: TreeMap<Link>;
+  private sourceToPortMap: TreeMap<PortLink<Link>>;
+  /* scope -> target -> source */
+  private targetToSourceMap: TreeMap<Link>;
 
   constructor() {
-    this.targetMap = new TreeMap();
-    this.sourceMap = new TreeMap();
+    this.portToSourceMap = new TreeMap();
+    this.sourceToPortMap = new TreeMap();
+    this.targetToSourceMap = new TreeMap();
   }
 
   public set(links: Link[]) {
-    this.targetMap.clear();
-    this.sourceMap.clear();
+    this.portToSourceMap.clear();
+    this.sourceToPortMap.clear();
+    this.targetToSourceMap.clear();
     for (const link of links) {
-      this.addToTargetMap(link);
+      if (link.port) {
+        this.addToPortToSourceMap(link as PortLink);
+      } else {
+        this.addToTargetToSourceMap(link);
+      }
     }
-    this.updateSourceMap = true;
+    this.updateSourceToPortMap = true;
+  }
+
+  public getLink(scopeId: string, target: string, source: string, port?:string) {
+    if(port){
+      const links = this.portToSourceMap.getFromPath(
+        false,
+        scopeId,
+        port,
+        target,
+        source
+      );
+      if (links.length > 0) {
+        return links[0];
+      }
+    }else{
+      const links = this.targetToSourceMap.getFromPath(
+        false,
+        scopeId,
+        target,
+        source
+      );
+      if (links.length > 0) {
+        return links[0];
+      }
+    }
+  }
+
+  public addLink(link: Link) {
+    if(link.port){
+      this.updateSourceToPortMap = true;
+      return this.addToPortToSourceMap(link as PortLink);
+    }else{
+      return this.addToTargetToSourceMap(link);
+    }
   }
 
   public getPortLinks(scopeId: string, port: string, target: string) {
-    return this.targetMap.getFromPath(false, scopeId, port, target);
+    return this.portToSourceMap.getFromPath(false, scopeId, port, target);
   }
 
-  public getSourceLinks(scopeId: string, source: string) {
-    if (this.updateSourceMap) {
-      this.sourceMap.clear();
-      const allLinks = this.targetMap.getAll();
+  public getSourceToPortLinks(scopeId: string, source: string) {
+    if (this.updateSourceToPortMap) {
+      this.sourceToPortMap.clear();
+      const allLinks = this.portToSourceMap.getAll();
       for (const link of allLinks) {
-        this.addToSourceMap(link);
+        this.addToSourceToPortMap(link);
       }
     }
-    return this.sourceMap.getFromPath(true, scopeId, source);
+    return this.sourceToPortMap.getFromPath(true, scopeId, source);
   }
 
-  public addLink(newLink: Link) {
-    let wasAdded = false;
-    wasAdded = this.addToTargetMap(newLink);
-    this.updateSourceMap = true;
-    return wasAdded;
-  }
-
-  public getLink(scopeId: string, port: string, target: string, source: string) {
-    const links = this.targetMap.getFromPath(true, scopeId, port, target, source);
-    if(links.length > 0){
-      return links[0]
-    }
+  public getSourceLinks(scopeId: string, target: string) {
+    return this.targetToSourceMap.getFromPath(true, scopeId, target);
   }
 
   public getLinks(scopeId: string) {
-    return this.targetMap.getFromPath(true, scopeId);
+    return [
+      ...this.portToSourceMap.getFromPath(true, scopeId),
+      ...this.targetToSourceMap.getFromPath(true, scopeId),
+    ];
   }
 
-  public getAllLinks() {
-    return this.targetMap.getAll();
-  }
-
-  public deleteLinks(links: Link[]) {
-    let wasDeleted = false;
-    for (const l of links) {
-      if(this.deleteLink(l)){
-        wasDeleted = true;
-      }
-    }
-    return wasDeleted;
+  public getAllLinks(){
+    return [
+      ...this.portToSourceMap.getAll(),
+      ...this.targetToSourceMap.getAll(),
+    ];
   }
 
   public deleteLink(link: Link) {
-    let wasDeleted = false;
-    wasDeleted = this.targetMap.deleteNode(
+    if(link.port){
+      this.updateSourceToPortMap = true;
+      return this.portToSourceMap.deleteNode(
+        link.scope || ROOT_SCOPE,
+        link.port,
+        link.target,
+        link.source
+      );
+    }else{
+      return this.targetToSourceMap.deleteNode(
+        link.scope || ROOT_SCOPE,
+        link.target,
+        link.source
+      );
+    }
+  }
+
+  private addToPortToSourceMap(link: PortLink<Link>) {
+    return this.portToSourceMap.setNodeValue(
+      link,
       link.scope || ROOT_SCOPE,
       link.port,
       link.target,
       link.source
     );
-    this.updateSourceMap = true;
-    return wasDeleted;
   }
 
-  private addToTargetMap(link: Link) {
-    let scope = link.scope || ROOT_SCOPE;
-    return this.targetMap.setNodeValue(
+  private addToSourceToPortMap(link: PortLink<Link>) {
+    this.sourceToPortMap.setNodeValue(
       link,
-      scope,
-      link.port,
-      link.target,
-      link.source
-    );
-  }
-
-  private addToSourceMap(link: Link) {
-    let scope = link.scope || ROOT_SCOPE;
-    this.sourceMap.setNodeValue(
-      link,
-      scope,
+      link.scope || ROOT_SCOPE,
       link.source,
       link.target,
       link.port
+    );
+  }
+
+  private addToTargetToSourceMap(link: Link) {
+    return this.targetToSourceMap.setNodeValue(
+      link,
+      link.scope || ROOT_SCOPE,
+      link.target,
+      link.source
     );
   }
 }

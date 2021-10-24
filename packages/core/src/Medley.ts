@@ -58,7 +58,6 @@ export class Medley<
     this.nodes = new NodesApi<MNode, MType, MLink>(
       this.scopeId,
       this.options.nodeRepo,
-      this.types,
       this.links,
       parentInstance?.nodes
     );

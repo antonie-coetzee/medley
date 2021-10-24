@@ -1,4 +1,4 @@
-import { Type, Link, Node } from ".";
+import { Type, Link, Node} from ".";
 
 export interface Graph<
   TNode extends Node = Node,

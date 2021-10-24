@@ -1,6 +1,6 @@
 import React from "react";
 import { Meta } from "@storybook/react";
-import { CacheStrategy, Medley } from "@medley-js/core";
+import { Cache, Medley } from "@medley-js/core";
 import {
   CLink,
   CNode,
@@ -26,7 +26,7 @@ export const Edit = componentStory(async () => {
   medley.types.addType(InputType);
   medley.types.addType(OutputType);
 
-  const compNode = medley.nodes.upsertNode({
+  const compNode = medley.nodes.insertNode({
     name: "test_composate",
     type: CompositeType.name,
   });
@@ -36,31 +36,31 @@ export const Edit = componentStory(async () => {
     compNode.id
   );
   
-  const id_0 = childScope.nodes.upsertNode({
+  const id_0 = childScope.nodes.insertNode({
     name: "INPUT",
     position: { x: 0, y: 50 },
     type: InputType.name,
   });
 
-  const id_1 = childScope.nodes.upsertNode({
+  const id_1 = childScope.nodes.insertNode({
     name: "Test_1",
-    cache: CacheStrategy.scope,
+    cache: Cache.scope,
     position: { x: 200, y: 50 },
     type: IdentityType.name,
   });
-  const id_2 = childScope.nodes.upsertNode({
+  const id_2 = childScope.nodes.insertNode({
     name: "Test_2",
-    cache: CacheStrategy.scope,
+    cache: Cache.scope,
     position: { x: 600, y: 50 },
     type: IdentityType.name,
   });
-  const id_3 = childScope.nodes.upsertNode({
+  const id_3 = childScope.nodes.insertNode({
     name: "Test_3",
-    cache: CacheStrategy.scope,
+    cache: Cache.scope,
     position: { x: 1000, y: 300 },
     type: IdentityType.name,
   });
-  const id_4 = childScope.nodes.upsertNode({
+  const id_4 = childScope.nodes.insertNode({
     name: "OUTPUT",
     position: { x: 1400, y: 50 },
     type: OutputType.name,

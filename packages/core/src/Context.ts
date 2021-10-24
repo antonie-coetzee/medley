@@ -1,4 +1,4 @@
-import { Link, Logger, MultiPort, Node, Type, UniPort, Port } from "./core";
+import { Link, Logger, MultiPort, Node, Type, UniPort, Port, NodePart } from "./core";
 import { Medley } from "./Medley";
 
 type Unwrap<T> = T extends Promise<infer U>
@@ -31,6 +31,15 @@ export type BaseContext<
 > = {
   medley: Medley<MNode, MType, MLink>;
   logger: Logger;
+};
+
+export type NodePartContext<
+TNodePart extends NodePart = NodePart,
+MNode extends Node = Node,
+MType extends Type = Type,
+MLink extends Link = Link
+> = BaseContext<MNode, MType, MLink> & {
+  node: TNodePart;
 };
 
 export type NodeContext<

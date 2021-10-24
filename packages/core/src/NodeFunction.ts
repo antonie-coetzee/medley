@@ -1,8 +1,7 @@
-import { NodeContext } from ".";
 import { ExecutionContext } from "./Context";
 import { Link, Type, Node } from "./core";
 
-export const nodeFunctionExport = "nodeFunction";
+export const nodeFunction = "nodeFunction";
 
 export interface NodeFunction<
   TContext extends {} = {},
@@ -11,7 +10,10 @@ export interface NodeFunction<
   MType extends Type = Type,
   MLink extends Link = Link
 > {
-  (context: TContext & ExecutionContext<TNode, MNode, MType, MLink>, ...args: any[]): any;
+  (
+    context: TContext & ExecutionContext<TNode, MNode, MType, MLink>,
+    ...args: any[]
+  ): any;
 }
 
 export type NF<

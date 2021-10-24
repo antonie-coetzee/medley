@@ -1,7 +1,7 @@
-import { EventType, Link, MedleyEvent } from "../core";
+import { EventType, Link, MedleyEvent, PortLink } from "../core";
 import { LinkRepo } from "../repos";
 
-export class LinksApi<TLink extends Link = Link> extends EventTarget {
+export class LinksApi<MLink extends Link = Link> extends EventTarget {
 
   constructor(private scopeId: string, private linkRepo: LinkRepo) {
     super();
@@ -9,18 +9,23 @@ export class LinksApi<TLink extends Link = Link> extends EventTarget {
 
   public setLinks(links: Link[]) {
     this.linkRepo.set(links);
+    
     this.dispatchEvent(new MedleyEvent(EventType.OnChange));
   }
 
-  public getPortLinks(port: string, target: string): TLink[] {
-    return this.linkRepo.getPortLinks(this.scopeId, port, target) as TLink[];
+  public getPortLinks(port: string, target: string){
+    return this.linkRepo.getPortLinks(this.scopeId, port, target) as PortLink<MLink>[];
   }
 
-  public getSourceLinks(source: string): TLink[] {
-    return this.linkRepo.getSourceLinks(this.scopeId, source) as TLink[];
+  public getSourceToPortLinks(source: string) {
+    return this.linkRepo.getSourceToPortLinks(this.scopeId, source) as PortLink<MLink>[];
   }
 
-  public addLink(newLink: TLink): void {
+  public getSourceLinks(target: string) {
+    return this.linkRepo.getSourceLinks(this.scopeId, target) as MLink[];
+  }
+
+  public addLink(newLink: MLink): void {
     const allowed = this.dispatchEvent(MedleyEvent.createCancelable(EventType.OnItemCreate, newLink));
     if (allowed) {
       const wasAdded = this.linkRepo.addLink(newLink);
@@ -30,19 +35,19 @@ export class LinksApi<TLink extends Link = Link> extends EventTarget {
     }
   }
 
-  public getLink(port: string, target: string, source: string): TLink {
-    return this.linkRepo.getLink(this.scopeId, port, target, source) as TLink;
+  public getLink(target: string, source: string, port?: string ): MLink {
+    return this.linkRepo.getLink(this.scopeId, target, source, port) as MLink;
   }
 
-  public getLinks(): TLink[] {
-    return this.linkRepo.getLinks(this.scopeId) as TLink[];
+  public getLinks(): MLink[] {
+    return this.linkRepo.getLinks(this.scopeId) as MLink[];
   }
 
-  public getAllLinks(): TLink[] {
-    return this.linkRepo.getAllLinks() as TLink[];
+  public getAllLinks(): MLink[] {
+    return this.linkRepo.getAllLinks() as MLink[];
   }
 
-  public deleteLink(link: TLink): void {
+  public deleteLink(link: MLink): void {
     const allowed = this.dispatchEvent(MedleyEvent.createCancelable(EventType.OnItemDelete, link));
     if (allowed) {
       let wasDeleted = false;

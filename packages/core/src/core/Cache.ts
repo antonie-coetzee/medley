@@ -1,4 +1,4 @@
-export const enum CacheStrategy {
+export const enum Cache {
     none = "none",
     scope = "scope",
     global = "global"

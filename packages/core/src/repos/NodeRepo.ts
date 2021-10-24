@@ -1,4 +1,4 @@
-import { Node, ROOT_SCOPE, TreeMap } from "../core";
+import { Node, NodePart, ROOT_SCOPE, TreeMap, WithPartial } from "../core";
 
 export class NodeRepo {
   public nodeIndex: Map<string,Node> = new Map();
@@ -16,10 +16,6 @@ export class NodeRepo {
   public getNode(scopeId: string, id: string){
     return this.nodeTreeMap.getNodeValue(scopeId, id);
   };
-
-  public getTypeNameFromNodeId(scopeId: string, id: string) {
-    return this.nodeTreeMap.getNodeValue(scopeId, id)?.type;
-  }
 
   public getNodesByType(scopeId: string, typeName: string): Node[] {
     return this.nodeTreeMap
@@ -53,36 +49,25 @@ export class NodeRepo {
     return Array.from(usedTypes.keys());
   }
 
-  public upsertNode(scopeId: string, node: Partial<Node>): [boolean, Node] {
-    if (node.type == null) {
-      throw new Error(`node requires typeName to be defined`);
-    }
-    if (node.id == null) {    
-      // new node
-      let newId: string;
-      do {
-        newId = generateId();
-      } while (this.nodeIndex.get(newId));
-      const nodeCpy = { ...node, type: node.type, id: newId, scope: scopeId } as Node;
-      this.nodeTreeMap.setNodeValue(nodeCpy, scopeId, nodeCpy.id);
-      this.nodeIndex.set(nodeCpy.id, nodeCpy);    
-      return [true, nodeCpy];
-    } else {
-      // existing node
-      const existingNode = this.nodeTreeMap.getNodeValue(scopeId, node.id);
-      if (existingNode == null) {
-        throw new Error(`node with id: '${node.id}' does not exist`);
-      }
-      const updatedNode = { ...existingNode, ...node, scope: scopeId } as Node;
-      this.nodeTreeMap.setNodeValue(updatedNode, scopeId, node.id);
-      this.nodeIndex.set(node.id, updatedNode);  
-      return [false, updatedNode];
-    }
+  public insertNode(node: NodePart){
+    let newId: string;
+    do {
+      newId = generateId();
+    } while (this.nodeIndex.get(newId));
+    const newNode = {...node, id:newId};
+    this.nodeTreeMap.setNodeValue(newNode, newNode.scope || ROOT_SCOPE, newNode.id);
+    this.nodeIndex.set(newNode.id, newNode);
+    return newNode;
   }
 
-  public deleteNode(scopeId: string, id: string) {
-    this.nodeIndex.delete(id);
-    return this.nodeTreeMap.deleteNode(scopeId, id);
+  public removeNode(node:Node) {
+    const storedNode = this.nodeIndex.get(node.id);
+    if(storedNode == null){
+      return
+    }
+    this.nodeIndex.delete(node.id);
+    this.nodeTreeMap.deleteNode(node.scope || ROOT_SCOPE, node.id);
+    return node;
   }
 }
 

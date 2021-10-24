@@ -1,17 +1,23 @@
-import { TypesApi, LinksApi } from ".";
-import { Type, Node, Link, MedleyEvent, EventType } from "../core";
+import { LinksApi } from ".";
+import {
+  Type,
+  Node,
+  Link,
+  MedleyEvent,
+  EventType,
+  WithPartial,
+  NodePart,
+} from "../core";
 import { NodeRepo } from "../repos";
 
 export class NodesApi<
   MNode extends Node = Node,
   MType extends Type = Type,
   MLink extends Link = Link
-  > extends EventTarget {
-
+> extends EventTarget {
   constructor(
     private scopeId: string,
     private nodeRepo: NodeRepo,
-    private typesApi: TypesApi<MType>,
     private linksApi: LinksApi<MLink>,
     private parentNodes?: NodesApi<MNode, MType, MLink>
   ) {
@@ -30,16 +36,6 @@ export class NodesApi<
     }
     if (this.parentNodes) {
       return this.parentNodes.getNode(id);
-    }
-  }
-
-  public getTypeNameFromNodeId(id: string): string | undefined {
-    const typeName = this.nodeRepo.getTypeNameFromNodeId(this.scopeId, id);
-    if (typeName) {
-      return typeName;
-    }
-    if (this.parentNodes) {
-      return this.parentNodes.getTypeNameFromNodeId(id);
     }
   }
 
@@ -69,66 +65,36 @@ export class NodesApi<
     return scopeTypes;
   }
 
-  public getScopedUsedTypes(): string[] {
-    const scopeTypes = this.nodeRepo.getUsedTypes(this.scopeId);
-    return scopeTypes;
+  public insertNode<TNode extends MNode = MNode>(node: NodePart<TNode>) {
+    const newNode = { ...node, scope: this.scopeId };
+    this.dispatchEvent(MedleyEvent.create(EventType.OnItemCreate, newNode));
+    this.dispatchEvent(MedleyEvent.create(EventType.OnChange));
+    return this.nodeRepo.insertNode(newNode) as TNode;
   }
 
-  public upsertNode(node: Partial<MNode>, type?: MType): MNode {
-    let nodeType: MType;
-    if (type) {
-      const hasType = this.typesApi.hasType(type.name);
-      if (hasType === false) {
-        this.typesApi.addType(type);
-      }
-      nodeType = type;
-    } else if (node.type) {
-      const type = this.typesApi.getType(node.type);
-      if (type == null) {
-        throw new Error(`type with name: '${node.type}' not found`);
-      }
-      nodeType = type;
-    } else {
-      throw new Error("either type or node.type must be provided");
-    }
-    const [created, outNode] = this.nodeRepo.upsertNode(this.scopeId, {
-      ...node,
-      type: nodeType.name,
-    });
-    if (created) {
-      this.dispatchEvent(MedleyEvent.create(EventType.OnItemCreate, outNode));
-      this.dispatchEvent(MedleyEvent.create(EventType.OnChange));
-    }else{
-      this.dispatchEvent(MedleyEvent.create(EventType.OnItemUpdate, outNode));
-    }
-    return outNode as MNode;
-  }
-
-  public copyNode(node: MNode) {
-    const nodeCopy = JSON.parse(JSON.stringify(node)) as Partial<MNode>;
+  public async copyNode<TNode extends MNode = MNode>(node: TNode) {
+    const nodeCopy = JSON.parse(JSON.stringify(node)) as WithPartial<
+      TNode,
+      "id"
+    >;
     delete nodeCopy.id;
-    nodeCopy.scope = this.scopeId;
-    return this.upsertNode(nodeCopy) as MNode;
+    return this.insertNode<TNode>(nodeCopy as NodePart<TNode>);
   }
 
-  public deleteNode(nodeId: string) {
-    const typeName = this.nodeRepo.getTypeNameFromNodeId(this.scopeId, nodeId);
-    if (typeName == null) {
-      throw new Error(`type name for node with id: '${nodeId}', not found`);
-    }
-
+  public deleteNode<TNode extends MNode = MNode>(node: TNode) {
     const sourceLinks = this.linksApi
       .getAllLinks()
-      .filter((l) => l.source === nodeId);
+      .filter((l) => l.source === node.id);
     if (sourceLinks && sourceLinks.length > 0) {
       throw new Error(
-        `node with id: '${nodeId}' is a source and cannot be deleted`
+        `node with id: '${node.id}' is a source and cannot be deleted`
       );
     }
-    const node = this.nodeRepo.getNode(this.scopeId, nodeId);
-    const wasDeleted = this.nodeRepo.deleteNode(this.scopeId, nodeId);
-    if (node && wasDeleted) {
-      this.dispatchEvent(MedleyEvent.create(EventType.OnItemDelete, node));
+    const deletedNode = this.nodeRepo.removeNode(node);
+    if (deletedNode) {
+      this.dispatchEvent(
+        MedleyEvent.create(EventType.OnItemDelete, deletedNode)
+      );
       this.dispatchEvent(MedleyEvent.create(EventType.OnChange));
     }
   }

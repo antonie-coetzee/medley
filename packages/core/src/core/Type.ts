@@ -1,11 +1,11 @@
-import { CacheStrategy } from "./CacheStrategy";
+import { Cache } from "./Cache";
 import { Module } from "./Module";
 import { Scoped } from "./Scoped";
 
 export interface TypeVersion {
   version: string;
   module: Module;
-  cache?: CacheStrategy;
+  cache?: Cache;
   composite?: boolean;
   /*
    ** string: (standard export name) -> (different export name)
