@@ -1,6 +1,6 @@
-import { GetLinkComponentProps } from "@medley-js/common";
+import { DecorateLinkComponent } from "@medley-js/common";
 
-export const getLinkComponentProps: GetLinkComponentProps = async () => {
+export const decorateLinkComponent: DecorateLinkComponent = async () => {
   return {
       animated:true
   }

@@ -1,4 +1,9 @@
-import { makeAutoObservable } from "mobx";
+import { MenuItem } from "@mui/material";
+import { TNodeEditComponentProps } from "@medley-js/common";
+import { makeAutoObservable, observable, runInAction, toJS } from "mobx";
+import { CompositeNode } from "../CompositeNode";
+import { getContextMenu } from "../util";
+import { ReactFlowStore } from "./ReactFlowStore";
 
 export class ContextMenuStore {
   public contextMenu: {
@@ -6,32 +11,47 @@ export class ContextMenuStore {
     mouseY: number;
   } | null = null;
 
-  public menuItems:(() => JSX.Element)[] | null = null;
+  public menuItems:
+    | React.VFC<{
+        close: () => void;
+        mouseX?: number | undefined;
+        mouseY?: number | undefined;
+      }>[]
+    | null = null;
 
-  constructor() {
-    makeAutoObservable(this);
+  constructor(private props: TNodeEditComponentProps<CompositeNode>, private reactFlowStore: ReactFlowStore) {
+    makeAutoObservable(this, { contextMenu: observable.ref });
+    this.setContextMenu(getContextMenu(props.context))
   }
 
   getPosition() {
-    return this.contextMenu !== null
-      ? { top: this.contextMenu.mouseY, left: this.contextMenu.mouseX }
-      : undefined;
+    if(toJS(this.contextMenu) !== null){
+      const position = this.reactFlowStore.reactFlowInstance?.project({x:this.contextMenu?.mouseX || 0 , y:this.contextMenu?.mouseY || 0})
+      return { top: position?.y || 0, left: position?.x || 0 }
+    }else{
+      return undefined;
+    }
   }
 
-  openContextMenu = (x: number, y: number) => {
-    this.contextMenu === null
-      ? {
-          mouseX: x - 2,
-          mouseY: y - 4,
-        }
-      : null;
+  handleContextMenu = (e: React.MouseEvent<Element, MouseEvent>) => {
+    e.preventDefault();
+    this.contextMenu = toJS(this.contextMenu) === null ? {
+        mouseX: e.clientX,
+        mouseY: e.clientY,
+      } : null
   };
 
   closeContextMenu = () => {
     this.contextMenu = null;
   };
 
-  setContextMenu(menuItems:(() => JSX.Element)[]):void {
+  setContextMenu(
+    menuItems: React.VFC<{
+      close: () => void;
+      mouseX?: number;
+      mouseY?: number;
+    }>[]
+  ): void {
     this.menuItems = menuItems;
   }
 }

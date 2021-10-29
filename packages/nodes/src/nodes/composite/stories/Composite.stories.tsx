@@ -1,13 +1,7 @@
 import React from "react";
 import { Meta } from "@storybook/react";
 import { Cache, Medley } from "@medley-js/core";
-import {
-  CLink,
-  CNode,
-  constants,
-  CType,
-  GetNodeEditComponent,
-} from "@medley-js/common";
+import { CLink, CNode, constants, CType, TNodeEditComponent } from "@medley-js/common";
 
 import { CompositeType } from "../type";
 import { InputType } from "../terminals/input/type";
@@ -35,34 +29,34 @@ export const Edit = componentStory(async () => {
     medley.getRootInstance(),
     compNode.id
   );
-  
+
   const id_0 = childScope.nodes.insertNode({
     name: "INPUT",
-    position: { x: 0, y: 50 },
+    position: [0,50],
     type: InputType.name,
   });
 
   const id_1 = childScope.nodes.insertNode({
     name: "Test_1",
     cache: Cache.scope,
-    position: { x: 200, y: 50 },
+    position: [200, 50 ],
     type: IdentityType.name,
   });
   const id_2 = childScope.nodes.insertNode({
     name: "Test_2",
     cache: Cache.scope,
-    position: { x: 600, y: 50 },
+    position: [600, 50 ],
     type: IdentityType.name,
   });
   const id_3 = childScope.nodes.insertNode({
     name: "Test_3",
     cache: Cache.scope,
-    position: { x: 1000, y: 300 },
+    position: [1000, 300 ],
     type: IdentityType.name,
   });
   const id_4 = childScope.nodes.insertNode({
     name: "OUTPUT",
-    position: { x: 1400, y: 50 },
+    position: [1400,50 ],
     type: OutputType.name,
   });
 
@@ -90,24 +84,29 @@ export const Edit = componentStory(async () => {
     port: "output",
     scope: compNode.id,
   });
-  
-  const getNodeEditComponent = (await medley.types.getExportFunction(
+
+  const NodeEditComponent = await medley.types.getExportFunction<TNodeEditComponent>(
     CompositeType.name,
-    constants.getNodeEditComponent
-  )) as GetNodeEditComponent;
-  return getNodeEditComponent({
-    logger: null,
-    medley: childScope,
-    node: compNode,
-  });
+    constants.NodeEditComponent
+  );
+  return () => (
+    <NodeEditComponent
+      context={{
+        logger: null,
+        medley: childScope,
+        node: compNode,
+      }}
+      host={{}}
+    />
+  );
 });
 
-export const Node = componentStory(async () => {
-  const medley = new Medley();
-  medley.types.addType(CompositeType);
-  const getNodeComponent = await medley.types.getExportFunction(
-    CompositeType.name,
-    constants.getNodeComponent
-  );
-  return getNodeComponent?.();
-});
+// export const Node = componentStory(async () => {
+//   const medley = new Medley();
+//   medley.types.addType(CompositeType);
+//   const NodeComponent = await medley.types.getExportFunction(
+//     CompositeType.name,
+//     constants.NodeComponent
+//   );
+//   return NodeComponent;
+// });

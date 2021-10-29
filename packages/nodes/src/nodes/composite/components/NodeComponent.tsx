@@ -1,10 +1,9 @@
 import React from "react";
 
-import { GetNodeComponent } from "@medley-js/common";
+import { TNodeComponent } from "@medley-js/common";
 import { Handle, Position } from "react-flow-renderer";
 
-export const getNodeComponent: GetNodeComponent = async () => {
-  return () => {
+export const NodeComponent: TNodeComponent = () => {
     return (
       <>
         <Handle
@@ -31,4 +30,3 @@ export const getNodeComponent: GetNodeComponent = async () => {
       </>
     );
   };
-};

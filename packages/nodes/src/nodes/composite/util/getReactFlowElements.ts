@@ -4,10 +4,10 @@ import {
   CNode,
   constants,
   CType,
-  GetLinkComponentProps,
-  GetNodeComponentProps,
+  DecorateLinkComponent,
+  DecorateNodeComponent,
 } from "@medley-js/common";
-import { CompositeNode } from "../node";
+import { CompositeNode } from "../CompositeNode";
 import { Edge, Node as RFNode, Position } from "react-flow-renderer";
 import { getNodes } from "./getNodes";
 
@@ -27,8 +27,8 @@ async function getReactFlowNodes(
   return Promise.all(
     mNodes.map(async (node) => {
       const nodeProps = await context.medley.types.runExportFunction<
-        GetNodeComponentProps<CNode>
-      >(node.type, constants.getNodeComponentProps, {
+        DecorateNodeComponent<CNode>
+      >(node.type, constants.decorateNodeComponent, {
         ...context,
         ...{ node },
       });
@@ -42,7 +42,7 @@ async function getReactFlowNodes(
       };
       return {
         id: node.id,
-        position: { x: node.position?.x || 0, y: node.position?.y || 0 },
+        position: { x: node.position?.[0] || 0, y: node.position?.[1] || 0 },
         type: node.type,
         selectable: props.selectable,
         draggable: props.draggable,
@@ -60,21 +60,21 @@ async function getReactFlowEdges(context: BaseContext<CNode>): Promise<Edge[]> {
   return Promise.all(
     mLinks.map(async (mLink) => {
       const node = context.medley.nodes.getNode(mLink.source);
-      let getLinkProps: GetLinkComponentProps | undefined;
+      let getLinkProps: DecorateLinkComponent | undefined;
       if (node) {
-        getLinkProps = await context.medley.types.getExportFunction<GetLinkComponentProps>(
+        getLinkProps = await context.medley.types.getExportFunction<DecorateLinkComponent>(
           node.type,
-          constants.getLinkComponentProps
-        );
+          constants.decorateLinkComponent
+        );      
       }
-      const linkProps = await getLinkProps?.({ ...context, ...{ node } });
+      const linkProps = node && await getLinkProps?.({ ...context, node  });
       return {
         id: `${mLink.scope}${mLink.source}${mLink.target}${mLink.port}`,
         source: mLink.source,
         target: mLink.target,
         targetHandle: mLink.port,
         ...linkProps,
-      };
+      };   
     })
   );
 }

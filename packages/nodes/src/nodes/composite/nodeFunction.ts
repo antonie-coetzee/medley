@@ -1,5 +1,5 @@
 import { NF, Node, Input, Type, Medley, NodeFunction } from "@medley-js/core";
-import { CompositeNode } from "./node";
+import { CompositeNode } from "./CompositeNode";
 
 export const nodeFunction: NF<{}, CompositeNode> = async (cntx) => {
   const { node, medley, input } = cntx;

@@ -1,5 +1,5 @@
 import { GetPorts } from "@medley-js/common";
-import { CompositeNode } from "./node";
+import { CompositeNode } from "./CompositeNode";
 
 export const getPorts: GetPorts<CompositeNode> = async ({ node }) => {
   return (

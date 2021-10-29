@@ -3,35 +3,39 @@ import { BaseContext } from "@medley-js/core";
 import {
   CNode,
   constants,
-  GetNodeComponent,
-  NodeComponentProps,
+  Host,
+  TNodeComponent,
+  TNodeComponentProps,
 } from "@medley-js/common";
 import React from "react";
 import { getNodes } from ".";
 
 export async function getReactFlowNodeTypes(
-  context: BaseContext<CNode>
+  context: BaseContext<CNode>,
+  host: Host
 ): Promise<{ [index: string]: ReactNode }> {
   const typeNames = [...new Set(getNodes(context).map((n) => n.type))];
   const nodeTypes = await Promise.all(
     typeNames.map(async (typeName) => {
-      const nodeComponent = await context.medley.types.runExportFunction<
-        GetNodeComponent<CNode>
-      >(typeName, constants.getNodeComponent, context);
+      const nodeComponent = await context.medley.types.getExportFunction<
+        TNodeComponent<CNode>
+      >(typeName, constants.NodeComponent);
       return { typeName, nodeComponent };
     })
   );
-  return nodeTypes.reduce((acc, crnt) => {
+  const mappedNodeTypes = nodeTypes.reduce((acc, crnt) => {
     if (crnt.nodeComponent) {
-      acc[crnt.typeName] = wrapNodeComponent(context, crnt.nodeComponent);
+      acc[crnt.typeName] = wrapNodeComponent(context, host, crnt.nodeComponent);
     }
     return acc;
   }, {} as { [index: string]: ReactNode });
+  return mappedNodeTypes;
 }
 
-export function wrapNodeComponent(
-  contex: BaseContext,
-  NodeComponent: React.VFC<NodeComponentProps>
+function wrapNodeComponent(
+  contex: BaseContext<CNode>,
+  host: Host,
+  NodeComponent: React.VFC<TNodeComponentProps>
 ) {
   const nodeWrapper: VFC<{
     id: string;
@@ -39,16 +43,11 @@ export function wrapNodeComponent(
     selected: boolean;
     sourcePosition: string;
     targetPosition: string;
-  }> = memo((props) => {
+  }> = (props) => {
     const node = contex.medley.nodes.getNode(props.id);
     return node ? (
-      <NodeComponent
-        logger={contex.logger}
-        medley={contex.medley}
-        node={node}
-        {...props}
-      />
+      <NodeComponent context={{ ...contex, node }} host={host} {...props} />
     ) : null;
-  });
+  };
   return nodeWrapper;
 }

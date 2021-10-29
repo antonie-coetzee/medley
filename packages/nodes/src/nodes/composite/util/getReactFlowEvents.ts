@@ -6,10 +6,10 @@ import {
   CPort,
   CType,
   GetPorts,
-  NodeEditComponentProps,
+  TNodeEditComponentProps
 } from "@medley-js/common";
 import React from "react";
-import { CompositeNode } from "../node";
+import { CompositeNode } from "../CompositeNode";
 import {
   Connection,
   Edge,
@@ -17,9 +17,7 @@ import {
   Node as RFNode,
 } from "react-flow-renderer";
 
-export function getReactFlowEvents(
-  context: NodeContext<CompositeNode, CNode, CType, CLink>,
-  edit?: NodeEditComponentProps["edit"]
+export function getReactFlowEvents({context, host}: TNodeEditComponentProps<CompositeNode>
 ) {
   const onConnect = (edge: Connection | Edge) => {
     context.medley.links.addLink({
@@ -36,7 +34,8 @@ export function getReactFlowEvents(
   ) => void = (_, rfNode) => {
     const mNode = context.medley.nodes.getNode(rfNode.id);
     if (mNode) {
-      mNode.position = rfNode.position;
+      const pos = rfNode.position;
+      mNode.position = [pos.x,pos.y];
     }
   };
 
@@ -44,8 +43,8 @@ export function getReactFlowEvents(
     event: React.MouseEvent<Element, MouseEvent>,
     node: RFNode<any>
   ) => void = (_, node) => {
-    if (node && edit?.openEditComponent) {
-      edit.openEditComponent(node.id);
+    if (node && host?.openNodeEdit) {
+      host.openNodeEdit(node.id);
     }
     console.log(JSON.stringify(context.medley.graph.getGraph(), null, 2));
   };

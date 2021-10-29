@@ -2,13 +2,13 @@ import { NodeContext } from "@medley-js/core";
 import {
   CLink,
   CNode,
+  CNodePart,
   constants,
   CType,
-  NodeEditComponentProps,
-  OnNodeCreate,
+  NodeCreate
 } from "@medley-js/common";
 import React from "react";
-import { CompositeNode } from "../node";
+import { CompositeNode } from "../CompositeNode";
 import { Connection, Edge, Node as RFNode } from "react-flow-renderer";
 import { Button, Chip, Divider, ListItemIcon, MenuItem } from "@mui/material";
 import { InputType } from "../terminals/input/type";
@@ -27,7 +27,7 @@ function getAddInputNode(
         type: InputType.name,
       });
       if (mouseX && mouseY) {
-        node.position = { x: mouseX, y: mouseY };
+        node.position = [mouseX, mouseY];
       }
 
       close();
@@ -51,12 +51,12 @@ function getAddOutputNode(
 ): React.VFC<{ close: () => void; mouseX?: number; mouseY?: number }> {
   return ({ close, mouseX, mouseY }) => {
     const addOutput = () => {
-      const node = context.medley.nodes.insertNode<>({
+      const node = context.medley.nodes.insertNode({
         name: "OUTPUT",
         type: OutputType.name,
       });
       if (mouseX && mouseY) {
-        node.position = { x: mouseX, y: mouseY };
+        node.position = [mouseX, mouseY];
       }
 
       close();
@@ -86,9 +86,9 @@ function getAddIdentityNode(
         type: IdentityType.name,
       }
       try {
-        identityNode.value = await context.medley.types.runExportFunction<OnNodeCreate<CNode>>(
+        identityNode.value = await context.medley.types.runExportFunction<NodeCreate<CNodePart>>(
           IdentityType.name,
-          constants.onNodeCreate,
+          constants.nodeCreate,
           { ...context}
         );
       } catch (e) {
@@ -97,7 +97,7 @@ function getAddIdentityNode(
       }
       const node = context.medley.nodes.insertNode(identityNode);
       if (mouseX && mouseY) {
-        node.position = { x: mouseX, y: mouseY };
+        node.position = [mouseX, mouseY];
       }
       close();
     };

@@ -1,2 +1,2 @@
-export * from "./getNodeComponent"
+export * from "./NodeComponent"
 export * from "./getPorts"

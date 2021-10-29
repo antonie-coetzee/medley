@@ -1,6 +1,6 @@
 import React from "react";
 import { Handle, Position } from "react-flow-renderer";
-import { GetNodeComponent } from "@medley-js/common";
+import { TNodeComponent } from "@medley-js/common";
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 
 import Info from "@mui/icons-material/Info";
@@ -33,8 +33,7 @@ const dragHandleStyle = {
   borderRadius: '50%',
 };
 
-export const getNodeComponent: GetNodeComponent<IdentityNode> = async () => {
-  return ({ node, selected }) => {
+export const NodeComponent: TNodeComponent<IdentityNode> = ({ context:{node}, selected }) => {
     const [age, setAge] = React.useState('');
     const [slider, setSlider] = React.useState(node.value?.slider || 0);
     const handleChange = (event: SelectChangeEvent) => {
@@ -112,4 +111,4 @@ export const getNodeComponent: GetNodeComponent<IdentityNode> = async () => {
       </>
     );
   };
-};
+

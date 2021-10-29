@@ -1,5 +1,4 @@
-export * from "./getNodeEditComponent"
-export * from "./getNodeComponent"
+export * from "./components"
 export * from "./nodeFunction"
 export * from "./getPorts"
-export * from "./node"
+export * from "./CompositeNode"
