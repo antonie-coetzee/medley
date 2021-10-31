@@ -7,6 +7,7 @@ import {
   EventType,
   WithPartial,
   NodePart,
+  Writeable
 } from "../core";
 import { NodeRepo } from "../repos";
 
@@ -15,6 +16,7 @@ export class NodesApi<
   MType extends Type = Type,
   MLink extends Link = Link
 > extends EventTarget {
+
   constructor(
     private scopeId: string,
     private nodeRepo: NodeRepo,
@@ -66,19 +68,10 @@ export class NodesApi<
   }
 
   public insertNode<TNode extends MNode = MNode>(node: NodePart<TNode>) {
-    const newNode = { ...node, scope: this.scopeId };
-    this.dispatchEvent(MedleyEvent.create(EventType.OnItemCreate, newNode));
+    node.scope = this.scopeId;
+    this.dispatchEvent(MedleyEvent.create(EventType.OnItemCreate, node));
     this.dispatchEvent(MedleyEvent.create(EventType.OnChange));
-    return this.nodeRepo.insertNode(newNode) as TNode;
-  }
-
-  public async copyNode<TNode extends MNode = MNode>(node: TNode) {
-    const nodeCopy = JSON.parse(JSON.stringify(node)) as WithPartial<
-      TNode,
-      "id"
-    >;
-    delete nodeCopy.id;
-    return this.insertNode<TNode>(nodeCopy as NodePart<TNode>);
+    return this.nodeRepo.insertNode(node) as TNode;
   }
 
   public deleteNode<TNode extends MNode = MNode>(node: TNode) {

@@ -1,4 +1,4 @@
 export * from "./components"
-export * from "./nodeFunction"
-export * from "./getPorts"
+export * from "./functions/nodeFunction"
+export * from "./functions/getPorts"
 export * from "./CompositeNode"

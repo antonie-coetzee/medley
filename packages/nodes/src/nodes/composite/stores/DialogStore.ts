@@ -1,19 +1,21 @@
-import { makeAutoObservable, makeObservable, observable, runInAction } from "mobx";
+import {
+  makeAutoObservable
+} from "mobx";
 
 export class DialogStore {
-    public open:boolean = false;
-    public dialog: React.VFC<{ close: () => void }> | null = null;
+  public open: boolean = false;
+  public dialog: React.VFC<{ close: () => void }> | null = null;
 
   constructor() {
-    makeAutoObservable(this);
+    makeAutoObservable(this, { dialog: false });
   }
 
-  openDialog(dialog: React.VFC<{ close: () => void }>){
-      this.dialog = dialog;
-      this.open = true;
+  openDialog(dialog: React.VFC<{ close: () => void }>) {
+    this.dialog = dialog;
+    this.open = true;
   }
 
-  closeDialog(){
+  closeDialog() {
     this.open = false;
   }
 }

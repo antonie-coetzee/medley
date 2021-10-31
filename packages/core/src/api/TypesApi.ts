@@ -53,10 +53,10 @@ export class TypesApi<TType extends Type = Type> extends EventTarget {
     }
   }
 
-  public async getExport(type: Type, name: string): Promise<any> {
+  public async getExport<T>(type: Type, name: string): Promise<T | undefined> {
     const typeExport = await this.typeRepo.getExport(type, name);
     if (typeExport) {
-      return typeExport;
+      return typeExport as T;
     }
   }
 

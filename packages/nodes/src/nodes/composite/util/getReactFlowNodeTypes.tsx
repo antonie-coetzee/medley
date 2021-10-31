@@ -1,14 +1,18 @@
 import { memo, ReactNode, VFC } from "react";
-import { BaseContext } from "@medley-js/core";
+import { BaseContext, NodeContext } from "@medley-js/core";
 import {
+  CLink,
   CNode,
   constants,
+  CType,
   Host,
   TNodeComponent,
   TNodeComponentProps,
 } from "@medley-js/common";
 import React from "react";
 import { getNodes } from ".";
+import { observable } from "mobx";
+import { observer } from "mobx-react";
 
 export async function getReactFlowNodeTypes(
   context: BaseContext<CNode>,
@@ -25,7 +29,7 @@ export async function getReactFlowNodeTypes(
   );
   const mappedNodeTypes = nodeTypes.reduce((acc, crnt) => {
     if (crnt.nodeComponent) {
-      acc[crnt.typeName] = wrapNodeComponent(context, host, crnt.nodeComponent);
+      acc[crnt.typeName] = wrapNodeComponent(host, memo(observer(crnt.nodeComponent)));
     }
     return acc;
   }, {} as { [index: string]: ReactNode });
@@ -33,21 +37,22 @@ export async function getReactFlowNodeTypes(
 }
 
 function wrapNodeComponent(
-  contex: BaseContext<CNode>,
   host: Host,
   NodeComponent: React.VFC<TNodeComponentProps>
 ) {
   const nodeWrapper: VFC<{
     id: string;
-    data: any;
+    data: NodeContext<CNode, CNode, CType, CLink>;
     selected: boolean;
     sourcePosition: string;
     targetPosition: string;
   }> = (props) => {
-    const node = contex.medley.nodes.getNode(props.id);
-    return node ? (
-      <NodeComponent context={{ ...contex, node }} host={host} {...props} />
-    ) : null;
+    const nodeContext = props.data;
+    if(nodeContext){
+      return <NodeComponent context={nodeContext} host={host} selected={props.selected} />
+    }else{
+      return null
+    }
   };
   return nodeWrapper;
 }

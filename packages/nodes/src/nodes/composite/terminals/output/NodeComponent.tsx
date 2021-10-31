@@ -23,7 +23,7 @@ export const NodeComponent: TNodeComponent<OutputNode> = ({
         position={Position.Left}
         style={{ background: "#555" }}
         isConnectable={true}
-        id="output"
+        id={node.id}
       />
     </>
   );

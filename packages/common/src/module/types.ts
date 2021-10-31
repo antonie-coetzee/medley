@@ -1,4 +1,5 @@
-import { Link, NodePart, Node, Port, Type } from "@medley-js/core";
+import { Link, NodePart, Node, Port, Type, BaseContext } from "@medley-js/core";
+import { useContext } from "react";
 
 export type Location = "left" | "top" | "right" | "bottom";
 
@@ -20,11 +21,17 @@ export type CType = Type;
 export type CPort = Port;
 
 export type Host = {
-  openNodeEdit?: (nodeId: string) => void;
+  openNodeEdit?: (
+    context: BaseContext<CNode, CType, CLink>,
+    node: CNode
+  ) => void;
   doDialog?: <T>(
     dialog: React.VFC<{ close: (result?: T) => void }>
   ) => Promise<T | undefined>;
   displayMessage?: () => void;
-  constructNode?: () => Promise<CNodePart>;
+  constructNode?: (
+    context: BaseContext<CNode, CType, CLink>,
+    type?: CType
+  ) => Promise<CNodePart | undefined>;
   selectNode?: () => Promise<CNode>;
 };

@@ -7,12 +7,13 @@ import { getReactFlowElements } from "../util/getReactFlowElements";
 import { getReactFlowNodeTypes } from "../util/getReactFlowNodeTypes";
 import { debounce } from "@mui/material";
 import { getReactFlowEvents } from "../util";
+import { EditStore } from "./EditStore";
 
 export class ReactFlowStore {
   public reactFlowInstance: OnLoadParams | null = null;
   public reactFlowProps: ReactFlowProps | null = null;
 
-  constructor(private props: TNodeEditComponentProps<CompositeNode>) {
+  constructor(private props: TNodeEditComponentProps<CompositeNode>, private editStore:EditStore) {
     makeAutoObservable(this, {reactFlowProps:observable.ref, reactFlowInstance: false});
     this.initialize(); 
   }
@@ -21,7 +22,7 @@ export class ReactFlowStore {
     const context = this.props.context;
     const nodeTypes = await getReactFlowNodeTypes(context, this.props.host);
     const elements = await getReactFlowElements(context);
-    const events = getReactFlowEvents(this.props);
+    const events = getReactFlowEvents(this.props, this.editStore);
     const onLoad = (rFI:OnLoadParams)=>{
       this.reactFlowInstance = rFI;
     }

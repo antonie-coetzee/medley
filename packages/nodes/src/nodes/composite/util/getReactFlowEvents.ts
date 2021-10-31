@@ -16,9 +16,10 @@ import {
   Elements,
   Node as RFNode,
 } from "react-flow-renderer";
+import { EditStore } from "../stores/EditStore";
 
-export function getReactFlowEvents({context, host}: TNodeEditComponentProps<CompositeNode>
-) {
+export function getReactFlowEvents({context, host}: TNodeEditComponentProps<CompositeNode>,
+editStore: EditStore) {
   const onConnect = (edge: Connection | Edge) => {
     context.medley.links.addLink({
       source: edge.source || "",
@@ -41,12 +42,12 @@ export function getReactFlowEvents({context, host}: TNodeEditComponentProps<Comp
 
   const onNodeDoubleClick: (
     event: React.MouseEvent<Element, MouseEvent>,
-    node: RFNode<any>
-  ) => void = (_, node) => {
-    if (node && host?.openNodeEdit) {
-      host.openNodeEdit(node.id);
+    rfnode: RFNode<any>
+  ) => void = (_, rfnode) => {
+    const node = context.medley.nodes.getNode(rfnode.id);
+    if (node) {
+      editStore.editNode(node);
     }
-    console.log(JSON.stringify(context.medley.graph.getGraph(), null, 2));
   };
 
   const onElementsRemove: (elements: Elements<any>) => void = (elements) => {

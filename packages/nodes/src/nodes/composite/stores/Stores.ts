@@ -5,6 +5,7 @@ import { ContextMenuStore } from "./ContextMenuStore";
 import { DialogStore } from "./DialogStore";
 import { CompositeNode } from "../CompositeNode";
 import { ReactFlowStore } from "./ReactFlowStore";
+import { EditStore } from "./EditStore";
 
 export function useStores() {
   return React.useContext(MobXProviderContext) as Stores;
@@ -14,10 +15,12 @@ export class Stores {
   dialogStore:DialogStore;
   contextMenuStore:ContextMenuStore;
   reactFlowStore:ReactFlowStore;
+  editStore:EditStore;
 
   constructor(props: TNodeEditComponentProps<CompositeNode>) {
     this.dialogStore = new DialogStore();
-    this.reactFlowStore = new ReactFlowStore(props);
-    this.contextMenuStore = new ContextMenuStore(props, this.reactFlowStore);
+    this.editStore = new EditStore(props, this.dialogStore);
+    this.reactFlowStore = new ReactFlowStore(props, this.editStore);
+    this.contextMenuStore = new ContextMenuStore(props, this.editStore);
   }
 }

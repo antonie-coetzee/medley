@@ -1,7 +1,14 @@
-import { Node, NodePart, ROOT_SCOPE, TreeMap, WithPartial } from "../core";
+import {
+  generateId,
+  Node,
+  NodePart,
+  ROOT_SCOPE,
+  TreeMap,
+  Writeable,
+} from "../core";
 
 export class NodeRepo {
-  public nodeIndex: Map<string,Node> = new Map();
+  public nodeIndex: Map<string, Node> = new Map();
   public nodeTreeMap: TreeMap<Node> = new TreeMap();
 
   public set(nodes: Node[]): void {
@@ -13,9 +20,9 @@ export class NodeRepo {
     });
   }
 
-  public getNode(scopeId: string, id: string){
+  public getNode(scopeId: string, id: string) {
     return this.nodeTreeMap.getNodeValue(scopeId, id);
-  };
+  }
 
   public getNodesByType(scopeId: string, typeName: string): Node[] {
     return this.nodeTreeMap
@@ -36,7 +43,7 @@ export class NodeRepo {
     const usedTypes = nodes.reduce((acc, node) => {
       acc.add(node.type);
       return acc;
-    },new Set<string>())
+    }, new Set<string>());
     return Array.from(usedTypes.keys());
   }
 
@@ -45,39 +52,33 @@ export class NodeRepo {
     const usedTypes = nodes.reduce((acc, node) => {
       acc.add(node.type);
       return acc;
-    },new Set<string>())
+    }, new Set<string>());
     return Array.from(usedTypes.keys());
   }
 
-  public insertNode(node: NodePart){
+  public insertNode(node: NodePart) {
+    let newNode = node as Writeable<Node, "id">;
     let newId: string;
     do {
       newId = generateId();
-    } while (this.nodeIndex.get(newId));
-    const newNode = {...node, id:newId};
-    this.nodeTreeMap.setNodeValue(newNode, newNode.scope || ROOT_SCOPE, newNode.id);
+    } while (this.nodeIndex.get(newId));  
+    newNode.id = newId
+    this.nodeTreeMap.setNodeValue(
+      newNode,
+      newNode.scope || ROOT_SCOPE,
+      newNode.id
+    );
     this.nodeIndex.set(newNode.id, newNode);
     return newNode;
   }
 
-  public removeNode(node:Node) {
+  public removeNode(node: Node) {
     const storedNode = this.nodeIndex.get(node.id);
-    if(storedNode == null){
-      return
+    if (storedNode == null) {
+      return;
     }
     this.nodeIndex.delete(node.id);
     this.nodeTreeMap.deleteNode(node.scope || ROOT_SCOPE, node.id);
     return node;
   }
 }
-
-const generateId = (length?: number) => {
-  const alphanumeric =
-    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-  const len = length ?? 10;
-  var result = "";
-  for (var i = 0; i < len; ++i) {
-    result += alphanumeric[Math.floor(Math.random() * alphanumeric.length)];
-  }
-  return result;
-};

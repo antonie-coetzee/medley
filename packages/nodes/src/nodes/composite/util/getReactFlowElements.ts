@@ -41,6 +41,7 @@ async function getReactFlowNodes(
         ...nodeProps,
       };
       return {
+        data: {...context, node},
         id: node.id,
         position: { x: node.position?.[0] || 0, y: node.position?.[1] || 0 },
         type: node.type,

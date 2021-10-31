@@ -4,8 +4,7 @@ import {
   CNode,
   CNodePart,
   constants,
-  CType,
-  NodeCreate
+  CType
 } from "@medley-js/common";
 import React from "react";
 import { CompositeNode } from "../CompositeNode";
@@ -76,46 +75,6 @@ function getAddOutputNode(
   };
 }
 
-function getAddIdentityNode(
-  context: NodeContext<CompositeNode, CNode, CType, CLink>
-): React.VFC<{ close: () => void; mouseX?: number; mouseY?: number }> {
-  return ({ close, mouseX, mouseY }) => {
-    const addIdentity = async () => {
-      const identityNode: Omit<CNode, "id"> = {
-        name: "Identity",
-        type: IdentityType.name,
-      }
-      try {
-        identityNode.value = await context.medley.types.runExportFunction<NodeCreate<CNodePart>>(
-          IdentityType.name,
-          constants.nodeCreate,
-          { ...context}
-        );
-      } catch (e) {
-        context.logger.error(e);
-        return
-      }
-      const node = context.medley.nodes.insertNode(identityNode);
-      if (mouseX && mouseY) {
-        node.position = [mouseX, mouseY];
-      }
-      close();
-    };
-    return (
-      <MenuItem onClick={addIdentity}>
-        {" "}
-        <Chip
-          icon={<Info />}
-          label="Identity"
-          color="primary"
-          variant="outlined"
-          style={{ borderWidth: "2px" }}
-        />
-      </MenuItem>
-    );
-  };
-}
-
 function getRunOption(
   context: NodeContext<CompositeNode, CNode, CType, CLink>
 ): React.VFC<{ close: () => void; mouseX?: number; mouseY?: number }> {
@@ -158,7 +117,6 @@ export function getContextMenu(
     getAddInputNode(context),
     getAddOutputNode(context),
     () => <Divider />,
-    getAddIdentityNode(context),
     () => <Divider />,
     getRunOption(context),
   ];

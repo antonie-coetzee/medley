@@ -2,8 +2,8 @@ import { Cache } from "./Cache";
 import { Scoped } from "./Scoped";
 
 export interface Node<TValue extends unknown = unknown> extends Scoped {
-  type: string;
-  id: string;
+  readonly type: string;
+  readonly id: string;
   cache?: Cache;
   value?: TValue;
 }

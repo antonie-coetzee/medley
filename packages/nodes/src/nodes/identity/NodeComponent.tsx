@@ -5,7 +5,6 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 
 import Info from "@mui/icons-material/Info";
 import {
-  Button,
   Card,
   CardContent,
   CardHeader,
@@ -18,20 +17,6 @@ import {
   Typography,
 } from "@mui/material";
 import { IdentityNode } from "./node";
-
-const labelStyle = {
-  display: 'flex',
-  alignItems: 'center',
-};
-
-const dragHandleStyle = {
-  display: 'inline-block',
-  width: 25,
-  height: 25,
-  backgroundColor: 'teal',
-  marginLeft: 5,
-  borderRadius: '50%',
-};
 
 export const NodeComponent: TNodeComponent<IdentityNode> = ({ context:{node}, selected }) => {
     const [age, setAge] = React.useState('');

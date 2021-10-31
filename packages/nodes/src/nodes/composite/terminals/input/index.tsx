@@ -1,2 +1,4 @@
-export * from "./NodeComponent"
-export * from "./getLinkComponentProps"
+export * from "./components";
+export * from "./functions";
+export * from "./decorators";
+

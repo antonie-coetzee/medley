@@ -33,7 +33,7 @@ export class Medley<
   public scopeId: string;
 
   public constructor(
-    options?: MedleyOptions<MNode, MType, MLink>,
+    options?: Partial<MedleyOptions<MNode, MType, MLink>>,
     public parentInstance?: Medley<MNode, MType, MLink>
   ) {
     if (options == null) {
@@ -43,7 +43,12 @@ export class Medley<
         nodeRepo: new NodeRepo(),
       }
     } else {
-      this.options = options;
+      this.options = {
+        ...options,
+        linkRepo: options.linkRepo || new LinkRepo(),
+        typeRepo: options.typeRepo || new TypeRepo(new Loader()),
+        nodeRepo: options.nodeRepo || new NodeRepo(),
+      }
     }
 
     this.scopeId = this.options.scopeId || ROOT_SCOPE;
