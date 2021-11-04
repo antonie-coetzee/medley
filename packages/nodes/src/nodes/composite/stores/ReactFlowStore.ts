@@ -1,6 +1,6 @@
 import { makeAutoObservable, observable } from "mobx";
-import { EventType } from "@medley-js/core";
-import { TNodeEditComponentProps } from "@medley-js/common";
+import { BaseContext, EventType } from "@medley-js/core";
+import { CNode, TNodeEditComponentProps } from "@medley-js/common";
 import { CompositeNode } from "../CompositeNode";
 import { OnLoadParams, ReactFlowProps } from "react-flow-renderer";
 import { getReactFlowElements } from "../util/getReactFlowElements";
@@ -14,19 +14,20 @@ export class ReactFlowStore {
   public reactFlowProps: ReactFlowProps | null = null;
 
   constructor(private props: TNodeEditComponentProps<CompositeNode>, private editStore:EditStore) {
-    makeAutoObservable(this, {reactFlowProps:observable.ref, reactFlowInstance: false});
+    makeAutoObservable(this, {reactFlowProps:observable.ref});
     this.initialize(); 
   }
 
   async initialize(){
     const context = this.props.context;
-    const nodeTypes = await getReactFlowNodeTypes(context, this.props.host);
+    const openNodeEdit = (_ctx:BaseContext,node:CNode)=>{
+      this.editStore.editNode(node);
+    }
+    const host = {...this.props.host, openNodeEdit: this.props.host.openNodeEdit || openNodeEdit}
+    const nodeTypes = await getReactFlowNodeTypes(context, host);
     const elements = await getReactFlowElements(context);
     const events = getReactFlowEvents(this.props, this.editStore);
-    const onLoad = (rFI:OnLoadParams)=>{
-      this.reactFlowInstance = rFI;
-    }
-    this.updateReactFlowProps({elements, nodeTypes, ...events, onLoad});
+    this.updateReactFlowProps({elements, nodeTypes, ...events});
     this.registerMedleyEvents();
   }
 

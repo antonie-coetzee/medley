@@ -4,8 +4,8 @@ import { Cache, Medley, NodeRepo } from "@medley-js/core";
 import { CLink, CNode, constants, CType, TNodeEditComponent } from "@medley-js/common";
 
 import { CompositeType } from "../type";
-import { InputType } from "../terminals/input/type";
-import { OutputType } from "../terminals/output/type";
+import { InputType } from "../scopedTypes/input/type";
+import { OutputType } from "../scopedTypes/output/type";
 import { IdentityType } from "../../index";
 import { componentStory } from "../../../util/util.sb";
 import { observable } from "mobx";
@@ -26,7 +26,7 @@ export const Edit = componentStory(async () => {
     type: CompositeType.name,
   });
 
-  const childScope = Medley.newChildInstance(
+  const childScope = Medley.getChildInstance(
     medley.getRootInstance(),
     compNode.id
   );
@@ -34,7 +34,6 @@ export const Edit = componentStory(async () => {
   const id_0 = childScope.nodes.insertNode(observable({
     name: "INPUT",
     position: [0,50],
-    value: {id: "INPUT"},
     type: InputType.name,
   }));
 
@@ -83,7 +82,7 @@ export const Edit = componentStory(async () => {
   childScope.links.addLink({
     source: id_3.id,
     target: id_4.id,
-    port: "output",
+    port: id_4.id,
     scope: compNode.id,
   });
 
@@ -103,13 +102,3 @@ export const Edit = componentStory(async () => {
     />
   );
 });
-
-// export const Node = componentStory(async () => {
-//   const medley = new Medley();
-//   medley.types.addType(CompositeType);
-//   const NodeComponent = await medley.types.getExportFunction(
-//     CompositeType.name,
-//     constants.NodeComponent
-//   );
-//   return NodeComponent;
-// });

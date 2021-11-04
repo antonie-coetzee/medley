@@ -40,16 +40,6 @@ editStore: EditStore) {
     }
   };
 
-  const onNodeDoubleClick: (
-    event: React.MouseEvent<Element, MouseEvent>,
-    rfnode: RFNode<any>
-  ) => void = (_, rfnode) => {
-    const node = context.medley.nodes.getNode(rfnode.id);
-    if (node) {
-      editStore.editNode(node);
-    }
-  };
-
   const onElementsRemove: (elements: Elements<any>) => void = (elements) => {
     if (elements) {
       elements.forEach(async (el) => {
@@ -80,5 +70,5 @@ editStore: EditStore) {
     }
   };
 
-  return { onConnect, onNodeDragStop, onNodeDoubleClick, onElementsRemove };
+  return { onConnect, onNodeDragStop, onElementsRemove };
 }

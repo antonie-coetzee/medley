@@ -7,7 +7,7 @@ import { ReactFlowStore } from "./ReactFlowStore";
 import { EditStore } from "./EditStore";
 import React from "react";
 import { ExitToApp } from "@mui/icons-material";
-import { InputType } from "../terminals/input/type";
+import { InputType } from "../scopedTypes/input/type";
 
 export class ContextMenuStore {
   public contextMenu: {

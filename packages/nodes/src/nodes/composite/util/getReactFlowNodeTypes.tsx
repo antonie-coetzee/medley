@@ -18,7 +18,7 @@ export async function getReactFlowNodeTypes(
   context: BaseContext<CNode>,
   host: Host
 ): Promise<{ [index: string]: ReactNode }> {
-  const typeNames = [...new Set(getNodes(context).map((n) => n.type))];
+  const typeNames = [...new Set([...getNodes(context).map((n) => n.type), ...["$input", "$output"]])];
   const nodeTypes = await Promise.all(
     typeNames.map(async (typeName) => {
       const nodeComponent = await context.medley.types.getExportFunction<

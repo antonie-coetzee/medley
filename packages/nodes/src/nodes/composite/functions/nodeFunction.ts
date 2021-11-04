@@ -1,34 +1,31 @@
-import { NF, Node, Input, Type, Medley, NodeFunction } from "@medley-js/core";
+import { NF, Input, Medley } from "@medley-js/core";
 import { CompositeNode } from "../CompositeNode";
+import { InputType } from "../scopedTypes/input";
+import { OutputType } from "../scopedTypes/output";
 
 export const nodeFunction: NF<{}, CompositeNode> = async (cntx) => {
   const { node, medley, input } = cntx;
+  
   const childScope = Medley.newChildInstance(medley.getRootInstance(), node.id);
+
   addInputType(childScope, input);
   addOutputType(childScope);
 
-  const outputNodes = childScope.nodes.getNodesByType("$output");
-
-  if (outputNodes && outputNodes.length > 0) {
-    const outputNode = outputNodes[0];
+  const outputNode = childScope.nodes.getNodesByType(OutputType.name)[0];
+  if (outputNode) {
     const result = childScope.runNode(cntx, outputNode.id);
     return result;
   }
 };
 
 function addInputType(childScope: Medley, input: Input): void {
-  const nodeFunction: NF<
-    {},
-    Node<{
-      input: string;
-    }>
-  > = ({ node }) => {
+  const nodeFunction: NF<{}> = ({ node }) => {
     return input({
       name: node.id,
     });
   };
   childScope.types.addType({
-    name: "$input",
+    name: InputType.name,
     version: "",
     volatile: true,
     module: {
@@ -47,7 +44,7 @@ function addOutputType(childScope: Medley): void {
     });
   };
   childScope.types.addType({
-    name: "$output",
+    name: OutputType.name,
     version: "",
     volatile: true,
     module: {

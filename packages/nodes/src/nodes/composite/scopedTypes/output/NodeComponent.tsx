@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { Handle, Position } from "react-flow-renderer";
 import { TNodeComponent } from "@medley-js/common";
-import Chip from "@material-ui/core/Chip";
-import { InputNode } from "../InputNode";
+import Chip from "@mui/material/Chip";
 import ExitToApp from "@mui/icons-material/ExitToApp";
+import { OutputNode } from "./node";
 
-export const NodeComponent: TNodeComponent<InputNode> = ({
+export const NodeComponent: TNodeComponent<OutputNode> = ({
   context: { node },
   selected,
 }) => {
@@ -14,15 +14,15 @@ export const NodeComponent: TNodeComponent<InputNode> = ({
       <Chip
         icon={<ExitToApp />}
         label={node.name}
-        color={"primary"}
         variant={!selected ? "outlined" : undefined}
-        style={{ borderWidth: "2px" }}
+        style={{ borderWidth: "1px" }}
       />
       <Handle
-        type="source"
-        position={Position.Right}
+        type="target"
+        position={Position.Left}
         style={{ background: "#555" }}
         isConnectable={true}
+        id={node.id}
       />
     </>
   );

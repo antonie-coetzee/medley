@@ -100,7 +100,7 @@ export class Medley<
     }
   }
 
-  public static newChildInstance<
+  public static getChildInstance<
     TNode extends Node = Node,
     TType extends Type = Type,
     TLink extends Link = Link

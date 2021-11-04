@@ -10,9 +10,9 @@ import React from "react";
 import { CompositeNode } from "../CompositeNode";
 import { Connection, Edge, Node as RFNode } from "react-flow-renderer";
 import { Button, Chip, Divider, ListItemIcon, MenuItem } from "@mui/material";
-import { InputType } from "../terminals/input/type";
+import { InputType } from "../scopedTypes/input/type";
 import { ExitToApp, Info } from "@mui/icons-material";
-import { OutputType } from "../terminals/output/type";
+import { OutputType } from "../scopedTypes/output/type";
 import { IdentityType } from "../../identity/type";
 import DirectionsRunIcon from "@mui/icons-material/DirectionsRun";
 
