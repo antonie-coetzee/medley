@@ -53,6 +53,22 @@ export const createBasicCompositeNode = (medley: Medley<CNode>, position?:Coordi
     })
   );
 
+  const id_00 = compositeScope.nodes.insertNode(
+    observable({
+      name: "INPUT2",
+      position: [0, 100],
+      type: InputType.name,
+    })
+  );
+
+  const id_01 = compositeScope.nodes.insertNode(
+    observable({
+      name: "INPUT3",
+      position: [0, 150],
+      type: InputType.name,
+    })
+  );
+
   const id_1 = compositeScope.nodes.insertNode(
     observable({
       name: "Test_1",
