@@ -1,4 +1,12 @@
-import { Node, Type, Logger, nullLogger, Link, ROOT_SCOPE, Loader } from "./core";
+import {
+  Node,
+  Type,
+  Logger,
+  nullLogger,
+  Link,
+  ROOT_SCOPE,
+  Loader,
+} from "./core";
 import { TypeRepo, NodeRepo, LinkRepo } from "./repos";
 import { Composer } from "./Composer";
 import { GraphApi, TypesApi, NodesApi, LinksApi } from "./api";
@@ -8,7 +16,7 @@ export interface MedleyOptions<
   MNode extends Node = Node,
   MType extends Type = Type,
   MLink extends Link = Link
-  > {
+> {
   typeRepo: TypeRepo;
   nodeRepo: NodeRepo;
   linkRepo: LinkRepo;
@@ -21,9 +29,9 @@ export class Medley<
   MNode extends Node = Node,
   MType extends Type = Type,
   MLink extends Link = Link
-  > {
+> {
   private composer: Composer<MNode, MType, MLink>;
-  private options: MedleyOptions<MNode, MType, MLink>
+  private options: MedleyOptions<MNode, MType, MLink>;
 
   public logger: Logger;
   public nodes: NodesApi<MNode, MType, MLink>;
@@ -41,14 +49,14 @@ export class Medley<
         linkRepo: new LinkRepo(),
         typeRepo: new TypeRepo(new Loader()),
         nodeRepo: new NodeRepo(),
-      }
+      };
     } else {
       this.options = {
         ...options,
         linkRepo: options.linkRepo || new LinkRepo(),
         typeRepo: options.typeRepo || new TypeRepo(new Loader()),
         nodeRepo: options.nodeRepo || new NodeRepo(),
-      }
+      };
     }
 
     this.scopeId = this.options.scopeId || ROOT_SCOPE;
@@ -84,11 +92,11 @@ export class Medley<
   }
 
   public runNodeWithInputs<T, TNode extends Node = Node>(
-      context: {} | null,
-      nodeId: string,
-      inputs: InputProvider<TNode, MNode, MType, MLink>,
-      ...args: any[]
-    ): Promise<T> {
+    context: {} | null,
+    nodeId: string,
+    inputs: InputProvider<TNode, MNode, MType, MLink>,
+    ...args: any[]
+  ): Promise<T> {
     return this.composer.runNodeFunction(context, nodeId, inputs, ...args);
   }
 
@@ -111,6 +119,25 @@ export class Medley<
     const instance = new Medley<TNode, TType, TLink>(
       { ...parent.options, scopeId },
       parent
+    );
+    return instance;
+  }
+
+  public static getScopedInstance<
+    TNode extends Node = Node,
+    TType extends Type = Type,
+    TLink extends Link = Link
+  >(
+    parent: Medley<TNode, TType, TLink>,
+    scopeId: string,
+    isChild: boolean = false
+  ) {
+    if (scopeId == null || scopeId === "") {
+      throw new Error("scopeId not valid");
+    }
+    const instance = new Medley<TNode, TType, TLink>(
+      { ...parent.options, scopeId },
+      isChild ? parent : undefined
     );
     return instance;
   }

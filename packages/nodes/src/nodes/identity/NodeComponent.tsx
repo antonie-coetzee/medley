@@ -1,7 +1,7 @@
 import React from "react";
 import { Handle, Position } from "react-flow-renderer";
 import { TNodeComponent } from "@medley-js/common";
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import { DragIndicator } from '@mui/icons-material';
 
 import Info from "@mui/icons-material/Info";
 import {
@@ -47,7 +47,7 @@ export const NodeComponent: TNodeComponent<IdentityNode> = ({ context:{node}, se
           variant="outlined"
           sx={selected ? { boxShadow: 2 } : undefined}
         >
-          <DragIndicatorIcon className="drag-handle" style={{position:"absolute", right:0}} />
+          <DragIndicator className="drag-handle" style={{position:"absolute", right:0}} />
           <CardHeader
             style={{ backgroundColor: "#b7dbff" }}
             title={"Test"}

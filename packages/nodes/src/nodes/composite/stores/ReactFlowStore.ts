@@ -4,7 +4,7 @@ import { CNode, TNodeEditComponentProps } from "@medley-js/common";
 import { CompositeNode } from "../CompositeNode";
 import { OnLoadParams, ReactFlowProps } from "react-flow-renderer";
 import { getReactFlowElements } from "../util/getReactFlowElements";
-import { getReactFlowNodeTypes } from "../util/getReactFlowNodeTypes";
+import { getReactFlowTypes } from "../util/getReactFlowNodeTypes";
 import { debounce } from "@mui/material";
 import { getReactFlowEvents } from "../util";
 import { EditStore } from "./EditStore";
@@ -24,10 +24,10 @@ export class ReactFlowStore {
       this.editStore.editNode(node);
     }
     const host = {...this.props.host, openNodeEdit: this.props.host.openNodeEdit || openNodeEdit}
-    const nodeTypes = await getReactFlowNodeTypes(context, host);
+    const {nodeTypes, edgeTypes} = await getReactFlowTypes(context, host);
     const elements = await getReactFlowElements(context);
     const events = getReactFlowEvents(this.props, this.editStore);
-    this.updateReactFlowProps({elements, nodeTypes, ...events});
+    this.updateReactFlowProps({elements, nodeTypes, edgeTypes, ...events});
     this.registerMedleyEvents();
   }
 
@@ -40,7 +40,7 @@ export class ReactFlowStore {
     const context = this.props.context;
     const debouncedUpdateState = debounce(async () => {
       const elements = await getReactFlowElements(context);
-      const nodeTypes = await getReactFlowNodeTypes(context, this.props.host);
+      const nodeTypes = await getReactFlowTypes(context, this.props.host);
       this.updateReactFlowProps({ elements, nodeTypes });
     }, 50);
     context.medley.nodes.addEventListener(EventType.OnChange, async (e) => {

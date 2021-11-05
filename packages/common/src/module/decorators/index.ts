@@ -2,7 +2,7 @@ import { CSSProperties, ReactNode, VFC } from "react";
 import { NodeContext } from "@medley-js/core";
 import { CLink, CNode, CType } from "../types";
 
-export type DecorateNodeComponent<TNode extends CNode = CNode> = (
+export type DecorateNode<TNode extends CNode = CNode> = (
   context: NodeContext<TNode, CNode, CType, CLink>
 ) => Promise<
   Partial<{
@@ -15,7 +15,7 @@ export type DecorateNodeComponent<TNode extends CNode = CNode> = (
   }>
 >;
 
-export type DecorateLinkComponent<TNode extends CNode = CNode> = (
+export type DecorateLink<TNode extends CNode = CNode> = (
   context: NodeContext<TNode, CNode, CType, CLink>
 ) => Promise<
   Partial<{

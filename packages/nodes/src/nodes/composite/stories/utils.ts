@@ -30,6 +30,13 @@ export const createEmptyCompositeNode = (medley: Medley<CNode>) => {
     medley.getRootInstance(),
     compositeNode.id
     );
+    const id_4 = compositeScope.nodes.insertNode(
+      observable({
+        name: "OUTPUT",
+        position: [600, 200],
+        type: OutputType.name,
+      })
+    );
     return [compositeScope, compositeNode] as const
 }
 
@@ -40,14 +47,14 @@ export const createBasicCompositeNode = (medley: Medley<CNode>, position?:Coordi
     position:position
   });
 
-  const compositeScope = Medley.getChildInstance(
+  const compositeScope = Medley.getScopedInstance(
     medley.getRootInstance(),
     compositeNode.id
   );
 
   const id_0 = compositeScope.nodes.insertNode(
     observable({
-      name: "INPUT",
+      name: "INPUT1",
       position: [0, 50],
       type: InputType.name,
     })

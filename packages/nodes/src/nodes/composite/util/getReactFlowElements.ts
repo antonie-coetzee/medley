@@ -4,8 +4,9 @@ import {
   CNode,
   constants,
   CType,
-  DecorateLinkComponent,
-  DecorateNodeComponent,
+  DecorateLink,
+  DecorateNode,
+  TLinkComponent,
 } from "@medley-js/common";
 import { CompositeNode } from "../CompositeNode";
 import { Edge, Node as RFNode, Position } from "react-flow-renderer";
@@ -27,8 +28,8 @@ async function getReactFlowNodes(
   return Promise.all(
     mNodes.map(async (node) => {
       const nodeProps = await context.medley.types.runExportFunction<
-        DecorateNodeComponent<CNode>
-      >(node.type, constants.decorateNodeComponent, {
+        DecorateNode<CNode>
+      >(node.type, constants.decorateNode, {
         ...context,
         ...{ node },
       });
@@ -41,7 +42,7 @@ async function getReactFlowNodes(
         ...nodeProps,
       };
       return {
-        data: {...context, node},
+        data: { ...context, node },
         id: node.id,
         position: { x: node.position?.[0] || 0, y: node.position?.[1] || 0 },
         type: node.type,
@@ -58,24 +59,31 @@ async function getReactFlowNodes(
 
 async function getReactFlowEdges(context: BaseContext<CNode>): Promise<Edge[]> {
   const mLinks = context.medley.links.getLinks();
-  return Promise.all(
+  const edges = await Promise.all(
     mLinks.map(async (mLink) => {
       const node = context.medley.nodes.getNode(mLink.source);
-      let getLinkProps: DecorateLinkComponent | undefined;
-      if (node) {
-        getLinkProps = await context.medley.types.getExportFunction<DecorateLinkComponent>(
-          node.type,
-          constants.decorateLinkComponent
-        );      
+      if (node == null) {
+        return;
       }
-      const linkProps = node && await getLinkProps?.({ ...context, node  });
+      const decorateLink = await context.medley.types.getExportFunction<DecorateLink>(
+        node.type,
+        constants.decorateLink
+      );
+      const linkComponent = await context.medley.types.getExportFunction<TLinkComponent>(
+        node.type,
+        constants.LinkComponent
+      );
+      const linkProps = await decorateLink?.({ ...context, node });
       return {
+        data: { context, link:mLink },
         id: `${mLink.scope}${mLink.source}${mLink.target}${mLink.port}`,
         source: mLink.source,
         target: mLink.target,
         targetHandle: mLink.port,
+        type: linkComponent && node.type,
         ...linkProps,
-      };   
+      };
     })
   );
+  return edges.filter((n) => n !== undefined) as Edge[];
 }

@@ -12,10 +12,10 @@ export const NodeComponent: TNodeComponent<OutputNode> = ({
   return (
     <>
       <Chip
-        icon={<ExitToApp />}
         label={node.name}
-        variant={!selected ? "outlined" : undefined}
-        style={{ borderWidth: "1px" }}
+        variant="outlined"
+        style={{ borderWidth: "2px" }}
+        size="small"
       />
       <Handle
         type="target"

@@ -1,100 +1,86 @@
 import React from "react";
 import { Medley } from "@medley-js/core";
 import { CNode, TNodeComponent } from "@medley-js/common";
-import { Handle, Position } from "react-flow-renderer";
+import { Position } from "react-flow-renderer";
 import { InputType } from "../scopedTypes/input";
 import { OutputType } from "../scopedTypes/output";
 import { styled } from "@mui/system";
-import { Badge, BadgeProps, Card, CardContent, CardHeader, Tooltip, Typography } from "@mui/material";
-import { Info } from "@mui/icons-material";
-import AirplanemodeActiveIcon from '@mui/icons-material/AirplanemodeActive';
-
-const StyledDiv = styled("div")(({ theme }) => ({
-  height:"20px",
-  lineHeight:"20px",
-  fontSize:"14px",
-  cursor: "default",
-  //backgroundColor:"#0288d1",
-  //color:"white",
-  paddingLeft:"4px",
-  paddingRight:"4px",
-  flex:1,
-  //translate: "-20px",
-  width:""
-}));
+import {
+  Badge,
+  BadgeProps,
+  Card,
+  CardContent,
+  CardHeader,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Slider,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import { Info, GroupWork, DragIndicator } from "@mui/icons-material";
+import { Handle } from "../../../components";
 
 function getHandles(medley: Medley<CNode>, node: CNode) {
-  const compContext = Medley.getChildInstance(medley, node.id);
+  const compContext = Medley.getScopedInstance(medley, node.id);
   const inputHandles = compContext.nodes
     .getNodesByType(InputType.name)
     .map((n) => {
-      return (<div style={{display: "flex", flexWrap: "wrap", flexDirection: "row", alignItems:"center", paddingLeft:"3px"}}>
-        <Handle
-          key={n.id}
-          type="target"
-          position={Position.Left}
-          style={{
-            borderTopLeftRadius: "5px",
-            borderBottomLeftRadius: "5px",
-            borderBottomRightRadius: "5px",
-            borderTopRightRadius: "5px",
-            border: "none",
-            height: "10px",
-            width: "10px",
-            backgroundColor: "#0288d1",
-            position:"unset",
-            //marginBottom:"5px",
-            transform: "none",
-          }}
-          isConnectable={true}
-          id={n.id}
-        >       
-        </Handle>
-        <StyledDiv>{n.name}</StyledDiv>
-        </div>
-      );
+      return <Handle id={n.id} key={n.id} label={n.name} />;
     });
   const outputHandles = compContext.nodes
     .getNodesByType(OutputType.name)
     .map((n) => {
-      return (
-        <Handle
-          key={n.id}
-          type="source"
-          position={Position.Right}
-          id={n.id}
-          style={{ top: 10, background: "#555" }}
-          isConnectable={true}
-        />
-      );
+      return <Handle output id={n.id} key={n.id} label={n.name} />;
     });
-  return [...inputHandles, ...outputHandles];
+  return [...outputHandles, ...inputHandles];
 }
 
 export const NodeComponent: TNodeComponent = ({
-  context: { medley, node }, selected
+  context: { medley, node },
+  selected,
 }) => {
   return (
-    <>    
+    <>
       <Card
-          style={{ maxWidth: "200px", overflow:"visible" }}
-          variant="outlined"
-          sx={selected ? { boxShadow: 2 } : undefined}
-        >
-          <CardHeader
-            style={{ backgroundColor: "#b7dbff" }}
-            title={"Test"}
-            subheader={`Name: ${node.name}`}
-            avatar={<Info />}
-          >        
-          </CardHeader>
-          <CardContent style={{padding:"0px"}}>
-            <div style={{translate:"0px", width:"calc(100% + 0px)"}}>
-              {getHandles(medley, node)}
-            </div>
-          
-          </CardContent>
-        </Card>
+        style={{ maxWidth: "200px", overflow: "visible", boxSizing:"content-box" }}
+        variant="outlined"
+        sx={selected ? { boxShadow: 1, borderWidth: "2px" } : { borderWidth: "2px" }}
+      >
+        <DragIndicator className="drag-handle" style={{position:"absolute", right:0}} />
+        <CardHeader
+          style={{ backgroundColor: "#b7dbff", paddingRight:"40px", marginBottom:"3px"}}
+          title={`${node.name}`}
+          avatar={<GroupWork />}
+        ></CardHeader>
+        <CardContent style={{ padding: "0px" }}>
+          <div>{getHandles(medley, node)}</div>
+        </CardContent>
+        <CardContent>
+          <Typography color="textSecondary" gutterBottom variant="caption">
+            Typography...
+          </Typography>
+          <Slider
+            key={"slider-" + node.id}
+            size="small"
+            aria-label="Small"
+            valueLabelDisplay="auto"
+          />
+          <FormControl fullWidth>
+            <InputLabel id="demo-simple-select-label">Test</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              label="Test"
+            >
+              <MenuItem value={10}>Ten</MenuItem>
+              <MenuItem value={20}>Twenty</MenuItem>
+              <MenuItem value={30}>Thirty</MenuItem>
+            </Select>
+          </FormControl>
+        </CardContent>
+      </Card>
     </>
   );
 };
