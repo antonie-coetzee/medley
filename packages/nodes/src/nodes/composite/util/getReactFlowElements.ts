@@ -75,7 +75,7 @@ async function getReactFlowEdges(context: BaseContext<CNode>): Promise<Edge[]> {
       );
       const linkProps = await decorateLink?.({ ...context, node });
       return {
-        data: { context, link:mLink },
+        data: { context:{...context, node}, link:mLink },
         id: `${mLink.scope}${mLink.source}${mLink.target}${mLink.port}`,
         source: mLink.source,
         target: mLink.target,

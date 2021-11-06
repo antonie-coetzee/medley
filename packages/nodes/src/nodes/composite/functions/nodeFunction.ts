@@ -6,7 +6,7 @@ import { OutputType } from "../scopedTypes/output";
 export const nodeFunction: NF<{}, CompositeNode> = async (cntx) => {
   const { node, medley, input } = cntx;
   
-  const childScope = Medley.newChildInstance(medley.getRootInstance(), node.id);
+  const childScope = Medley.getChildInstance(medley.getRootInstance(), node.id);
 
   addInputType(childScope, input);
   addOutputType(childScope);

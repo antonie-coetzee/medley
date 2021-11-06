@@ -10,6 +10,6 @@ export type TNodeConstructComponentProps<
   close: (construct:boolean) => void;
 };
 
-export type TNodeConstructComponent<TNodePart extends CNodePart = CNodePart> = VFC<
-  TNodeConstructComponentProps<TNodePart>
+export type TNodeConstructComponent<TNode extends CNode = CNode> = VFC<
+  TNodeConstructComponentProps<CNodePart<TNode>>
 >;

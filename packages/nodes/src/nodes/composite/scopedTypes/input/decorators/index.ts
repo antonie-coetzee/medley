@@ -1,1 +1,1 @@
-export * from "./decorateLinkComponent"
+export * from "./decorateLink"

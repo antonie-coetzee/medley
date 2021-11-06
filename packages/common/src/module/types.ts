@@ -14,7 +14,7 @@ export type CLink = Link & {
   position?: Coordinates;
 };
 
-export type CNodePart<T extends unknown = unknown> = NodePart<CNode<T>>;
+export type CNodePart<TNode extends CNode = CNode> = NodePart<TNode>;
 
 export type CType = Type;
 

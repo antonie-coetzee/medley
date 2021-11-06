@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { Position } from "react-flow-renderer";
+import { Handle, Position } from "react-flow-renderer";
 import { TNodeComponent } from "@medley-js/common";
 import Chip from "@material-ui/core/Chip";
 import { InputNode } from "../InputNode";
 import ExitToApp from "@mui/icons-material/ExitToApp";
 import { Menu, Popover } from "@mui/material";
 import { NodeEditComponent } from "./NodeEditComponent";
-import { Handle } from "../../../../../components";
 
 export const NodeComponent: TNodeComponent<InputNode> = ({
   context,
@@ -48,12 +47,27 @@ export const NodeComponent: TNodeComponent<InputNode> = ({
     >
       <Chip
         label={node.name}
-        color={"primary"}
+        //color={"#0288d1"}
         variant="outlined"
-        style={{ borderWidth: "2px" }}
+        style={{ borderWidth: "2px", paddingRight: "8px", borderColor: node.value?.color ? node.value?.color : "#0288d1" }}
         size="small"
       />
-      <Handle id={context.node.id} output />
+      <Handle
+        id={context.node.id}
+        type="source"
+        position={Position.Right}
+        isConnectable={true}
+        style={{
+          background: node.value?.color ? node.value.color : "#0288d1" ,
+          right: "0px",
+          height: "24px",
+          border: "none",
+          width: "12px",
+          borderRadius: "unset",
+          borderBottomRightRadius: "12px",
+          borderTopRightRadius: "12px",
+        }}
+      />
       <Menu
         open={contextMenu !== null}
         onClose={handleClose}

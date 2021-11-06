@@ -13,6 +13,7 @@ import { InputType } from "../type";
 
 export const NodeEditComponent: TNodeEditComponent<InputNode> = (props) => {
   const node = props.context.node;
+  node.value = node.value || {}
   return (
     <>
       <DialogContent>
@@ -29,6 +30,16 @@ export const NodeEditComponent: TNodeEditComponent<InputNode> = (props) => {
             node.name = e.target.value;
           }}
         />
+        <input
+        className="nodrag"
+        type="color"
+        onChange={(e)=>{
+          if(node.value){
+              node.value.color = e.target.value;
+          }         
+        }}
+        defaultValue={node.value.color}
+      />
       </DialogContent>
     </>
   );

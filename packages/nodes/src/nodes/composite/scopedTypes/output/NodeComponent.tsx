@@ -14,13 +14,22 @@ export const NodeComponent: TNodeComponent<OutputNode> = ({
       <Chip
         label={node.name}
         variant="outlined"
-        style={{ borderWidth: "2px" }}
+        style={{ borderWidth: "2px", paddingLeft: "8px" }}
         size="small"
       />
       <Handle
         type="target"
         position={Position.Left}
-        style={{ background: "#555" }}
+        style={{
+          background: "#bdbdbd",
+          left: "0px",
+          height: "24px",
+          border: "none",
+          width: "12px",
+          borderRadius: "unset",
+          borderBottomLeftRadius: "12px",
+          borderTopLeftRadius: "12px",
+        }}
         isConnectable={true}
         id={node.id}
       />

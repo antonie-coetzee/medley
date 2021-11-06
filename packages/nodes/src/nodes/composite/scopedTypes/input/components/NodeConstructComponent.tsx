@@ -8,6 +8,7 @@ import { InputType } from "../type";
 export const NodeConstructComponent: TNodeConstructComponent<InputNode> = (props) => {
   const node = props.context.node;
   node.name = getDefaultName(props.context.medley);
+  node.value = {color:"black"};
   return <Fragment>
       <DialogTitle>Create new input terminal</DialogTitle>
       <DialogContent>

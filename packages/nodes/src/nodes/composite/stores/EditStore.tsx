@@ -61,7 +61,7 @@ export class EditStore {
 
   private async createNodeFallback(type: CType, position?: Coordinates) {
     const medley = this.props.context.medley;
-    const newNodePart: CNodePart = { type: type.name, name: "", position };
+    const newNodePart: CNodePart = { type: type.name, name: "", position, value:null };
     // first construct/initialize the nodepart with nodeCreate if
     // available
     try {

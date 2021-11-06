@@ -1,10 +1,10 @@
 import React from "react";
 import { ArrowHeadType, getBezierPath, getMarkerEnd, Position } from "react-flow-renderer";
 import { TLinkComponent } from "@medley-js/common";
+import { InputNode } from "../InputNode";
 
-import { CompositeNode } from "../CompositeNode";
 
-export const LinkComponent: TLinkComponent<CompositeNode> = ({ context:{node}, linkProps:{
+export const LinkComponent: TLinkComponent<InputNode> = ({ context:{node}, linkProps:{
     id,
     sourceX,
     sourceY,
@@ -12,21 +12,17 @@ export const LinkComponent: TLinkComponent<CompositeNode> = ({ context:{node}, l
     targetY,
     sourcePosition ,
     targetPosition,
-    style = {},
+    style,
     data,
     arrowHeadType,
     markerEndId,
   } }) => {
     const edgePath = getBezierPath({ sourceX, sourceY, sourcePosition:sourcePosition as Position  , targetX, targetY, targetPosition: targetPosition as  Position});
     const markerEnd = getMarkerEnd(arrowHeadType as ArrowHeadType, markerEndId);
+    console.log("updated")
     return (
       <>
-        <path id={id} style={style} className="react-flow__edge-path" d={edgePath} markerEnd={markerEnd} />
-        <text>
-            <textPath href={`#${id}`} style={{ fontSize: '12px', marginBottom:"2px" }} startOffset="50%" textAnchor="middle">
-            {data?.source}
-            </textPath>
-        </text>
+        <path id={id} style={{...style, ...{ stroke: node.value?.color ? node.value?.color : "#0288d1", strokeWidth: "2px"}}} className="react-flow__edge-path" d={edgePath} markerEnd={markerEnd} />
       </>
     );
   };
