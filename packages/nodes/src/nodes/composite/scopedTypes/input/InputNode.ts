@@ -1,3 +1,3 @@
-import { CNode, CPort } from "@medley-js/common";
+import { CNodeWithValue } from "@medley-js/common";
 
-export type InputNode = CNode<{color?:string}>;
+export type InputNode = CNodeWithValue<{ color?: string }>;

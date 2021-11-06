@@ -1,7 +1,7 @@
 import React from "react";
 import { Meta } from "@storybook/react";
 import { Cache, Medley } from "@medley-js/core";
-import { CLink, CNode, constants, CType, TNodeEditComponent } from "@medley-js/common";
+import { CLink, CNode, constants, CType, TEditNodeComponent } from "@medley-js/common";
 
 import { CompositeType } from "../type";
 import { InputType } from "../scopedTypes/input/type";
@@ -21,12 +21,12 @@ export const Node = componentStory(async () => {
   const [ecn, cn] = createEmptyCompositeNode(medley)
   createBasicCompositeNode(ecn, [200,200])
 
-  const NodeEditComponent = await medley.types.getExportFunction<TNodeEditComponent>(
+  const EditNodeComponent = await medley.types.getExportFunction<TEditNodeComponent>(
     CompositeType.name,
-    constants.NodeEditComponent
+    constants.EditNodeComponent
   );
   return () => (
-    <NodeEditComponent
+    <EditNodeComponent
       context={{
         logger: null,
         medley: ecn,

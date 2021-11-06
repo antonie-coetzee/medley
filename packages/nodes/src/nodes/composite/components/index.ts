@@ -1,2 +1,2 @@
-export * from "./NodeEditComponent"
+export * from "./EditNodeComponent"
 export * from "./NodeComponent"

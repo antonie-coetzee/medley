@@ -1,4 +1,4 @@
-import { TNodeEditComponent } from "@medley-js/common";
+import { TEditNodeComponent } from "@medley-js/common";
 import { observer, Provider } from "mobx-react";
 import React from "react";
 import ReactFlow, {
@@ -32,7 +32,7 @@ export const EditComponent: React.VFC = observer(() => {
   );
 });
 
-export const NodeEditComponent: TNodeEditComponent<CompositeNode> = (props) => {
+export const EditNodeComponent: TEditNodeComponent<CompositeNode> = (props) => {
   const stores = new Stores(props);
   return (
     <Provider {...stores}>

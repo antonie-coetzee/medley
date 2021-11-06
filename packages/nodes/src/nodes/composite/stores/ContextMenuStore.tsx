@@ -1,5 +1,5 @@
 import { Chip, MenuItem } from "@mui/material";
-import { TNodeEditComponentProps } from "@medley-js/common";
+import { TEditNodeComponentProps } from "@medley-js/common";
 import { makeAutoObservable, observable, runInAction, toJS } from "mobx";
 import { CompositeNode } from "../CompositeNode";
 import { getContextMenu } from "../util";
@@ -22,7 +22,7 @@ export class ContextMenuStore {
   }>[] = [];
 
   constructor(
-    private props: TNodeEditComponentProps<CompositeNode>,
+    private props: TEditNodeComponentProps<CompositeNode>,
     private editStore: EditStore
   ) {
     this.menuItems.push(this.menuAddInputNode());

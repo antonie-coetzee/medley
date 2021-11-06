@@ -1,6 +1,6 @@
 import { NF, Input, Type, Node, Medley } from "@medley-js/core";
 
-export const nodeFunction: NF<{}, Node<{ outputId: string }>> = (cntx) => {
+export const nodeFunction: NF<{}, Node & { outputId: string }> = (cntx) => {
   const { node, medley, input } = cntx;
 
   const childScope = Medley.getChildInstance(medley.getRootInstance(), node.id);
@@ -10,8 +10,8 @@ export const nodeFunction: NF<{}, Node<{ outputId: string }>> = (cntx) => {
   const outputType = getOutputType();
   childScope.types.addType(outputType);
 
-  if (node.value?.outputId) {
-    const outputId = node.value.outputId;
+  if (node.outputId) {
+    const outputId = node.outputId;
     const result = childScope.runNode(cntx, outputId);
     return result;
   }
@@ -20,13 +20,13 @@ export const nodeFunction: NF<{}, Node<{ outputId: string }>> = (cntx) => {
 function getInputType(input: Input): Type {
   const nodeFunction: NF<
     {},
-    Node<{
+    Node & {
       input: string;
-    }>
+    }
   > = ({ node }) => {
-    if (node.value?.input) {
+    if (node.input) {
       return input({
-        name: node.value.input,
+        name: node.input,
       });
     }
   };

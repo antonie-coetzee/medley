@@ -3,6 +3,6 @@ import { CompositeNode } from "../CompositeNode";
 
 export const getPorts: GetPorts<CompositeNode> = async ({ node }) => {
   return (
-    node.value?.inputNodes || []
+    node.inputNodes || []
   );
 };

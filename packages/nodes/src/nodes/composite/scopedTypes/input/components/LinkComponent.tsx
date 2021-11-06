@@ -22,7 +22,7 @@ export const LinkComponent: TLinkComponent<InputNode> = ({ context:{node}, linkP
     console.log("updated")
     return (
       <>
-        <path id={id} style={{...style, ...{ stroke: node.value?.color ? node.value?.color : "#0288d1", strokeWidth: "2px"}}} className="react-flow__edge-path" d={edgePath} markerEnd={markerEnd} />
+        <path id={id} style={{...style, ...{ stroke: node.value?.color ? node.value.color : "#0288d1", strokeWidth: "2px"}}} className="react-flow__edge-path" d={edgePath} markerEnd={markerEnd} />
       </>
     );
   };

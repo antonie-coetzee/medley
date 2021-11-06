@@ -1,5 +1,5 @@
 import { Medley } from "@medley-js/core";
-import { TNodeEditComponent } from "@medley-js/common";
+import { TEditNodeComponent } from "@medley-js/common";
 import {
   Button,
   DialogActions,
@@ -10,10 +10,10 @@ import {
 import React, { Fragment, useState } from "react";
 import { InputNode } from "../InputNode";
 import { InputType } from "../type";
+import { runInAction } from "mobx";
 
-export const NodeEditComponent: TNodeEditComponent<InputNode> = (props) => {
+export const EditNodeComponent: TEditNodeComponent<InputNode> = (props) => {
   const node = props.context.node;
-  node.value = node.value || {}
   return (
     <>
       <DialogContent>
@@ -25,21 +25,23 @@ export const NodeEditComponent: TNodeEditComponent<InputNode> = (props) => {
           type="text"
           fullWidth
           variant="standard"
-          defaultValue={node.name}
-          onChange={(e) => {
-            node.name = e.target.value;
+          defaultValue = {node.name}
+          onChange={(e) => {         
+            runInAction(() => {
+              node.name = e.target.value;
+            });
           }}
         />
         <input
-        className="nodrag"
-        type="color"
-        onChange={(e)=>{
-          if(node.value){
+          className="nodrag"
+          type="color"
+          onChange={(e) => {
+            runInAction(() => {
               node.value.color = e.target.value;
-          }         
-        }}
-        defaultValue={node.value.color}
-      />
+            });
+          }}
+          defaultValue={node.value.color}
+        />
       </DialogContent>
     </>
   );

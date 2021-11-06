@@ -1,4 +1,3 @@
-export * from "./getNodeEditComponent"
 export * from "./nodeFunction"
 export * from "./NodeComponent"
 export * from "./decorateNodeComponent"

@@ -1,3 +1,3 @@
 import { CNode } from "@medley-js/common";
 
-export type OutputNode = CNode<{}>;
+export type OutputNode = CNode;

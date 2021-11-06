@@ -5,10 +5,14 @@ export type Location = "left" | "top" | "right" | "bottom";
 
 export type Coordinates = [x: number, y: number];
 
-export type CNode<T extends unknown = unknown> = Node<T> & {
+export type CNode = Node & {
   name: string;
   position?: Coordinates;
 };
+
+export type CNodeWithValue<T> = CNode & {
+  value:T
+}
 
 export type CLink = Link & {
   position?: Coordinates;

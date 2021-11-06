@@ -1,4 +1,4 @@
 export * from "./NodeComponent";
-export * from "./NodeEditComponent";
-export * from "./NodeConstructComponent";
+export * from "./EditNodeComponent";
+export * from "./CreateNodeComponent";
 export * from "./LinkComponent";

@@ -41,13 +41,13 @@ export class NodesApi<
     }
   }
 
-  public getNodesByType(typeName: string): MNode[] {
+  public getNodesByType<TNode extends MNode = MNode>(typeName: string): TNode[] {
     const scopeNodes = this.nodeRepo.getNodesByType(
       this.scopeId,
       typeName
-    ) as MNode[];
+    ) as TNode[];
     if (this.parentNodes) {
-      const parentNodes = this.parentNodes.getNodesByType(typeName);
+      const parentNodes = this.parentNodes.getNodesByType<TNode>(typeName);
       return [...parentNodes, ...scopeNodes];
     }
     return scopeNodes;
@@ -67,7 +67,7 @@ export class NodesApi<
     return scopeTypes;
   }
 
-  public insertNode<TNode extends MNode = MNode>(node: NodePart<TNode>) {
+  public insertNode<TNode extends MNode = never, InferredTNode extends TNode = TNode>(node: NodePart<InferredTNode>) {
     node.scope = this.scopeId;
     this.dispatchEvent(MedleyEvent.create(EventType.OnItemCreate, node));
     this.dispatchEvent(MedleyEvent.create(EventType.OnChange));

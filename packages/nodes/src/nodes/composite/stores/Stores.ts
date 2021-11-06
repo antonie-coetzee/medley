@@ -1,6 +1,6 @@
 import { MobXProviderContext } from "mobx-react";
 import React from "react";
-import { TNodeEditComponentProps} from "@medley-js/common";
+import { TEditNodeComponentProps} from "@medley-js/common";
 import { ContextMenuStore } from "./ContextMenuStore";
 import { DialogStore } from "./DialogStore";
 import { CompositeNode } from "../CompositeNode";
@@ -17,7 +17,7 @@ export class Stores {
   reactFlowStore:ReactFlowStore;
   editStore:EditStore;
 
-  constructor(props: TNodeEditComponentProps<CompositeNode>) {
+  constructor(props: TEditNodeComponentProps<CompositeNode>) {
     this.dialogStore = new DialogStore();
     this.editStore = new EditStore(props, this.dialogStore);
     this.reactFlowStore = new ReactFlowStore(props, this.editStore);

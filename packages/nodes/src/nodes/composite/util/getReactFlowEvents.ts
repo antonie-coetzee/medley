@@ -6,7 +6,7 @@ import {
   CPort,
   CType,
   GetPorts,
-  TNodeEditComponentProps
+  TEditNodeComponentProps
 } from "@medley-js/common";
 import React from "react";
 import { CompositeNode } from "../CompositeNode";
@@ -18,7 +18,7 @@ import {
 } from "react-flow-renderer";
 import { EditStore } from "../stores/EditStore";
 
-export function getReactFlowEvents({context, host}: TNodeEditComponentProps<CompositeNode>,
+export function getReactFlowEvents({context, host}: TEditNodeComponentProps<CompositeNode>,
 editStore: EditStore) {
   const onConnect = (edge: Connection | Edge) => {
     context.medley.links.addLink({

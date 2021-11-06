@@ -1,11 +1,11 @@
 import { Medley } from "@medley-js/core";
-import { TNodeConstructComponent } from "@medley-js/common";
+import { TCreateNodeComponent } from "@medley-js/common";
 import { Button, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
 import React, { Fragment } from "react";
 import { InputNode } from "../InputNode";
 import { InputType } from "../type";
 
-export const NodeConstructComponent: TNodeConstructComponent<InputNode> = (props) => {
+export const CreateNodeComponent: TCreateNodeComponent<InputNode> = (props) => {
   const node = props.context.node;
   node.name = getDefaultName(props.context.medley);
   node.value = {color:"black"};

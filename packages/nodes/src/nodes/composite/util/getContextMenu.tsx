@@ -15,15 +15,18 @@ import { ExitToApp, Info } from "@mui/icons-material";
 import { OutputType } from "../scopedTypes/output/type";
 import { IdentityType } from "../../identity/type";
 import DirectionsRunIcon from "@mui/icons-material/DirectionsRun";
+import { InputNode } from "../scopedTypes/input/InputNode";
+import { OutputNode } from "../scopedTypes/output/node";
 
 function getAddInputNode(
   context: NodeContext<CompositeNode, CNode, CType, CLink>
 ): React.VFC<{ close: () => void; mouseX?: number; mouseY?: number }> {
   return ({ close, mouseX, mouseY }) => {
     const addInput = () => {
-      const node = context.medley.nodes.insertNode({
+      const node = context.medley.nodes.insertNode<InputNode>({
         name: "INPUT",
         type: InputType.name,
+        value:{}
       });
       if (mouseX && mouseY) {
         node.position = [mouseX, mouseY];
@@ -50,7 +53,7 @@ function getAddOutputNode(
 ): React.VFC<{ close: () => void; mouseX?: number; mouseY?: number }> {
   return ({ close, mouseX, mouseY }) => {
     const addOutput = () => {
-      const node = context.medley.nodes.insertNode({
+      const node = context.medley.nodes.insertNode<OutputNode>({
         name: "OUTPUT",
         type: OutputType.name,
       });

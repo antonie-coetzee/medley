@@ -1,6 +1,6 @@
 import { makeAutoObservable, observable } from "mobx";
 import { BaseContext, EventType } from "@medley-js/core";
-import { CNode, TNodeEditComponentProps } from "@medley-js/common";
+import { CNode, TEditNodeComponentProps } from "@medley-js/common";
 import { CompositeNode } from "../CompositeNode";
 import { OnLoadParams, ReactFlowProps } from "react-flow-renderer";
 import { getReactFlowElements } from "../util/getReactFlowElements";
@@ -13,7 +13,7 @@ export class ReactFlowStore {
   public reactFlowInstance: OnLoadParams | null = null;
   public reactFlowProps: ReactFlowProps | null = null;
 
-  constructor(private props: TNodeEditComponentProps<CompositeNode>, private editStore:EditStore) {
+  constructor(private props: TEditNodeComponentProps<CompositeNode>, private editStore:EditStore) {
     makeAutoObservable(this, {reactFlowProps:observable.ref});
     this.initialize(); 
   }

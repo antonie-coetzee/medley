@@ -21,16 +21,20 @@ import {
 } from "@mui/material";
 import { Info, GroupWork, DragIndicator } from "@mui/icons-material";
 import { Handle } from "../../../components";
+import { InputNode } from "../scopedTypes/input/InputNode";
+import { OutputNode } from "../scopedTypes/output/node";
 
 function getHandles(medley: Medley<CNode>, node: CNode) {
   const compContext = Medley.getScopedInstance(medley, node.id);
   const inputHandles = compContext.nodes
-    .getNodesByType(InputType.name)
+    .getNodesByType<InputNode>(InputType.name)
+    .sort((a, b) => a.name.localeCompare(b.name))
     .map((n) => {
-      return <Handle id={n.id} key={n.id} label={n.name} />;
+      return <Handle id={n.id} key={n.id} label={n.name} color={n.value.color} />;
     });
   const outputHandles = compContext.nodes
-    .getNodesByType(OutputType.name)
+    .getNodesByType<OutputNode>(OutputType.name)
+    .sort((a, b) => a.name.localeCompare(b.name))
     .map((n) => {
       return <Handle output id={n.id} key={n.id} label={n.name} />;
     });
@@ -73,6 +77,7 @@ export const NodeComponent: TNodeComponent = ({
               labelId="demo-simple-select-label"
               id="demo-simple-select"
               label="Test"
+              defaultValue="10"
             >
               <MenuItem value={10}>Ten</MenuItem>
               <MenuItem value={20}>Twenty</MenuItem>

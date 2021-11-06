@@ -1,6 +1,6 @@
 import { CNode, CPort } from "@medley-js/common";
 
-export type CompositeNode = CNode<{
-  outputNode: CNode;
+export type CompositeNode = CNode & {
+  outputNode?: CNode;
   inputNodes?: (CNode & CPort)[]
-}>;
+};

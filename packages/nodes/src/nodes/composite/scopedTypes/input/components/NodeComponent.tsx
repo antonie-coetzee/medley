@@ -5,7 +5,7 @@ import Chip from "@material-ui/core/Chip";
 import { InputNode } from "../InputNode";
 import ExitToApp from "@mui/icons-material/ExitToApp";
 import { Menu, Popover } from "@mui/material";
-import { NodeEditComponent } from "./NodeEditComponent";
+import { EditNodeComponent } from "./EditNodeComponent";
 
 export const NodeComponent: TNodeComponent<InputNode> = ({
   context,
@@ -78,7 +78,7 @@ export const NodeComponent: TNodeComponent<InputNode> = ({
             : undefined
         }
       >
-        <NodeEditComponent context={context} host={host} close={handleClose} />
+        <EditNodeComponent context={context} host={host} close={handleClose} />
       </Menu>
     </div>
   );

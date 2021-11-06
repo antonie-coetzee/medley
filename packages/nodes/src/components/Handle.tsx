@@ -44,10 +44,11 @@ const HandleWrapper: React.FC<{ output: boolean }> = ({ children, output }) => {
   );
 };
 
-export const Handle: React.VFC<{ id: string; output?: boolean; label?: string }> = ({
+export const Handle: React.VFC<{ id: string; output?: boolean; label?: string, color?: string }> = ({
   id,
   output,
   label,
+  color
 }) => {
   const handle = (
     <RfHandle
@@ -62,7 +63,7 @@ export const Handle: React.VFC<{ id: string; output?: boolean; label?: string }>
         border: "none",
         height: "12px",
         width: "12px",
-        backgroundColor: "#0288d1",
+        backgroundColor: color ?? "#0288d1",
         position: "unset",
         transform: "none",
       }}
