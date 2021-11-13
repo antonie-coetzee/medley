@@ -1,5 +1,5 @@
-import { makeAutoObservable, observable } from "mobx";
-import { BaseContext, EventType } from "@medley-js/core";
+import { makeAutoObservable, observable, runInAction } from "mobx";
+import { BaseContext, EventType, Medley } from "@medley-js/core";
 import { CNode, TEditNodeComponentProps } from "@medley-js/common";
 import { CompositeNode } from "../CompositeNode";
 import { OnLoadParams, ReactFlowProps } from "react-flow-renderer";
@@ -8,6 +8,11 @@ import { getReactFlowTypes } from "../util/getReactFlowNodeTypes";
 import { debounce } from "@mui/material";
 import { getReactFlowEvents } from "../util";
 import { EditStore } from "./EditStore";
+import { InputNode } from "../scopedTypes/input/InputNode";
+import { InputType } from "../scopedTypes/input";
+import { NodeStore } from "./NodeStore";
+import { OutputNode } from "../scopedTypes/output/node";
+import { OutputType } from "../scopedTypes/output";
 
 export class ReactFlowStore {
   public reactFlowInstance: OnLoadParams | null = null;
@@ -26,7 +31,7 @@ export class ReactFlowStore {
     const host = {...this.props.host, openNodeEdit: this.props.host.openNodeEdit || openNodeEdit}
     const {nodeTypes, edgeTypes} = await getReactFlowTypes(context, host);
     const elements = await getReactFlowElements(context);
-    const events = getReactFlowEvents(this.props, this.editStore);
+    const events = getReactFlowEvents(this, this.props, this.editStore);
     this.updateReactFlowProps({elements, nodeTypes, edgeTypes, ...events});
     this.registerMedleyEvents();
   }
@@ -41,6 +46,10 @@ export class ReactFlowStore {
     const debouncedUpdateState = debounce(async () => {
       const elements = await getReactFlowElements(context);
       const nodeTypes = await getReactFlowTypes(context, this.props.host);
+      runInAction(()=>{
+        const nodeStore = NodeStore.get(this.props.context);
+        nodeStore.updateNodeInterface();
+      })
       this.updateReactFlowProps({ elements, nodeTypes });
     }, 50);
     context.medley.nodes.addEventListener(EventType.OnChange, async (e) => {

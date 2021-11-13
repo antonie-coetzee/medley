@@ -1,7 +1,6 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
   .BundleAnalyzerPlugin;
-const StatoscopeWebpackPlugin = require('@statoscope/webpack-plugin').default;
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const path = require("path");
 
@@ -9,32 +8,6 @@ module.exports = {
   mode: "development",
   entry: "./src/index.tsx",
   devtool: "inline-source-map",
-  optimization: {
-    runtimeChunk: "single",
-    splitChunks: {
-      name: "vendor",
-      chunks: "all",
-    },
-  },
-  externals: [
-    "react-is",
-    "react-dom",
-    "react",
-    "mobx",
-    "mobx-react",
-    "medley",
-    "notistack",
-    "@material-ui/styles",
-    "@material-ui/core",
-    "@material-ui/icons", 
-    /@material-ui\/core\/.*/,
-    /@material-ui\/icons\/.*/,    
-    "@material-ui/lab" ,           
-    "@rjsf/material-ui",
-    "@rjsf/core",
-    "@material-ui/data-grid",
-    "react-dnd"
-  ],
   module: {
     rules: [
       {
@@ -60,7 +33,6 @@ module.exports = {
     } 
   },
   output: {
-    libraryTarget: "system",
     filename: "[name].bundle.js",
     path: path.resolve(__dirname, "dist"),
   },
@@ -72,6 +44,5 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({ template: "index.ejs" }),
     // new BundleAnalyzerPlugin(),
-    //new StatoscopeWebpackPlugin()
   ],
 };

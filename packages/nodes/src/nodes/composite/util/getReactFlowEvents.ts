@@ -15,10 +15,13 @@ import {
   Edge,
   Elements,
   Node as RFNode,
+  OnLoadParams,
 } from "react-flow-renderer";
 import { EditStore } from "../stores/EditStore";
+import { ReactFlowStore } from "../stores/ReactFlowStore";
+import { runInAction } from "mobx";
 
-export function getReactFlowEvents({context, host}: TEditNodeComponentProps<CompositeNode>,
+export function getReactFlowEvents(reactFlowStore:ReactFlowStore, {context, host}: TEditNodeComponentProps<CompositeNode>,
 editStore: EditStore) {
   const onConnect = (edge: Connection | Edge) => {
     context.medley.links.addLink({
@@ -28,6 +31,14 @@ editStore: EditStore) {
       scope: context.node.id,
     });
   };
+
+  const onLoad: (instance:OnLoadParams) => void = (instance)=>{
+    reactFlowStore.reactFlowInstance = instance;
+    runInAction(()=>{
+      console.log("asd")
+      instance.fitView();
+    })
+  }
 
   const onNodeDragStop: (
     event: React.MouseEvent<Element, MouseEvent>,
@@ -70,5 +81,5 @@ editStore: EditStore) {
     }
   };
 
-  return { onConnect, onNodeDragStop, onElementsRemove };
+  return { onConnect, onNodeDragStop, onElementsRemove,onLoad };
 }

@@ -14,41 +14,9 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="index.css" />
-    <script type="systemjs-importmap">
-      {
-        "imports": {
-          "react": "/vendor/react.17.0.2.js",
-          "react-is": "/vendor/react-is.17.0.2.js",
-          "react-dom": "/vendor/react-dom.17.0.2.js",
-          "mobx": "/vendor/mobx.6.1.8.js",
-          "mobx-react": "/vendor/mobx-react.7.1.0.js",
-          "medley": "/vendor/medley.1.0.0.js",
-          "@material-ui/core": "/vendor/material-ui-core.4.11.4.js",
-          "@material-ui/core/styles": "/vendor/material-ui-core-styles.4.11.4.js",
-          "@material-ui/styles": "/vendor/material-ui-styles.4.11.4.js",
-          "@material-ui/icons": "/vendor/material-ui-icons.4.11.4.js",
-          "@material-ui/lab": "/vendor/material-ui-lab.4.0.0-alpha.57.js",
-          "@rjsf/material-ui": "/vendor/rjsf-material-ui.3.0.0.js",
-          "@rjsf/core": "/vendor/rjsf-core.3.0.0.js",
-          "@material-ui/data-grid": "/vendor/material-ui-data-grid.4.0.0-alpha.34.js",
-          "notistack": "/vendor/notistack.1.0.9.js",
-          "react-dnd": "/vendor/react-dnd.14.0.2.js"
-        }
-      }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/systemjs/dist/system.js"></script>
-    <script
-      type="text/javascript"
-      src="https://cdn.jsdelivr.net/npm/import-map-overrides/dist/import-map-overrides.js"
-    ></script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    <!-- <script type="systemjs-module" src="index.js"></script> -->
-    <script type="systemjs-module" src="main.bundle.js"></script>
-    <import-map-overrides-full
-      show-when-local-storage="devtools"
-    ></import-map-overrides-full>
   </body>
 </html>

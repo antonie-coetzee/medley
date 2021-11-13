@@ -60,7 +60,7 @@ export const NodeComponent: TNodeComponent<InputNode> = ({
         style={{
           background: node.value?.color ? node.value.color : "#0288d1" ,
           right: "0px",
-          height: "24px",
+          height: "23px",
           border: "none",
           width: "12px",
           borderRadius: "unset",

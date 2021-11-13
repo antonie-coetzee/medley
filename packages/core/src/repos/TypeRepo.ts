@@ -6,7 +6,7 @@ export class TypeRepo {
   private typeMap: TreeMap<Type> = new TreeMap();
   private baseUrl?: URL;
 
-  constructor(private loader: Loader) {}
+  constructor(public loader: Loader) {}
 
   public set(types: Type[], baseUrl: URL) {
     this.baseUrl = baseUrl;
@@ -49,7 +49,6 @@ export class TypeRepo {
     }else{
       module = await this.loader.importModule(
         moduleInfo,
-        type.version,
         this.baseUrl
       ); 
       this.moduleCache.set(`${type.name}${type.version}`, module);   

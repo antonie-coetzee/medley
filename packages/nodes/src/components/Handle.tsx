@@ -17,7 +17,7 @@ const Label: React.FC<{ justifyRight: boolean }> = ({
         paddingRight: "4px",
         flex: !justifyRight ? 1 : undefined,
         width: "unset",
-        marginLeft: justifyRight ? "auto" : undefined,
+        marginLeft: justifyRight ? "auto" : undefined
       }}
     >
       {children}
@@ -27,20 +27,22 @@ const Label: React.FC<{ justifyRight: boolean }> = ({
 
 const HandleWrapper: React.FC<{ output: boolean }> = ({ children, output }) => {
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexWrap: "wrap",
-        flexDirection: "row",
-        alignItems: "center",
-        paddingRight: output ? "3px" : undefined,
-        paddingLeft: !output ? "3px" : undefined,
-        translate: output ? "9px" : "-9px",
-        width: "calc(100%) + 9px",
-      }}
-    >
-      {children}
-    </Box>
+    <div className={"handle"} >
+      <Box     
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          flexDirection: "row",
+          alignItems: "center",
+          paddingRight: output ? "3px" : undefined,
+          paddingLeft: !output ? "3px" : undefined,
+          translate: output ? "9px" : "-9px",
+          width: "calc(100%) + 9px",
+        }}
+      >
+        {children}
+      </Box>
+    </div>
   );
 };
 

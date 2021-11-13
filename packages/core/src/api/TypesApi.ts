@@ -19,6 +19,10 @@ export class TypesApi<TType extends Type = Type> extends EventTarget {
     super();
   }
 
+  public setOrigin(origin:string){
+    this.typeRepo.loader.origin = origin;
+  }
+
   public setTypes(types: TType[], baseUrl: URL): void {
     this.typeRepo.set(types, baseUrl);
     this.dispatchEvent(new MedleyEvent(EventType.OnChange));

@@ -1,10 +1,10 @@
-import React from "react";
-import { Medley } from "@medley-js/core";
+import React, { useEffect } from "react";
+import { Medley, NodeContext } from "@medley-js/core";
 import { CNode, TNodeComponent } from "@medley-js/common";
-import { Position } from "react-flow-renderer";
+import { Position, useUpdateNodeInternals } from "react-flow-renderer";
 import { InputType } from "../scopedTypes/input";
 import { OutputType } from "../scopedTypes/output";
-import { styled } from "@mui/system";
+import { Box, styled } from "@mui/system";
 import {
   Badge,
   BadgeProps,
@@ -19,73 +19,100 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { Info, GroupWork, DragIndicator } from "@mui/icons-material";
+import { Info, GroupWork, DragIndicator, Close, Public, Sync, AutoAwesome, AutoAwesomeMotion, HelpOutline, AccountTree, AccountTreeOutlined, Refresh } from "@mui/icons-material";
 import { Handle } from "../../../components";
 import { InputNode } from "../scopedTypes/input/InputNode";
 import { OutputNode } from "../scopedTypes/output/node";
+import { CompositeNode } from "../CompositeNode";
+import { NodeStore } from "../stores/NodeStore";
 
-function getHandles(medley: Medley<CNode>, node: CNode) {
-  const compContext = Medley.getScopedInstance(medley, node.id);
-  const inputHandles = compContext.nodes
-    .getNodesByType<InputNode>(InputType.name)
-    .sort((a, b) => a.name.localeCompare(b.name))
+function getHandles(context:NodeContext<CNode>) {
+  const nodeStore = NodeStore.get(context);
+  const inputHandles = nodeStore.inputNodes.slice().
+    sort((a, b) => a.name.localeCompare(b.name))
     .map((n) => {
-      return <Handle id={n.id} key={n.id} label={n.name} color={n.value.color} />;
+      return (
+        <Handle id={n.id} key={n.id} label={n.name} color={n.value.color} />
+      );
     });
-  const outputHandles = compContext.nodes
-    .getNodesByType<OutputNode>(OutputType.name)
-    .sort((a, b) => a.name.localeCompare(b.name))
-    .map((n) => {
-      return <Handle output id={n.id} key={n.id} label={n.name} />;
-    });
+  let outputHandles:JSX.Element[] = [];
+  const outputNode = nodeStore.outputNode;
+  if(outputNode){
+    outputHandles = [<Handle output id={outputNode.id} key={outputNode.id} label={outputNode.name} />]
+  }
   return [...outputHandles, ...inputHandles];
 }
 
-export const NodeComponent: TNodeComponent = ({
-  context: { medley, node },
+export const NodeComponent: TNodeComponent<CompositeNode> = ({
+  context,
   selected,
-}) => {
+}) => { 
+  const updateNodeInternals = useUpdateNodeInternals();
+  useEffect(()=>{
+    updateNodeInternals(context.node.id);
+  });
+  
   return (
     <>
       <Card
-        style={{ maxWidth: "200px", overflow: "visible", boxSizing:"content-box" }}
+        style={{
+          maxWidth: "200px",
+          overflow: "visible",
+          boxSizing: "content-box",
+          borderColor: "#e9e9e9",
+          paddingBottom: "0px"
+        }}
         variant="outlined"
-        sx={selected ? { boxShadow: 1, borderWidth: "2px" } : { borderWidth: "2px" }}
+        sx={
+          selected
+            ? { boxShadow: 2, borderWidth: "2px" }
+            : { borderWidth: "2px" }
+        }
       >
-        <DragIndicator className="drag-handle" style={{position:"absolute", right:0}} />
+        <Box
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            backgroundColor: "#b7dbff",
+            borderBottom: "1px solid #e9e9e9"
+          }}
+        >
+          <DragIndicator className="drag-handle" />
+           {/* <Public />  */}
+           {/* <div/> */}
+          { <Refresh /> }
+          {/* <AutoAwesomeMotion/> */}
+          <HelpOutline/>
+          <Close />
+        </Box>
         <CardHeader
-          style={{ backgroundColor: "#b7dbff", paddingRight:"40px", marginBottom:"3px"}}
-          title={`${node.name}`}
-          avatar={<GroupWork />}
+          sx={{
+            backgroundColor: "#b7dbff",
+            marginBottom: "3px",
+            borderBottom: "2px solid #e9e9e9",
+            padding: "2px",
+            height: "42px",
+            paddingLeft: "8px",
+            paddingRight: "8px",
+            "& .MuiCardHeader-subheader": {}
+          }}
+          subheader={`${context.node.name}`}
         ></CardHeader>
         <CardContent style={{ padding: "0px" }}>
-          <div>{getHandles(medley, node)}</div>
+          <Box sx={{
+            '& .handle:not(:last-child)' : {
+              borderBottom: "1px solid #e9e9e9"
+            }
+          }}>
+            {getHandles(context)}
+          </Box>
         </CardContent>
-        <CardContent>
-          <Typography color="textSecondary" gutterBottom variant="caption">
-            Typography...
-          </Typography>
-          <Slider
-            key={"slider-" + node.id}
-            size="small"
-            aria-label="Small"
-            valueLabelDisplay="auto"
-          />
-          <FormControl fullWidth>
-            <InputLabel id="demo-simple-select-label">Test</InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              label="Test"
-              defaultValue="10"
-            >
-              <MenuItem value={10}>Ten</MenuItem>
-              <MenuItem value={20}>Twenty</MenuItem>
-              <MenuItem value={30}>Thirty</MenuItem>
-            </Select>
-          </FormControl>
-        </CardContent>
+        {/* <CardContent>
+        </CardContent> */}
       </Card>
+      
     </>
   );
 };

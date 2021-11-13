@@ -1,21 +1,29 @@
-import {
-  EsmModule,
-  Module,
-  SystemModule,
-  toCustomModule
-} from "./Module";
+import { EsmModule, Module, SystemModule, toCustomModule } from "./Module";
 
 export type ImportFunction = (
   module: Module,
-  version: string,
+  origin: string | null,
   baseUrl?: URL
 ) => Promise<any>;
 
 export class Loader {
+  public origin: string | null = null;
+
   constructor(private importer?: ImportFunction) {}
 
+  async importModule(module: Module, baseUrl?: URL): Promise<any> {
+    const customModule = toCustomModule(module);
+    if (customModule && customModule.import) {
+      return customModule.import();
+    }
+    if (this.importer == null) {
+      throw new Error("importer not defined");
+    }
+    return this.importer(module, this.origin, baseUrl);
+  }
+
   public static SystemImportWrapper(importer: (url: string) => Promise<any>) {
-    return (module: Module, version: string, baseUrl?: URL) => {
+    return (module: Module, origin: string, baseUrl?: URL) => {
       const systemModule = module as SystemModule;
       let resolvedModuleBaseUrl: URL | undefined;
       if (systemModule.base) {
@@ -25,13 +33,15 @@ export class Loader {
         systemModule.system.toString(),
         resolvedModuleBaseUrl
       );
-      resolvedUrl.search = `version=${version}`;
+      if (origin) {
+        resolvedUrl.search = `origin=${encodeURIComponent(origin)}`;
+      }
       return importer(resolvedUrl.toString());
     };
   }
 
   public static ESMImportWrapper(importer: (url: string) => Promise<any>) {
-    return (module: Module, version: string, baseUrl?: URL) => {
+    return (module: Module, origin: string, baseUrl?: URL) => {
       const esmModule = module as EsmModule;
       let resolvedModuleBaseUrl: URL | undefined;
       if (esmModule.base) {
@@ -41,23 +51,10 @@ export class Loader {
         esmModule.esm.toString(),
         resolvedModuleBaseUrl
       );
-      resolvedUrl.search = `version=${version}`;
+      if (origin) {
+        resolvedUrl.search = `origin=${encodeURIComponent(origin)}`;
+      }
       return importer(resolvedUrl.toString());
     };
-  }
-
-  async importModule(
-    module: Module,
-    version: string,
-    baseUrl?: URL
-  ): Promise<any> {
-    const customModule = toCustomModule(module);
-    if (customModule && customModule.import) {
-      return customModule.import();
-    }
-    if (this.importer == null) {
-      throw new Error("importer not defined");
-    }
-    return this.importer(module, version, baseUrl);
   }
 }

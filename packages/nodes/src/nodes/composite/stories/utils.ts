@@ -17,6 +17,7 @@ import { CompositeNode } from "..";
 import { OutputNode } from "../scopedTypes/output/node";
 import { InputNode } from "../scopedTypes/input/InputNode";
 import { IdentityNode } from "@/nodes/identity";
+import { TryRounded } from "@mui/icons-material";
 
 export const addTypes = (medley: Medley<CNode>) => {
     medley.types.addType(CompositeType);
@@ -46,15 +47,16 @@ export const createEmptyCompositeNode = (medley: Medley<CNode>) => {
 }
 
 export const createBasicCompositeNode = (medley: Medley<CNode>, position?:Coordinates) => {
-  const compositeNode = medley.nodes.insertNode<CompositeNode>({
-    name: "basic_composite",
+  const compositeNode = medley.nodes.insertNode<CompositeNode>(observable({
+    name: "Basic Composite",
     type: CompositeType.name,
     position:position
-  });
+  }));
 
   const compositeScope = Medley.getScopedInstance(
     medley.getRootInstance(),
-    compositeNode.id
+    compositeNode.id,
+    true
   );
 
   const id_0 = compositeScope.nodes.insertNode<InputNode>(

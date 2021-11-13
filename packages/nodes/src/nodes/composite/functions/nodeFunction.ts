@@ -6,25 +6,25 @@ import { OutputType } from "../scopedTypes/output";
 export const nodeFunction: NF<{}, CompositeNode> = async (cntx) => {
   const { node, medley, input } = cntx;
   
-  const childScope = Medley.getChildInstance(medley.getRootInstance(), node.id);
+  const scopedInstance = Medley.getScopedInstance(medley.getRootInstance(), node.id);
 
-  addInputType(childScope, input);
-  addOutputType(childScope);
+  addInputType(scopedInstance, input);
+  addOutputType(scopedInstance);
 
-  const outputNode = childScope.nodes.getNodesByType(OutputType.name)[0];
+  const outputNode = scopedInstance.nodes.getNodesByType(OutputType.name)[0];
   if (outputNode) {
-    const result = childScope.runNode(cntx, outputNode.id);
+    const result = scopedInstance.runNode(cntx, outputNode.id);
     return result;
   }
 };
 
-function addInputType(childScope: Medley, input: Input): void {
+function addInputType(scopedInstance: Medley, input: Input): void {
   const nodeFunction: NF<{}> = ({ node }) => {
     return input({
       name: node.id,
     });
   };
-  childScope.types.addType({
+  scopedInstance.types.addType({
     name: InputType.name,
     version: "",
     volatile: true,
@@ -37,13 +37,13 @@ function addInputType(childScope: Medley, input: Input): void {
   });
 }
 
-function addOutputType(childScope: Medley): void {
+function addOutputType(scopedInstance: Medley): void {
   const nodeFunction: NF = ({ node, input }) => {
     return input({
       name: node.id,
     });
   };
-  childScope.types.addType({
+  scopedInstance.types.addType({
     name: OutputType.name,
     version: "",
     volatile: true,

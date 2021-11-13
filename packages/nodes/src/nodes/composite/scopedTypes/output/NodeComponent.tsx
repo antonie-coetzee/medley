@@ -23,7 +23,7 @@ export const NodeComponent: TNodeComponent<OutputNode> = ({
         style={{
           background: "#bdbdbd",
           left: "0px",
-          height: "24px",
+          height: "23px",
           border: "none",
           width: "12px",
           borderRadius: "unset",

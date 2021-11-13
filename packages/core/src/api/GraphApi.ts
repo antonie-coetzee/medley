@@ -18,9 +18,11 @@ export class GraphApi<
 
   public setGraph(graph: Graph<MNode, MType, MLink>, baseUrl: URL) {
     this.typesApi.setTypes(graph.types, baseUrl);
+    this.typesApi.setOrigin(graph.name);
     this.nodesApi.setNodes(graph.nodes);
     this.linksApi.setLinks(graph.links);
     this.graph = graph;
+    
   }
 
   public getGraph() {

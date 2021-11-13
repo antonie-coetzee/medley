@@ -1,15 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
-import { CssBaseline } from "@material-ui/core";
 import "flexlayout-react/style/light.css";
 
 ReactDOM.render(
-  <React.Fragment>
-    <CssBaseline />
-    <div id="container">
-      <App />
-    </div>
-  </React.Fragment>,
+  <div id="container">
+    <App />
+  </div>,
   document.getElementById("root")
 );

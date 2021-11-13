@@ -14,7 +14,7 @@ import { DialogManager } from "./DialogManager";
 export const EditComponent: React.VFC = observer(() => {
   const { reactFlowStore: rFS, contextMenuStore: cMS } = useStores();
   return (
-    <div style={{ height: 800 }}>
+    <div style={{ height: 850 }}>
       {rFS.reactFlowProps !== null && (
         <ReactFlowProvider>
           <ReactFlow
