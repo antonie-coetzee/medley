@@ -27,7 +27,6 @@ module.exports = {
   },
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
-    //plugins: [new TsconfigPathsPlugin()],
     alias: {
       "@": path.resolve(__dirname, "src"),
     } 
@@ -42,7 +41,7 @@ module.exports = {
     port: 9000,
   },
   plugins: [
-    new HtmlWebpackPlugin({ template: "index.ejs" }),
+    new HtmlWebpackPlugin({ template: "src/index.ejs" }),
     // new BundleAnalyzerPlugin(),
   ],
 };

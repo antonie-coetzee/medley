@@ -15,7 +15,7 @@ export type InputProvider<
   ) => Promise<any>;
 };
 
-export class Composer<
+export class Conductor<
   MNode extends Node = Node,
   MType extends Type = Type,
   MLink extends Link = Link
@@ -35,16 +35,16 @@ export class Composer<
     ...args: any[]
   ): Promise<T> {
     // use closure to capture nodeEngine on initial invocation
-    const composer = this;
+    const conductor = this;
     const getNodeFunction = async function (
       context: ExecutionContext<TNode, MNode, MType, MLink>
     ) {
-      const nodeFuction = Composer.buildNodeFunction<
+      const nodeFuction = Conductor.buildNodeFunction<
         TNode,
         MNode,
         MType,
         MLink
-      >(context, composer, nodeId, inputProvider);
+      >(context, conductor, nodeId, inputProvider);
       return nodeFuction;
     };
 
@@ -61,7 +61,7 @@ export class Composer<
     MLink extends Link = Link
   >(
     context: ExecutionContext<TNode, MNode, MType, MLink> | void,
-    composer: Composer<MNode, MType, MLink>,
+    conductor: Conductor<MNode, MType, MLink>,
     nodeId: string,
     inputProvider: InputProvider<TNode, MNode, MType, MLink> | null
   ) {
@@ -71,29 +71,29 @@ export class Composer<
       inputProvider: InputProvider<TNode, MNode, MType, MLink> | null,
       ...args: any[]
     ): Promise<T> {
-      const nodeFunction = await Composer.buildNodeFunction<
+      const nodeFunction = await Conductor.buildNodeFunction<
         TNode,
         MNode,
         MType,
         MLink
-      >(parentContext, composer, nodeId, inputProvider);
+      >(parentContext, conductor, nodeId, inputProvider);
       return nodeFunction(...args);
     };
 
-    const node = (composer.medley.nodes.getNode(nodeId) as unknown) as TNode;
+    const node = (conductor.medley.nodes.getNode(nodeId) as unknown) as TNode;
     if (node == null) {
       throw new Error(`node with id: '${nodeId}', not found`);
     }
-    const nodeFunction = await composer.medley.types.getExportFunction<
+    const nodeFunction = await conductor.medley.types.getExportFunction<
       NodeFunction<{}, TNode, MNode, MType, MLink>
     >(node.type, nodeFunctionExportName);
 
     if (nodeFunction == null) {
       throw new Error(`node function for type: '${node.type}', not valid`);
     }
-    const childContext = composer.createContext(context, composer.medley, node);
+    const childContext = conductor.createContext(context, conductor.medley, node);
 
-    const portInput = composer.buildPortInputFunction(
+    const portInput = conductor.buildPortInputFunction(
       node,
       childContext,
       inputProvider,
@@ -136,7 +136,7 @@ export class Composer<
       ...args: any[]
     ) => Promise<T>
   ) {
-    const composer = this;
+    const conductor = this;
     const portInputFunction = async function <T>(
       port: Port,
       ...args: any[]
@@ -148,7 +148,7 @@ export class Composer<
         }
         return inputFunction == null ? null : inputFunction(context);
       }
-      let links = composer.medley.links.getPortLinks(port.name, node.id);
+      let links = conductor.medley.links.getPortLinks(port.name, node.id);
       if (links == null || links.length === 0) {
         return;
       }
@@ -163,13 +163,13 @@ export class Composer<
 
       if (isSingle) {
         const link = links[0];
-        return composer.cacheRunner(link.source, args, () =>
+        return conductor.cacheRunner(link.source, args, () =>
           runNodeFunction<T>(executionContext, link.source, null, args)
         );
       } else {
         const results = await Promise.all(
           links.map((l) =>
-            composer.cacheRunner(l.source, args, () =>
+            conductor.cacheRunner(l.source, args, () =>
               runNodeFunction<T>(executionContext, l.source, null, args)
             )
           )

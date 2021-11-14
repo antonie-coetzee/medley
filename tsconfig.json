@@ -1,7 +1,13 @@
 {
-	"exclude": ["node_modules"],
-	"compilerOptions": {
-		"esModuleInterop": true,
-		"skipLibCheck": true,
-	}
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  },
+  "exclude": [
+    "node_modules",
+    "./src/**/*.stories.tsx",
+    "./src/**/*.stories.ts",
+    "./src/**/*.sb.ts",
+    "./src/**/*.sb.tsx"
+  ]
 }

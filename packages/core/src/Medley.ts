@@ -8,7 +8,7 @@ import {
   Loader,
 } from "./core";
 import { TypeRepo, NodeRepo, LinkRepo } from "./repos";
-import { Composer } from "./Composer";
+import { Conductor } from "./Conductor";
 import { GraphApi, TypesApi, NodesApi, LinksApi } from "./api";
 import { InputProvider, NodeContext } from ".";
 
@@ -30,7 +30,7 @@ export class Medley<
   MType extends Type = Type,
   MLink extends Link = Link
 > {
-  private composer: Composer<MNode, MType, MLink>;
+  private conductor: Conductor<MNode, MType, MLink>;
   private options: MedleyOptions<MNode, MType, MLink>;
 
   public logger: Logger;
@@ -80,7 +80,7 @@ export class Medley<
       this.links
     );
 
-    this.composer = new Composer<MNode, MType, MLink>(this, this.options.cache);
+    this.conductor = new Conductor<MNode, MType, MLink>(this, this.options.cache);
   }
 
   public runNode<T>(
@@ -88,7 +88,7 @@ export class Medley<
     nodeId: string,
     ...args: any[]
   ): Promise<T> {
-    return this.composer.runNodeFunction(context, nodeId, null, ...args);
+    return this.conductor.runNodeFunction(context, nodeId, null, ...args);
   }
 
   public runNodeWithInputs<T, TNode extends Node = Node>(
@@ -97,7 +97,7 @@ export class Medley<
     inputs: InputProvider<TNode, MNode, MType, MLink>,
     ...args: any[]
   ): Promise<T> {
-    return this.composer.runNodeFunction(context, nodeId, inputs, ...args);
+    return this.conductor.runNodeFunction(context, nodeId, inputs, ...args);
   }
 
   public getRootInstance(): Medley<MNode, MType, MLink> {
