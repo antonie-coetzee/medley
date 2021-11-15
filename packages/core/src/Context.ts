@@ -1,13 +1,5 @@
-import { Link, Logger, Node, Type, Port, NodePart } from "./core";
+import { Link, Logger, Node, Type, Port, NodePart, Unwrap } from "./core";
 import { Medley } from "./Medley";
-
-type Unwrap<T> = T extends Promise<infer U>
-  ? U
-  : T extends (...args: any) => Promise<infer U>
-  ? U
-  : T extends (...args: any) => infer U
-  ? U
-  : T;
 
 type TypeOfPort<T> = T extends Port<infer X> ? X : never;
 

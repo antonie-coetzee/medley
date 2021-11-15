@@ -22,8 +22,8 @@ export class Loader {
     return this.importer(module, this.origin, baseUrl);
   }
 
-  public static SystemImportWrapper(importer: (url: string) => Promise<any>) {
-    return (module: Module, origin: string, baseUrl?: URL) => {
+  public static SystemImportWrapper(importer: (url: string) => Promise<any>):ImportFunction {
+    return (module: Module, origin: string | null, baseUrl?: URL) => {
       const systemModule = module as SystemModule;
       let resolvedModuleBaseUrl: URL | undefined;
       if (systemModule.base) {
@@ -40,8 +40,8 @@ export class Loader {
     };
   }
 
-  public static ESMImportWrapper(importer: (url: string) => Promise<any>) {
-    return (module: Module, origin: string, baseUrl?: URL) => {
+  public static ESMImportWrapper(importer: (url: string) => Promise<any>):ImportFunction {
+    return (module: Module, origin: string | null, baseUrl?: URL) => {
       const esmModule = module as EsmModule;
       let resolvedModuleBaseUrl: URL | undefined;
       if (esmModule.base) {

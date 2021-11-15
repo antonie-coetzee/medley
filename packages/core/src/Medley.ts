@@ -6,6 +6,7 @@ import {
   Link,
   ROOT_SCOPE,
   Loader,
+  Unwrap,
 } from "./core";
 import { TypeRepo, NodeRepo, LinkRepo } from "./repos";
 import { Conductor } from "./Conductor";
@@ -101,16 +102,16 @@ export class Medley<
 
   public runNode<T>(
     nodeId: string,
-    ...args: any[]
-  ): Promise<T> {
+    ...args: T extends (...args: any) => any ? Parameters<T> : any[]
+  ): Promise<Unwrap<T>> {
     return this.conductor.runNodeFunction(nodeId, null, ...args);
   }
 
   public runNodeWithInputs<T>(
     nodeId: string,
     inputs: InputProvider<MNode, MType, MLink>,
-    ...args: any[]
-  ): Promise<T> {
+    ...args:  T extends (...args: any) => any ? Parameters<T> : any[]
+  ): Promise<Unwrap<T>>{
     return this.conductor.runNodeFunction(nodeId, inputs, ...args);
   }
 

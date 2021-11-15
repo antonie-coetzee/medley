@@ -14,7 +14,7 @@ describe("Loader", function () {
     let module: Module = {
       system: "foo:/bar.js",
     };
-    const res = await loader.importModule(module, "");
+    const res = await loader.importModule(module);
     expect(res).toEqual(true);
   });
   it("should load an esm module without a baseUrl", async function () {
@@ -27,7 +27,7 @@ describe("Loader", function () {
     let module: Module = {
       esm: "foo:/bar.js",
     };
-    const res = await loader.importModule(module, "");
+    const res = await loader.importModule(module);
     expect(res).toEqual(true);
   });
 });

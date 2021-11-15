@@ -26,7 +26,7 @@ describe("Medley", function () {
             winston.format.timestamp({
               format: "YY-MM-DD HH:MM:SS",
             }),
-            winston.format.printf((info) => {
+            winston.format.printf((info:any) => {
               const { timestamp, level, message, typeName, nodeId } = info;
               return ` ${timestamp}  ${level} ${typeName} ${nodeId} : ${message}`;
             })
@@ -38,7 +38,7 @@ describe("Medley", function () {
       linkRepo: new LinkRepo(),
       typeRepo: new TypeRepo(
         new Loader(
-          Loader.SystemImportWrapper((url) => {
+          Loader.SystemImportWrapper((url:string) => {
             const module = System.import(url);
             return module;
           })
@@ -60,19 +60,12 @@ describe("Medley", function () {
       return xml(xmlString, { indentation: "  " });
     };
 
-    // const res = await medley.runNode<string>(
-    //   { xmlFormatter: formatter } /* used by typeOne */,
-    //   "nodeOne",
-    //   "testArg"
-    // );
     medley.setScopeData({xmlFormatter: formatter});
     const res2 = await medley.runNodeWithInputs<string>(
       "nodeNested",
       {"typeNested-input-port": async ()=>"test input"},
       "testArg"
     );
-    const res = medley.getScopeData<{xmlFormatter:number}>()
-    const num:number = res.xmlFormatter;
     console.log(res2);
   });
   it("should return the active composition", async function () {
@@ -80,7 +73,7 @@ describe("Medley", function () {
       linkRepo: new LinkRepo(),
       typeRepo: new TypeRepo(
         new Loader(
-          Loader.SystemImportWrapper((url) => {
+          Loader.SystemImportWrapper((url:string) => {
             const module = System.import(url);
             return module;
           })

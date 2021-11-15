@@ -104,12 +104,12 @@
       "id": "nodeNested",
       "name": "nodeNested",
       "cache": true,
-      "value": {"outputId":"$output-id"}
+      "outputId":"$output-id"
     },
     {
       "type": "$input",
       "id": "$input-id",
-      "value": {"input":"typeNested-input-port"}
+      "input":"typeNested-input-port"
     },
     {
       "type": "$output",

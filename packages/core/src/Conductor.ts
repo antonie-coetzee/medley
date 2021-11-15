@@ -1,5 +1,5 @@
 import { Medley } from "./Medley";
-import { Link, Node, Type, Port } from "./core";
+import { Link, Node, Type, Port, Unwrap } from "./core";
 import { Input, ExecutionContext, NodeContext } from "./Context";
 import {
   NodeFunction,
@@ -29,43 +29,17 @@ export class Conductor<
     this.resultCache = cache || new Map();
   }
 
-  public async runNodeFunction<T, TNode extends Node = Node>(
+  public async runNodeFunction<T = unknown>(
     nodeId: string,
     inputProvider: InputProvider<MNode, MType, MLink> | null,
-    ...args: any[]
-  ): Promise<T> {
-    // use closure to capture nodeEngine on initial invocation
-    const conductor = this;
-    const getNodeFunction = async function () {
-      const nodeFuction = Conductor.buildNodeFunction<
-        TNode,
-        MNode,
-        MType,
-        MLink
-      >(conductor, nodeId, inputProvider);
-      return nodeFuction;
-    };
-
-    const nodeFunction = await getNodeFunction();
-    return nodeFunction(...args);
-  }
-
-  private static async buildNodeFunction<
-    TNode extends Node = Node,
-    MNode extends Node = Node,
-    MType extends Type = Type,
-    MLink extends Link = Link
-  >(
-    conductor: Conductor<MNode, MType, MLink>,
-    nodeId: string,
-    inputProvider: InputProvider<MNode, MType, MLink> | null
-  ) {
-    const node = (conductor.medley.nodes.getNode(nodeId) as unknown) as TNode;
+    ...args: T extends (...args: any) => any ? Parameters<T> : any[]
+  ): Promise<Unwrap<T>> {
+    const node = this.medley.nodes.getNode(nodeId);
     if (node == null) {
       throw new Error(`node with id: '${nodeId}', not found`);
     }
-    const nodeFunction = await conductor.medley.types.getExportFunction<
-      NodeFunction<TNode, MNode, MType, MLink>
+    const nodeFunction = await this.medley.types.getExportFunction<
+      NodeFunction<MNode, MNode, MType, MLink>
     >(node.type, nodeFunctionExportName);
 
     if (nodeFunction == null) {
@@ -73,31 +47,31 @@ export class Conductor<
     }
 
     const context = {
-      medley:conductor.medley,
+      medley: this.medley,
       node,
-      logger: conductor.medley.logger.child({
+      logger: this.medley.logger.child({
         typeName: node.type,
         nodeId: node.id,
       }),
-    } as ExecutionContext<TNode, MNode, MType, MLink>;
+    } as ExecutionContext<MNode, MNode, MType, MLink>;
 
     if (inputProvider == null) {
-      context.input = conductor.portInput.bind({
-        conductor,
+      context.input = this.portInput.bind({
+        conductor: this,
         context,
       }) as Input;
     } else {
-      context.input = conductor.inputProviderInput.bind({
-        conductor,
+      context.input = this.inputProviderInput.bind({
+        conductor: this,
         context,
         inputProvider,
       }) as Input;
     }
 
-    return (...args: any[]) => nodeFunction(context, ...args);
+    return nodeFunction(context, args);
   }
 
-  async inputProviderInput<T, TNode extends Node = Node>(
+  private async inputProviderInput<T, TNode extends Node = Node>(
     this: {
       context: ExecutionContext<TNode, MNode, MType, MLink>;
       conductor: Conductor;
@@ -113,14 +87,14 @@ export class Conductor<
     return inputFunction == null ? null : inputFunction(this.context);
   }
 
-  async portInput<T, TNode extends Node = Node>(
+  private async portInput(
     this: {
-      context: ExecutionContext<TNode, MNode, MType, MLink>;
+      context: ExecutionContext<MNode, MNode, MType, MLink>;
       conductor: Conductor;
     },
     port: Port,
     ...args: any[]
-  ): Promise<T | undefined> {
+  ): Promise<unknown | undefined> {
     let links = this.conductor.medley.links.getPortLinks(
       port.name,
       this.context.node.id
@@ -129,20 +103,15 @@ export class Conductor<
       return;
     }
     if (links.length === 0 && port.required === true) {
-      throw new Error(`link not detected for required port: '${port.name}'`);
+      throw new Error(`required port not linked: '${port.name}'`);
     }
     if (links.length !== 1) {
       throw new Error(`multiple links detected for port: '${port.name}'`);
     }
     const link = links[0];
+
     return this.conductor.cacheRunner(link.source, args, async () => {
-      const nodeFunction = await Conductor.buildNodeFunction<
-        TNode,
-        MNode,
-        MType,
-        MLink
-      >(this.conductor, link.source, null);
-      return nodeFunction(...args);
+      return this.conductor.runNodeFunction(link.source, null, args);
     });
   }
 

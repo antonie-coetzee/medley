@@ -3,7 +3,7 @@ import { NF, Input, Type, Node, Medley } from "@medley-js/core";
 export const nodeFunction: NF<Node & { outputId: string }> = (cntx) => {
   const { node, medley, input } = cntx;
 
-  const childScope = Medley.getChildInstance(medley.getRootInstance(), node.id);
+  const childScope = Medley.getScopedInstance(medley.getRootInstance(), node.id, true);
 
   const inputType = getInputType(input);
   childScope.types.addType(inputType);
