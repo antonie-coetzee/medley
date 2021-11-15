@@ -3,7 +3,7 @@ import { CompositeNode } from "../CompositeNode";
 import { InputType } from "../scopedTypes/input";
 import { OutputType } from "../scopedTypes/output";
 
-export const nodeFunction: NF<{}, CompositeNode> = async (cntx) => {
+export const nodeFunction: NF<CompositeNode> = async (cntx) => {
   const { node, medley, input } = cntx;
   
   const scopedInstance = Medley.getScopedInstance(medley.getRootInstance(), node.id);
@@ -13,13 +13,13 @@ export const nodeFunction: NF<{}, CompositeNode> = async (cntx) => {
 
   const outputNode = scopedInstance.nodes.getNodesByType(OutputType.name)[0];
   if (outputNode) {
-    const result = scopedInstance.runNode(cntx, outputNode.id);
+    const result = scopedInstance.runNode(outputNode.id);
     return result;
   }
 };
 
 function addInputType(scopedInstance: Medley, input: Input): void {
-  const nodeFunction: NF<{}> = ({ node }) => {
+  const nodeFunction: NF = ({ node }) => {
     return input({
       name: node.id,
     });

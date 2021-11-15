@@ -10,7 +10,7 @@ import {
 import { TypeRepo, NodeRepo, LinkRepo } from "./repos";
 import { Conductor } from "./Conductor";
 import { GraphApi, TypesApi, NodesApi, LinksApi } from "./api";
-import { InputProvider, NodeContext } from ".";
+import { InputProvider } from ".";
 
 export interface MedleyOptions<
   MNode extends Node = Node,
@@ -32,6 +32,7 @@ export class Medley<
 > {
   private conductor: Conductor<MNode, MType, MLink>;
   private options: MedleyOptions<MNode, MType, MLink>;
+  private instanceData: {} = {};
 
   public logger: Logger;
   public nodes: NodesApi<MNode, MType, MLink>;
@@ -83,21 +84,34 @@ export class Medley<
     this.conductor = new Conductor<MNode, MType, MLink>(this, this.options.cache);
   }
 
-  public runNode<T>(
-    context: {} | null,
-    nodeId: string,
-    ...args: any[]
-  ): Promise<T> {
-    return this.conductor.runNodeFunction(context, nodeId, null, ...args);
+  public setScopeData(data:{}){
+    if(this.parentInstance){
+      if(this.instanceData === {}){
+        this.instanceData = {...this.parentInstance.instanceData};  
+      }
+      this.instanceData = {...this.instanceData, ...data};
+    }else{
+      this.instanceData = {...this.instanceData, ...data};
+    }
   }
 
-  public runNodeWithInputs<T, TNode extends Node = Node>(
-    context: {} | null,
+  public getScopeData<T extends {}>(){
+    return this.instanceData as { [Property in keyof T]: T[Property] | undefined};
+  }
+
+  public runNode<T>(
     nodeId: string,
-    inputs: InputProvider<TNode, MNode, MType, MLink>,
     ...args: any[]
   ): Promise<T> {
-    return this.conductor.runNodeFunction(context, nodeId, inputs, ...args);
+    return this.conductor.runNodeFunction(nodeId, null, ...args);
+  }
+
+  public runNodeWithInputs<T>(
+    nodeId: string,
+    inputs: InputProvider<MNode, MType, MLink>,
+    ...args: any[]
+  ): Promise<T> {
+    return this.conductor.runNodeFunction(nodeId, inputs, ...args);
   }
 
   public getRootInstance(): Medley<MNode, MType, MLink> {

@@ -65,13 +65,14 @@ describe("Medley", function () {
     //   "nodeOne",
     //   "testArg"
     // );
-
+    medley.setScopeData({xmlFormatter: formatter});
     const res2 = await medley.runNodeWithInputs<string>(
-      { xmlFormatter: formatter } /* used by typeOne */,
       "nodeNested",
       {"typeNested-input-port": async ()=>"test input"},
       "testArg"
     );
+    const res = medley.getScopeData<{xmlFormatter:number}>()
+    const num:number = res.xmlFormatter;
     console.log(res2);
   });
   it("should return the active composition", async function () {

@@ -1,35 +1,22 @@
-import { MultiPort, NF, UniPort } from "@medley-js/core";
+import { NF, Port } from "@medley-js/core";
 
 export const typeTwoNodeFunction: NF = async ({ input, logger }) => {
   logger.info("log from ModuleTwo.typeTwo");
-  const portOneValue = await input<typeof typeTwoPortOne>({
-    ...typeTwoPortOne,
-    context: { customContextProp: "dfg" },
-  });
-
-  const testResult = await input(typeTwoPortMulti, "ssdf");
+  const portOneValue = await input(typeTwoPortOne);
   return `<moduleTwo-typeTwo>${portOneValue}</moduleTwo-typeTwo>`;
 };
 
-const typeTwoPortOne: UniPort<string> = {
+const typeTwoPortOne: Port<string> = {
   name: "typeTwoPortOne",
-};
-
-const typeTwoPortMulti: MultiPort<boolean> = {
-  multiArity: true,
-  name: "typeTwoPortMulti",
 };
 
 export const typeFiveNodeFunction: NF = async ({ logger, input }) => {
   logger.info("log from ModuleTwo.typeFive");
-  const portOneValue = await input(typeFivePortOne, "sdf");
+  const portOneValue = await input(typeFivePortOne);
   return `<moduleTwo-typeFive>${portOneValue}</moduleTwo-typeFive>`;
 };
 
-const typeFivePortOne: UniPort<string> = {
+const typeFivePortOne: Port<string> = {
   name: "typeFivePortOne",
 };
 
-const typeFivePortTwo: UniPort<(arg1: string) => string> = {
-  name: "typeFivePortTwo"
-};

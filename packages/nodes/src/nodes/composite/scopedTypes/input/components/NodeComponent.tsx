@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { Handle, Position } from "react-flow-renderer";
 import { TNodeComponent } from "@medley-js/common";
-import Chip from "@material-ui/core/Chip";
 import { InputNode } from "../InputNode";
 import ExitToApp from "@mui/icons-material/ExitToApp";
-import { Menu, Popover } from "@mui/material";
+import { Chip, Menu, Popover } from "@mui/material";
 import { EditNodeComponent } from "./EditNodeComponent";
 
 export const NodeComponent: TNodeComponent<InputNode> = ({

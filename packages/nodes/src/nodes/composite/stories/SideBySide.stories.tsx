@@ -1,6 +1,6 @@
 import React from "react";
 import { Meta } from "@storybook/react";
-import { Cache, Medley } from "@medley-js/core";
+import { Cache, Medley, nullLogger } from "@medley-js/core";
 import {
   CLink,
   CNode,
@@ -36,6 +36,9 @@ export const SideBySide = componentStory(async () => {
     CompositeType.name,
     constants.EditNodeComponent
   );
+  if(EditNodeComponent == null){
+    throw new Error("EditNodeComponent is undefined")
+  }
   return () => (
     <Grid container spacing={0.5}>
       <Grid item xs={6}>
@@ -43,12 +46,12 @@ export const SideBySide = componentStory(async () => {
           <Box style={{position:"absolute", padding:"5px"}}>Node View</Box>
           <EditNodeComponent
             context={{
-              logger: null,
+              logger: nullLogger,
               medley: ecn,
               node: cn,
             }}
             host={{}}
-            close={null}
+            close={()=>{}}
           />
         </Paper>
       </Grid>
@@ -57,12 +60,12 @@ export const SideBySide = componentStory(async () => {
           <Box style={{position:"absolute", padding:"5px"}}>Edit View</Box>
           <EditNodeComponent
             context={{
-              logger: null,
+              logger: nullLogger,
               medley: bcnScope,
               node: bcn,
             }}
             host={{}}
-            close={null}
+            close={()=>{}}
           />
         </Paper>
       </Grid>

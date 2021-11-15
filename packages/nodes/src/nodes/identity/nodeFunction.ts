@@ -1,15 +1,15 @@
-import { NF, UniPort } from "@medley-js/core";
+import { NF, Port } from "@medley-js/core";
 import { IdentityNode } from "./node";
 
-const PortOne: UniPort<string> = {
+const PortOne: Port<string> = {
   name: "input1",
 };
 
-const PortTwo: UniPort<string> = {
+const PortTwo: Port<string> = {
   name: "input2",
 };
 
-export const nodeFunction: NF<{}, IdentityNode> = async ({node, input}) => {
+export const nodeFunction: NF<IdentityNode> = async ({node, input}) => {
   const in1 = await input(PortOne);
   const in2 = await input(PortTwo);
   console.log(node.id);

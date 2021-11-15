@@ -1,30 +1,19 @@
-import { NF, UniPort } from "@medley-js/core";
+import { NF, Port} from "@medley-js/core";
 
-export const nodeFunction: NF<{
-  xmlFormatter?: (xmlString: string) => string;
-}> = async ({ logger, xmlFormatter, input }, testArg: string) => {
+export const nodeFunction: NF = async ({ logger, input }, testArg: string) => {
   logger.info("log from ModuleOne.typeOne");
   const portOneValue = await input(portOne);
-  const portTwoValue = await input<typeof portTwo>({
-    ...portTwo,
-    context: { customContextProp: testArg },
-  });
+  const portTwoValue = await input(portTwo);
 
   const xml = `<moduleOne-typeOne>${portOneValue}${portTwoValue}</moduleOne-typeOne>`;
 
-  if (xmlFormatter) {
-    const formattedXml = xmlFormatter(xml);
-    logger.info(`\n${formattedXml}`);
-    return formattedXml;
-  } else {
-    return xml;
-  }
+  return xml; 
 };
 
-const portOne: UniPort<string> = {
+const portOne: Port<string> = {
   name: "typeOnePortOne",
 };
 
-const portTwo: UniPort<string> = {
+const portTwo: Port<string> = {
   name: "typeOnePortTwo",
 };

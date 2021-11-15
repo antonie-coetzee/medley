@@ -1,11 +1,5 @@
 import { NodeContext } from "@medley-js/core";
-import {
-  CLink,
-  CNode,
-  CNodePart,
-  constants,
-  CType
-} from "@medley-js/common";
+import { CLink, CNode, CNodePart, constants, CType } from "@medley-js/common";
 import React from "react";
 import { CompositeNode } from "../CompositeNode";
 import { Connection, Edge, Node as RFNode } from "react-flow-renderer";
@@ -26,7 +20,7 @@ function getAddInputNode(
       const node = context.medley.nodes.insertNode<InputNode>({
         name: "INPUT",
         type: InputType.name,
-        value:{}
+        value: {},
       });
       if (mouseX && mouseY) {
         node.position = [mouseX, mouseY];
@@ -91,11 +85,9 @@ function getRunOption(
           return;
         }
         const compositeNode = nodes[0];
-        const res = await rootInstance.runNodeWithInputs(
-          null,
-          compositeNode.id,
-          { input: async () => "Test" }
-        );
+        const res = await rootInstance.runNodeWithInputs(compositeNode.id, {
+          input: async () => "Test",
+        });
         console.log(res);
       } catch (e) {
         console.log(e);
