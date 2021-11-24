@@ -16,16 +16,19 @@ export class GraphApi<
     super();
   }
 
-  public setGraph(graph: Graph<MNode, MType, MLink>, baseUrl: URL) {
-    this.typesApi.setTypes(graph.types, baseUrl);
+  public setGraph<
+    TGraph extends Graph<MNode, MType, MLink> = Graph<MNode, MType, MLink>
+  >(graph: TGraph, baseUrl: URL) {
     this.typesApi.setOrigin(graph.name);
+    this.typesApi.setTypes(graph.types, baseUrl);
     this.nodesApi.setNodes(graph.nodes);
     this.linksApi.setLinks(graph.links);
     this.graph = graph;
-    
   }
 
-  public getGraph() {
+  public getGraph<
+    TGraph extends Graph<MNode, MType, MLink> = Graph<MNode, MType, MLink>
+  >() {
     const types = this.typesApi
       .getAllTypes()
       .filter((t) => t.volatile == null || t.volatile === false);
@@ -40,6 +43,6 @@ export class GraphApi<
       types,
       nodes,
       links,
-    };
+    } as TGraph;
   }
 }

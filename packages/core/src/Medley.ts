@@ -7,6 +7,9 @@ import {
   ROOT_SCOPE,
   Loader,
   Unwrap,
+  Chainable,
+  Middleware,
+  chainMiddleware,
 } from "./core";
 import { TypeRepo, NodeRepo, LinkRepo } from "./repos";
 import { Conductor } from "./Conductor";
@@ -21,6 +24,15 @@ export interface MedleyOptions<
   typeRepo: TypeRepo;
   nodeRepo: NodeRepo;
   linkRepo: LinkRepo;
+  nodesApiMiddleware?: (
+    use: (middleware: Middleware<NodesApi<MNode, MType, MLink>>) => void
+  ) => void;
+  typesApiMiddleware?: (
+    use: (middleware: Middleware<TypesApi<MType>>) => void
+  ) => void;
+  linksApiMiddleware?: (
+    use: (middleware: Middleware<LinksApi<MLink>>) => void
+  ) => void;
   cache?: Map<string, unknown>;
   logger?: Logger;
   scopeId?: string;
@@ -64,17 +76,24 @@ export class Medley<
     this.scopeId = this.options.scopeId || ROOT_SCOPE;
     this.logger = this.options.logger || nullLogger;
 
-    this.types = new TypesApi<MType>(
+    this.types = this.buildTypesApi(
       this.scopeId,
       this.options.typeRepo,
-      parentInstance?.types
+      parentInstance?.types,
+      this.options.typesApiMiddleware
     );
-    this.links = new LinksApi<MLink>(this.scopeId, this.options.linkRepo);
-    this.nodes = new NodesApi<MNode, MType, MLink>(
+    this.links = this.buildLinksApi(
+      this.scopeId,
+      this.options.linkRepo,
+      this.parentInstance?.links,
+      this.options.linksApiMiddleware
+    );
+    this.nodes = this.buildNodesApi(
       this.scopeId,
       this.options.nodeRepo,
       this.links,
-      parentInstance?.nodes
+      this.parentInstance?.nodes,
+      this.options.nodesApiMiddleware
     );
     this.graph = new GraphApi<MNode, MType, MLink>(
       this.nodes,
@@ -82,22 +101,27 @@ export class Medley<
       this.links
     );
 
-    this.conductor = new Conductor<MNode, MType, MLink>(this, this.options.cache);
+    this.conductor = new Conductor<MNode, MType, MLink>(
+      this,
+      this.options.cache
+    );
   }
 
-  public setScopeData(data:{}){
-    if(this.parentInstance){
-      if(this.instanceData === {}){
-        this.instanceData = {...this.parentInstance.instanceData};  
+  public setScopeData(data: {}) {
+    if (this.parentInstance) {
+      if (this.instanceData === {}) {
+        this.instanceData = { ...this.parentInstance.instanceData };
       }
-      this.instanceData = {...this.instanceData, ...data};
-    }else{
-      this.instanceData = {...this.instanceData, ...data};
+      this.instanceData = { ...this.instanceData, ...data };
+    } else {
+      this.instanceData = { ...this.instanceData, ...data };
     }
   }
 
-  public getScopeData<T extends {}>(){
-    return this.instanceData as { [Property in keyof T]: T[Property] | undefined};
+  public getScopeData<T extends {}>() {
+    return this.instanceData as {
+      [Property in keyof T]: T[Property] | undefined;
+    };
   }
 
   public runNode<T>(
@@ -110,8 +134,8 @@ export class Medley<
   public runNodeWithInputs<T>(
     nodeId: string,
     inputs: InputProvider<MNode, MType, MLink>,
-    ...args:  T extends (...args: any) => any ? Parameters<T> : any[]
-  ): Promise<Unwrap<T>>{
+    ...args: T extends (...args: any) => any ? Parameters<T> : any[]
+  ): Promise<Unwrap<T>> {
     return this.conductor.runNodeFunction(nodeId, inputs, ...args);
   }
 
@@ -121,21 +145,6 @@ export class Medley<
     } else {
       return this;
     }
-  }
-
-  public static getChildInstance<
-    TNode extends Node = Node,
-    TType extends Type = Type,
-    TLink extends Link = Link
-  >(parent: Medley<TNode, TType, TLink>, scopeId: string) {
-    if (scopeId == null || scopeId === "") {
-      throw new Error("scopeId not valid");
-    }
-    const instance = new Medley<TNode, TType, TLink>(
-      { ...parent.options, scopeId },
-      parent
-    );
-    return instance;
   }
 
   public static getScopedInstance<
@@ -155,5 +164,67 @@ export class Medley<
       isChild ? parent : undefined
     );
     return instance;
+  }
+
+  private buildNodesApi(
+    scopeId: string,
+    nodeRepo: NodeRepo,
+    linksApi: LinksApi<MLink>,
+    parent?: NodesApi<MNode, MType, MLink>,
+    builder?: MedleyOptions<MNode, MType, MLink>["nodesApiMiddleware"]
+  ) {
+    let nodesApi = new NodesApi<MNode, MType, MLink>(
+      scopeId,
+      nodeRepo,
+      linksApi
+    );
+    if (parent) {
+      nodesApi = chainMiddleware(parent, nodesApi);
+    }
+    if (builder) {
+      const use = (middleware: Middleware<NodesApi<MNode, MType, MLink>>) => {
+        nodesApi = chainMiddleware(nodesApi, middleware);
+      };
+      builder(use);
+    }
+    return nodesApi;
+  }
+
+  private buildTypesApi(
+    scopeId: string,
+    typeRepo: TypeRepo,
+    parent?: TypesApi<MType>,
+    builder?: MedleyOptions<MNode, MType, MLink>["typesApiMiddleware"]
+  ) {
+    let typesApi = new TypesApi<MType>(scopeId, typeRepo);
+    if (parent) {
+      typesApi = chainMiddleware(parent, typesApi);
+    }
+    if (builder) {
+      const use = (middleware: Middleware<TypesApi<MType>>) => {
+        typesApi = chainMiddleware(typesApi, middleware);
+      };
+      builder(use);
+    }
+    return typesApi;
+  }
+
+  private buildLinksApi(
+    scopeId: string,
+    linkRepo: LinkRepo,
+    parent?: LinksApi<MLink>,
+    builder?: MedleyOptions<MNode, MType, MLink>["linksApiMiddleware"]
+  ) {
+    let linksApi = new LinksApi<MLink>(scopeId, linkRepo);
+    if (parent) {
+      linksApi = chainMiddleware(parent, linksApi);
+    }
+    if (builder) {
+      const use = (middleware: Middleware<LinksApi<MLink>>) => {
+        linksApi = chainMiddleware(linksApi, middleware);
+      };
+      builder(use);
+    }
+    return linksApi;
   }
 }

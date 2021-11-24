@@ -1,6 +1,6 @@
 import { VFC } from "react";
 import { NodePartContext } from "@medley-js/core";
-import { CLink, CNode, CNodePart, CType, Host } from "../types";
+import { CLink, CNode, CNodePart, CType, Host } from "../../types";
 
 export type TCreateNodeComponentProps<
   TNodePart extends CNodePart = CNodePart

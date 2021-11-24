@@ -1,6 +1,6 @@
 import { CSSProperties, ReactNode, VFC } from "react";
 import { NodeContext } from "@medley-js/core";
-import { CLink, CNode, Location, CType, Host } from "../types";
+import { CLink, CNode, Location, CType, Host } from "../../types";
 
 export type LinkProps = {
     id: string;

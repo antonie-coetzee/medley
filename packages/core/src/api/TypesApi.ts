@@ -1,31 +1,16 @@
-import { EventType, MedleyEvent, Type } from "../core";
+import { EventType, MedleyEvent, Type, Unwrap } from "../core";
 import { TypeRepo } from "../repos";
 
-type Unwrap<T> = T extends Promise<infer U>
-  ? U
-  : T extends (...args: any) => Promise<infer U>
-  ? U
-  : T extends (...args: any) => infer U
-  ? U
-  : T;
+export class TypesApi<TType extends Type = Type> {
+  public parent?: TypesApi<TType>;
+  constructor(private scopeId: string, private typeRepo: TypeRepo) {}
 
-export class TypesApi<TType extends Type = Type> extends EventTarget {
-
-  constructor(
-    private scopeId: string,
-    private typeRepo: TypeRepo,
-    private parentTypes?: TypesApi<TType>,
-  ) {
-    super();
-  }
-
-  public setOrigin(origin:string){
+  public setOrigin(origin: string) {
     this.typeRepo.loader.origin = origin;
   }
 
   public setTypes(types: TType[], baseUrl: URL): void {
     this.typeRepo.set(types, baseUrl);
-    this.dispatchEvent(new MedleyEvent(EventType.OnChange));
   }
 
   public async runExportFunction<T extends (...args: any) => any>(
@@ -33,11 +18,14 @@ export class TypesApi<TType extends Type = Type> extends EventTarget {
     functionName: string,
     ...params: Parameters<T>
   ): Promise<Unwrap<ReturnType<T>> | undefined> {
-    const exportFunc = await this.getExportFunction(typeName, functionName) as T;
-    if(exportFunc == null){
+    const exportFunc = (await this.getExportFunction(
+      typeName,
+      functionName
+    )) as T;
+    if (exportFunc == null) {
       return;
     }
-    return exportFunc(...(params as any[]))
+    return exportFunc(...(params as any[]));
   }
 
   public async getExportFunction<T extends Function = Function>(
@@ -52,8 +40,8 @@ export class TypesApi<TType extends Type = Type> extends EventTarget {
     if (func) {
       return func;
     }
-    if (this.parentTypes) {
-      return this.parentTypes.getExportFunction<T>(typeName, functionName);
+    if (this.parent) {
+      return this.parent.getExportFunction<T>(typeName, functionName);
     }
   }
 
@@ -66,8 +54,8 @@ export class TypesApi<TType extends Type = Type> extends EventTarget {
 
   public getTypes(): TType[] {
     const scopeTypes = this.typeRepo.getTypes(this.scopeId) as TType[];
-    if (this.parentTypes) {
-      const parentTypes = this.parentTypes.getTypes();
+    if (this.parent) {
+      const parentTypes = this.parent.getTypes();
       return [...new Set([...parentTypes, ...scopeTypes])];
     }
     return scopeTypes;
@@ -82,8 +70,8 @@ export class TypesApi<TType extends Type = Type> extends EventTarget {
     if (type) {
       return type;
     }
-    if (this.parentTypes) {
-      return this.parentTypes.getType(typeName) as TType;
+    if (this.parent) {
+      return this.parent.getType(typeName) as TType;
     }
   }
 
@@ -92,19 +80,13 @@ export class TypesApi<TType extends Type = Type> extends EventTarget {
     if (scopeHasType) {
       return true;
     }
-    if (this.parentTypes) {
-      return this.parentTypes.hasType(typeName);
+    if (this.parent) {
+      return this.parent.hasType(typeName);
     }
     return false;
   }
 
   public addType(type: TType) {
-    const allowed = this.dispatchEvent(MedleyEvent.createCancelable(EventType.OnItemCreate, type));
-    if (allowed === false) {
-      return;
-    }
-    if (this.typeRepo.addType(this.scopeId, type)) {
-      this.dispatchEvent(MedleyEvent.create(EventType.OnChange));
-    }
+    this.typeRepo.addType(this.scopeId, type);
   }
 }

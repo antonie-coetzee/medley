@@ -1,4 +1,4 @@
-import { CNode } from "module/types";
+import { CNode } from "types";
 
 export function setNodeMetaData<TMetaData>(
   node: CNode & { __getMetaData?: () => TMetaData },

@@ -8,16 +8,16 @@ export interface TypeVersion {
   cache?: Cache;
   composite?: boolean;
   /*
-   ** string: (standard export name) -> (different export name)
-   ** Module: (standard export name) -> (different module).(standard export name)
-   ** { name: string } & Module: (standard export name) -> (different module).(different export name)
-   ** undefined: (standard export name)
+   ** string: (std module).(std export name) -> (std module).(diff export name)
+   ** Module: (std module).(std export name) -> (diff module).(std export name)
+   ** { name: string } & Module: (std module).(std export name) -> (diff module).(diff export name)
+   ** undefined: (std export name)
    */
   exportMap?: {
     [name: string]: string | Module | ({ name: string } & Module) | undefined;
   };
 }
 
-export interface Type extends TypeVersion, Scoped{
+export interface Type extends TypeVersion, Scoped {
   name: string;
 }

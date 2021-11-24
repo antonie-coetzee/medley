@@ -7,7 +7,7 @@ import {
   EventType,
   WithPartial,
   NodePart,
-  Writeable
+  Writeable,
 } from "../core";
 import { NodeRepo } from "../repos";
 
@@ -15,20 +15,17 @@ export class NodesApi<
   MNode extends Node = Node,
   MType extends Type = Type,
   MLink extends Link = Link
-> extends EventTarget {
+> {
+  public parent?: NodesApi<MNode, MType, MLink>
 
   constructor(
     private scopeId: string,
     private nodeRepo: NodeRepo,
     private linksApi: LinksApi<MLink>,
-    private parentNodes?: NodesApi<MNode, MType, MLink>
-  ) {
-    super();
-  }
+  ) {}
 
   public setNodes(nodes: Node[]) {
     this.nodeRepo.set(nodes);
-    this.dispatchEvent(new MedleyEvent(EventType.OnChange));
   }
 
   public getNode(id: string): MNode | undefined {
@@ -36,18 +33,20 @@ export class NodesApi<
     if (node) {
       return node as MNode;
     }
-    if (this.parentNodes) {
-      return this.parentNodes.getNode(id);
+    if (this.parent) {
+      return this.parent.getNode(id);
     }
   }
 
-  public getNodesByType<TNode extends MNode = MNode>(typeName: string): TNode[] {
+  public getNodesByType<TNode extends MNode = MNode>(
+    typeName: string
+  ): TNode[] {
     const scopeNodes = this.nodeRepo.getNodesByType(
       this.scopeId,
       typeName
     ) as TNode[];
-    if (this.parentNodes) {
-      const parentNodes = this.parentNodes.getNodesByType<TNode>(typeName);
+    if (this.parent) {
+      const parentNodes = this.parent.getNodesByType<TNode>(typeName);
       return [...parentNodes, ...scopeNodes];
     }
     return scopeNodes;
@@ -67,10 +66,11 @@ export class NodesApi<
     return scopeTypes;
   }
 
-  public insertNode<TNode extends MNode = never, InferredTNode extends TNode = TNode>(node: NodePart<InferredTNode>) {
+  public insertNode<
+    TNode extends MNode = never,
+    InferredTNode extends TNode = TNode
+  >(node: NodePart<InferredTNode>) {
     node.scope = this.scopeId;
-    this.dispatchEvent(MedleyEvent.create(EventType.OnItemCreate, node));
-    this.dispatchEvent(MedleyEvent.create(EventType.OnChange));
     return this.nodeRepo.insertNode(node) as TNode;
   }
 
@@ -84,11 +84,6 @@ export class NodesApi<
       );
     }
     const deletedNode = this.nodeRepo.removeNode(node);
-    if (deletedNode) {
-      this.dispatchEvent(
-        MedleyEvent.create(EventType.OnItemDelete, deletedNode)
-      );
-      this.dispatchEvent(MedleyEvent.create(EventType.OnChange));
-    }
+    return deletedNode ? true : false;
   }
 }
