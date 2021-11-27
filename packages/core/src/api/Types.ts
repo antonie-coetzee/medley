@@ -1,8 +1,8 @@
 import { EventType, MedleyEvent, Type, Unwrap } from "../core";
 import { TypeRepo } from "../repos";
 
-export class TypesApi<TType extends Type = Type> {
-  public parent?: TypesApi<TType>;
+export class Types<TType extends Type = Type> {
+  public parent?: Types<TType>;
   constructor(private scopeId: string, private typeRepo: TypeRepo) {}
 
   public setOrigin(origin: string) {

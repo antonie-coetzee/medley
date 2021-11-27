@@ -1,7 +1,7 @@
-import { LinksApi, NodesApi, TypesApi } from ".";
+import { Links, Nodes, Types } from ".";
 import { Graph, Link, Type, Node } from "../core";
 
-export class GraphApi<
+export class Graphs<
   MNode extends Node = Node,
   MType extends Type = Type,
   MLink extends Link = Link
@@ -9,9 +9,9 @@ export class GraphApi<
   private graph?: Graph<MNode, MType, MLink>;
 
   constructor(
-    private nodesApi: NodesApi<MNode, MType, MLink>,
-    private typesApi: TypesApi<MType>,
-    private linksApi: LinksApi<MLink>
+    private nodesApi: Nodes<MNode, MType, MLink>,
+    private typesApi: Types<MType>,
+    private linksApi: Links<MLink>
   ) {
     super();
   }

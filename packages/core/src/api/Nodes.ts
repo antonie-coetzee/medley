@@ -1,4 +1,4 @@
-import { LinksApi } from ".";
+import { Links } from ".";
 import {
   Type,
   Node,
@@ -11,17 +11,17 @@ import {
 } from "../core";
 import { NodeRepo } from "../repos";
 
-export class NodesApi<
+export class Nodes<
   MNode extends Node = Node,
   MType extends Type = Type,
   MLink extends Link = Link
 > {
-  public parent?: NodesApi<MNode, MType, MLink>
+  public parent?: Nodes<MNode, MType, MLink>
 
   constructor(
     private scopeId: string,
     private nodeRepo: NodeRepo,
-    private linksApi: LinksApi<MLink>,
+    private linksApi: Links<MLink>,
   ) {}
 
   public setNodes(nodes: Node[]) {

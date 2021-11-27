@@ -1,8 +1,8 @@
 import { EventType, Link, MedleyEvent, PortLink } from "../core";
 import { LinkRepo } from "../repos";
 
-export class LinksApi<MLink extends Link = Link> {
-  parent?: LinksApi<MLink>;
+export class Links<MLink extends Link = Link> {
+  parent?: Links<MLink>;
 
   constructor(private scopeId: string, private linkRepo: LinkRepo) {}
 
