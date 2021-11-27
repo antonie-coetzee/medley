@@ -1,4 +1,4 @@
-export * from "./repos";
+export * from "./repositories";
 export * from "./api";
 export * from "./core";
 export * from "./Medley";

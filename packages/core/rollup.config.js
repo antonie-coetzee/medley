@@ -43,7 +43,7 @@ export default [
         plugins: [terser()]
       }           
     ],
-    plugins: [nodeResolve(), commonjs(), typescript()],
+    plugins: [typescript(), nodeResolve(), commonjs() ],
   },
   {
     input: "src/index.ts",

@@ -1,10 +1,10 @@
 import { EventType, Link, MedleyEvent, PortLink } from "../core";
-import { LinkRepo } from "../repos";
+import { LinkRepository } from "../repositories";
 
 export class Links<MLink extends Link = Link> {
   parent?: Links<MLink>;
 
-  constructor(private scopeId: string, private linkRepo: LinkRepo) {}
+  constructor(private scopeId: string, private linkRepo: LinkRepository) {}
 
   public setLinks(links: Link[]) {
     this.linkRepo.set(links);

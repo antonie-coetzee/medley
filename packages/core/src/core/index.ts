@@ -11,4 +11,4 @@ export * from "./TreeMap";
 export * from "./Events";
 export * from "./Cache";
 export * from "./utility";
-export * from "./Middleware";
+export * from "./PartialProxy";

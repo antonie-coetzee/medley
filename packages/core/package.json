@@ -9,6 +9,7 @@
   "license": "MIT",
   "author": "Antonie Coetzee",
   "scripts": {
+    "compile": "tsc --build",
     "build": "npx rollup -c",
     "build:test": "npx rollup -c rollup.config.test.js",
     "test": "npx jest --verbose"

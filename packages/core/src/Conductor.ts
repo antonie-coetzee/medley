@@ -29,7 +29,14 @@ export class Conductor<
     this.resultCache = cache || new Map();
   }
 
-  public async runNodeFunction<T = unknown>(
+  public async runNode<T = unknown>(
+    nodeId: string,
+    ...args: T extends (...args: any) => any ? Parameters<T> : any[]
+  ): Promise<Unwrap<T>> {
+    return this.runNodeWithInputs(nodeId, null, ...args);
+  }
+
+  public async runNodeWithInputs<T = unknown>(
     nodeId: string,
     inputProvider: InputProvider<MNode, MType, MLink> | null,
     ...args: T extends (...args: any) => any ? Parameters<T> : any[]
@@ -74,7 +81,7 @@ export class Conductor<
   private async inputProviderInput<T, TNode extends Node = Node>(
     this: {
       context: ExecutionContext<TNode, MNode, MType, MLink>;
-      conductor: Conductor;
+      conductor: Conductor<MNode, MType, MLink>;
       inputProvider: InputProvider<MNode, MType, MLink>;
     },
     port: Port,
@@ -90,7 +97,7 @@ export class Conductor<
   private async portInput(
     this: {
       context: ExecutionContext<MNode, MNode, MType, MLink>;
-      conductor: Conductor;
+      conductor: Conductor<MNode, MType, MLink>;
     },
     port: Port,
     ...args: any[]
@@ -111,7 +118,7 @@ export class Conductor<
     const link = links[0];
 
     return this.conductor.cacheRunner(link.source, args, async () => {
-      return this.conductor.runNodeFunction(link.source, null, args);
+      return this.conductor.runNode(link.source, null, args);
     });
   }
 

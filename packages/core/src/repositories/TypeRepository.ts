@@ -1,6 +1,6 @@
 import { Type, Loader, isModule, TreeMap, ROOT_SCOPE, Module } from "../core";
 
-export class TypeRepo {
+export class TypeRepository {
   private moduleCache: Map<string, any> = new Map();
   /* scope -> type */
   private typeMap: TreeMap<Type> = new TreeMap();

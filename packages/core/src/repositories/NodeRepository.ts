@@ -7,7 +7,7 @@ import {
   Writeable,
 } from "../core";
 
-export class NodeRepo {
+export class NodeRepository {
   public nodeIndex: Map<string, Node> = new Map();
   public nodeTreeMap: TreeMap<Node> = new TreeMap();
 

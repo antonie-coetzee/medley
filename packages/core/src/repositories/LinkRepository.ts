@@ -5,7 +5,7 @@ import {
   PortLink,
 } from "../core";
 
-export class LinkRepo {
+export class LinkRepository {
   private updateSourceToPortMap: boolean = false;
 
   /* scope -> port -> target -> source -> link */

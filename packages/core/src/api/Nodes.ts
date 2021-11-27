@@ -9,7 +9,7 @@ import {
   NodePart,
   Writeable,
 } from "../core";
-import { NodeRepo } from "../repos";
+import { NodeRepository } from "../repositories";
 
 export class Nodes<
   MNode extends Node = Node,
@@ -20,7 +20,7 @@ export class Nodes<
 
   constructor(
     private scopeId: string,
-    private nodeRepo: NodeRepo,
+    private nodeRepo: NodeRepository,
     private linksApi: Links<MLink>,
   ) {}
 
