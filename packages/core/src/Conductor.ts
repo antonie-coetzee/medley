@@ -1,6 +1,6 @@
 import { Medley } from "./Medley";
 import { Link, Node, Type, Port, Unwrap } from "./core";
-import { Input, ExecutionContext, NodeContext } from "./Context";
+import { Input, ExecutionContext } from "./Context";
 import {
   NodeFunction,
   nodeFunction as nodeFunctionExportName,
@@ -106,7 +106,7 @@ export class Conductor<
       port.name,
       this.context.node.id
     );
-    if (links == null || (links.length === 0 && port.required == false)) {
+    if (links == null || (links.length === 0 && !port.required)) {
       return;
     }
     if (links.length === 0 && port.required === true) {

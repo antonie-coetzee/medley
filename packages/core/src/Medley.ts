@@ -17,13 +17,14 @@ export interface MedleyOptions<
   MLink extends Link = Link
 > {
   loader?: Loader;
-  typeRepo?: TypeRepository;
-  nodeRepo?: NodeRepository;
-  linkRepo?: LinkRepository;
-  nodes?: Nodes<MNode, MType, MLink>;
+  typeRepository?: TypeRepository;
+  nodeRepository?: NodeRepository;
+  linkRepository?: LinkRepository;
+  nodes?: Nodes<MNode>;
   types?: Types<MType>;
   links?: Links<MLink>;
   conductor?: Conductor<MNode, MType, MLink>;
+  graphs?: Graphs<MNode, MType, MLink>;
   cache?: Map<string, unknown>;
   logger?: Logger;
   scopeId?: string;
@@ -35,30 +36,28 @@ export class Medley<
   MType extends Type = Type,
   MLink extends Link = Link
 > {
-  public parent?: Medley<MNode, MType, MLink>;
+  public readonly loader: Loader;
+  public readonly nodeRepository: NodeRepository;
+  public readonly typeRepository: TypeRepository;
+  public readonly linkRepository: LinkRepository;
+  public readonly cache: Map<string, unknown>;
+  public readonly conductor: Conductor<MNode, MType, MLink>;
 
-  public loader: Loader;
-  public nodeRepo: NodeRepository;
-  public typeRepo: TypeRepository;
-  public linkRepo: LinkRepository;
-  public cache: Map<string, unknown>;
-  public conductor: Conductor<MNode, MType, MLink>;
+  public readonly scopeId: string;
+  public readonly logger: Logger;
 
-  public scopeId: string;
-  public logger: Logger;
-
-  public nodes: Nodes<MNode, MType, MLink>;
-  public types: Types<MType>;
-  public links: Links<MLink>;
-  public graphs: Graphs<MNode, MType, MLink>;
+  public readonly nodes: Nodes<MNode>;
+  public readonly types: Types<MType>;
+  public readonly links: Links<MLink>;
+  public readonly graphs: Graphs<MNode, MType, MLink>;
 
   private context: { [index: symbol]: unknown } = {};
 
   public constructor(options?: MedleyOptions<MNode, MType, MLink>) {
     this.loader = options?.loader || new Loader();
-    this.nodeRepo = options?.nodeRepo || new NodeRepository();
-    this.typeRepo = options?.typeRepo || new TypeRepository(this.loader);
-    this.linkRepo = options?.linkRepo || new LinkRepository();
+    this.nodeRepository = options?.nodeRepository || new NodeRepository();
+    this.typeRepository = options?.typeRepository || new TypeRepository(this.loader);
+    this.linkRepository = options?.linkRepository || new LinkRepository();
     this.cache = options?.cache || new Map();
     this.conductor = options?.conductor || new Conductor(this, this.cache);
 
@@ -66,15 +65,15 @@ export class Medley<
     this.logger = options?.logger || nullLogger;
 
     this.links =
-      options?.links || new Links<MLink>(this.scopeId, this.linkRepo);
-    this.types = options?.types || new Types(this.scopeId, this.typeRepo);
+      options?.links || new Links<MLink>(this.scopeId, this.linkRepository);
+    this.types = options?.types || new Types(this.scopeId, this.typeRepository);
     this.nodes =
-      options?.nodes ||
-      new Nodes<MNode, MType, MLink>(this.scopeId, this.nodeRepo, this.links);
-    this.graphs = new Graphs<MNode, MType, MLink>(
+      options?.nodes || new Nodes<MNode>(this.scopeId, this.nodeRepository);
+    this.graphs = options?.graphs || new Graphs<MNode, MType, MLink>(
       this.nodes,
       this.types,
-      this.links
+      this.links,
+      this.loader
     );
 
     this.conductor =
@@ -90,9 +89,6 @@ export class Medley<
 
   public useContext<T>(context: symbol) {
     let contextValue = this.context[context] as T;
-    if (contextValue == null && this.parent) {
-      contextValue = this.parent.useContext(context);
-    }
     return contextValue;
   }
 }

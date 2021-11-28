@@ -63,9 +63,10 @@ export class NodeRepository {
       newId = generateId();
     } while (this.nodeIndex.get(newId));  
     newNode.id = newId
+    newNode.scope = newNode.scope || ROOT_SCOPE;
     this.nodeTreeMap.setNodeValue(
       newNode,
-      newNode.scope || ROOT_SCOPE,
+      newNode.scope,
       newNode.id
     );
     this.nodeIndex.set(newNode.id, newNode);

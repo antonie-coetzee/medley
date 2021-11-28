@@ -1,92 +1,48 @@
-import { EventType, MedleyEvent, Type, Unwrap } from "../core";
+import { Type } from "../core";
 import { TypeRepository } from "../repositories";
 
 export class Types<TType extends Type = Type> {
-  public parent?: Types<TType>;
-  constructor(private scopeId: string, private typeRepo: TypeRepository) {}
+  constructor(
+    private scopeId: string,
+    private typeRepository: TypeRepository
+  ) {}
 
-  public setOrigin(origin: string) {
-    this.typeRepo.loader.origin = origin;
-  }
-
-  public setTypes(types: TType[], baseUrl: URL): void {
-    this.typeRepo.set(types, baseUrl);
-  }
-
-  public async runExportFunction<T extends (...args: any) => any>(
-    typeName: string,
-    functionName: string,
-    ...params: Parameters<T>
-  ): Promise<Unwrap<ReturnType<T>> | undefined> {
-    const exportFunc = (await this.getExportFunction(
-      typeName,
-      functionName
-    )) as T;
-    if (exportFunc == null) {
-      return;
-    }
-    return exportFunc(...(params as any[]));
+  public setTypes(types: TType[]): void {
+    return this.typeRepository.set(types);
   }
 
   public async getExportFunction<T extends Function = Function>(
     typeName: string,
     functionName: string
   ): Promise<T | undefined> {
-    const func = await this.typeRepo.getExportFunction<T>(
+    return await this.typeRepository.getExportFunction<T>(
       this.scopeId,
       typeName,
       functionName
     );
-    if (func) {
-      return func;
-    }
-    if (this.parent) {
-      return this.parent.getExportFunction<T>(typeName, functionName);
-    }
   }
 
   public async getExport<T>(type: Type, name: string): Promise<T | undefined> {
-    const typeExport = await this.typeRepo.getExport(type, name);
-    if (typeExport) {
-      return typeExport as T;
-    }
+    return await this.typeRepository.getExport(type, name);
   }
 
   public getTypes(): TType[] {
-    const scopeTypes = this.typeRepo.getTypes(this.scopeId) as TType[];
-    if (this.parent) {
-      const parentTypes = this.parent.getTypes();
-      return [...new Set([...parentTypes, ...scopeTypes])];
-    }
-    return scopeTypes;
+    return this.typeRepository.getTypes(this.scopeId) as TType[];
   }
 
   public getAllTypes(): TType[] {
-    return this.typeRepo.getAllTypes() as TType[];
+    return this.typeRepository.getAllTypes() as TType[];
   }
 
   public getType(typeName: string): TType | undefined {
-    const type = this.typeRepo.getType(this.scopeId, typeName) as TType;
-    if (type) {
-      return type;
-    }
-    if (this.parent) {
-      return this.parent.getType(typeName) as TType;
-    }
+    return this.typeRepository.getType(this.scopeId, typeName) as TType;
   }
 
   public hasType(typeName: string): boolean {
-    const scopeHasType = this.typeRepo.hasType(this.scopeId, typeName);
-    if (scopeHasType) {
-      return true;
-    }
-    if (this.parent) {
-      return this.parent.hasType(typeName);
-    }
-    return false;
+    return this.typeRepository.hasType(this.scopeId, typeName);
   }
 
   public addType(type: TType) {
-    this.typeRepo.addType(this.scopeId, type);
+    return this.typeRepository.addType(this.scopeId, type);
   }
 }

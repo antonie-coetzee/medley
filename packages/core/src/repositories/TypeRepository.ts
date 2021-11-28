@@ -1,23 +1,20 @@
 import { Type, Loader, isModule, TreeMap, ROOT_SCOPE, Module } from "../core";
 
 export class TypeRepository {
-  private moduleCache: Map<string, any> = new Map();
   /* scope -> type */
   private typeMap: TreeMap<Type> = new TreeMap();
-  private baseUrl?: URL;
 
   constructor(public loader: Loader) {}
 
-  public set(types: Type[], baseUrl: URL) {
-    this.baseUrl = baseUrl;
+  public set(types: Type[]) {
     this.typeMap.clear();
     for (const type of types) {
-      this.typeMap.setNodeValue(type, type.scope || ROOT_SCOPE, type.name)  
+      this.typeMap.setNodeValue(type, type.scope || ROOT_SCOPE, type.name);
     }
   }
 
   public async getExportFunction<T extends Function = Function>(
-    scope:string,
+    scope: string,
     typeName: string,
     functionName: string
   ) {
@@ -43,25 +40,17 @@ export class TypeRepository {
         moduleInfo = redirect;
       }
     }
-    let module:any;
-    if(this.moduleCache.has(`${type.name}${type.version}`)){
-      module = this.moduleCache.get(`${type.name}${type.version}`);
-    }else{
-      module = await this.loader.importModule(
-        moduleInfo,
-        this.baseUrl
-      ); 
-      this.moduleCache.set(`${type.name}${type.version}`, module);   
-    }
 
-    if(moduleInfo.nameSpace){
+    let module = await this.loader.importModule(moduleInfo);
+
+    if (moduleInfo.nameSpace) {
       return module[moduleInfo.nameSpace][exportName];
-    }else{
+    } else {
       return module[exportName];
     }
   }
 
-  public getTypes(scopeId:string): Type[] {
+  public getTypes(scopeId: string): Type[] {
     return this.typeMap.getFromPath(false, scopeId);
   }
 
@@ -69,11 +58,11 @@ export class TypeRepository {
     return this.typeMap.getAll();
   }
 
-  public getType(scopeId:string, typeName: string): Type | undefined {
+  public getType(scopeId: string, typeName: string): Type | undefined {
     return this.typeMap.getNodeValue(scopeId, typeName);
   }
 
-  public hasType(scopeId:string, typeName: string): boolean {
+  public hasType(scopeId: string, typeName: string): boolean {
     const type = this.typeMap.getNodeValue(scopeId, typeName);
     if (type == null) {
       return false;
@@ -82,11 +71,11 @@ export class TypeRepository {
     }
   }
 
-  public deleteType(scopeId:string, typeName: string) {;
+  public deleteType(scopeId: string, typeName: string) {
     return this.typeMap.deleteNode(scopeId, typeName);
   }
 
-  public addType(scopeId:string, type: Type) {
+  public addType(scopeId: string, type: Type) {
     type.scope = scopeId || ROOT_SCOPE;
     return this.typeMap.setNodeValue(type, type.scope, type.name);
   }

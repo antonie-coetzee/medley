@@ -1,13 +1,8 @@
-import { HasParent } from "./utility";
-
-export type PartialProxy<T> = Partial<T> & HasParent<T>;
-
-export function wrapWithPartialProxy<T extends HasParent<T>>(
+export function PartialProxy<T extends {}>(
   target: T,
-  partialProxy: PartialProxy<T>
+  partialProxy: Partial<T>
 ) {
   let proxyHandler: ProxyHandler<T> = {};
-  partialProxy.parent = target;
   proxyHandler.get = (targetObject, prop) => {
     const intercept = partialProxy[prop as keyof T];
     if (intercept) {
@@ -18,5 +13,3 @@ export function wrapWithPartialProxy<T extends HasParent<T>>(
   };
   return new Proxy(target, proxyHandler);
 }
-
-export {}

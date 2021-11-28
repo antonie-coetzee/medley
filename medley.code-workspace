@@ -16,5 +16,8 @@
       "name": "@medley-js/nodes",
       "path": "./packages/nodes"
     },    
-  ]
+  ],
+  "settings": {
+    "typescript.tsdk": "@medley-js\\core\\node_modules\\typescript\\lib"
+  }
 }

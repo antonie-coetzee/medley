@@ -1,41 +1,41 @@
 import { Links, Nodes, Types } from ".";
-import { Graph, Link, Type, Node } from "../core";
+import { Graph, Link, Type, Node, Loader } from "../core";
 
 export class Graphs<
   MNode extends Node = Node,
   MType extends Type = Type,
   MLink extends Link = Link
-> extends EventTarget {
+> {
   private graph?: Graph<MNode, MType, MLink>;
 
   constructor(
-    private nodesApi: Nodes<MNode, MType, MLink>,
-    private typesApi: Types<MType>,
-    private linksApi: Links<MLink>
-  ) {
-    super();
-  }
+    private nodes: Nodes<MNode>,
+    private types: Types<MType>,
+    private links: Links<MLink>,
+    private loader: Loader
+  ) {}
 
   public setGraph<
     TGraph extends Graph<MNode, MType, MLink> = Graph<MNode, MType, MLink>
   >(graph: TGraph, baseUrl: URL) {
-    this.typesApi.setOrigin(graph.name);
-    this.typesApi.setTypes(graph.types, baseUrl);
-    this.nodesApi.setNodes(graph.nodes);
-    this.linksApi.setLinks(graph.links);
+    this.loader.origin = graph.name;
+    this.loader.baseUrl = baseUrl;
+    this.types.setTypes(graph.types);
+    this.nodes.setNodes(graph.nodes);
+    this.links.setLinks(graph.links);
     this.graph = graph;
   }
 
   public getGraph<
     TGraph extends Graph<MNode, MType, MLink> = Graph<MNode, MType, MLink>
   >() {
-    const types = this.typesApi
+    const types = this.types
       .getAllTypes()
       .filter((t) => t.volatile == null || t.volatile === false);
-    const nodes = this.nodesApi
+    const nodes = this.nodes
       .getAllNodes()
       .filter((n) => n.volatile == null || n.volatile === false);
-    const links = this.linksApi
+    const links = this.links
       .getAllLinks()
       .filter((l) => l.volatile == null || l.volatile === false);
     return {

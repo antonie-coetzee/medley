@@ -7,11 +7,12 @@ export type ImportFunction = (
 ) => Promise<any>;
 
 export class Loader {
+  public baseUrl?: URL;
   public origin: string | null = null;
 
   constructor(private importer?: ImportFunction) {}
 
-  async importModule(module: Module, baseUrl?: URL): Promise<any> {
+  async importModule(module: Module): Promise<any> {
     const customModule = toCustomModule(module);
     if (customModule && customModule.import) {
       return customModule.import();
@@ -19,10 +20,12 @@ export class Loader {
     if (this.importer == null) {
       throw new Error("importer not defined");
     }
-    return this.importer(module, this.origin, baseUrl);
+    return this.importer(module, this.origin, this.baseUrl);
   }
 
-  public static SystemImportWrapper(importer: (url: string) => Promise<any>):ImportFunction {
+  public static SystemImportWrapper(
+    importer: (url: string) => Promise<any>
+  ): ImportFunction {
     return (module: Module, origin: string | null, baseUrl?: URL) => {
       const systemModule = module as SystemModule;
       let resolvedModuleBaseUrl: URL | undefined;
@@ -40,7 +43,9 @@ export class Loader {
     };
   }
 
-  public static ESMImportWrapper(importer: (url: string) => Promise<any>):ImportFunction {
+  public static ESMImportWrapper(
+    importer: (url: string) => Promise<any>
+  ): ImportFunction {
     return (module: Module, origin: string | null, baseUrl?: URL) => {
       const esmModule = module as EsmModule;
       let resolvedModuleBaseUrl: URL | undefined;

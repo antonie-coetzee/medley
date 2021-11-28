@@ -1,1 +1,1 @@
-export * from "./nodeMeta"
+export * from "./nodeMetaData"

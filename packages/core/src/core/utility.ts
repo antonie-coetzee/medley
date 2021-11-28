@@ -14,8 +14,6 @@ export type Unwrap<T> = T extends Promise<infer U>
   ? U
   : T;
 
-export type HasParent<T> = { parent?: T }
-
 export const generateId = (length?: number) => {
   const alphanumeric =
     "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";

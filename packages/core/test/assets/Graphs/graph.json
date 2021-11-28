@@ -51,15 +51,6 @@
         "system": "moduleFour-system.js",
         "esm": "moduleFour-esm.js"
       }
-    },
-    {
-      "name": "typeNested",
-      "version": "1.0.0",
-      "module": {
-        "base": "../modules/moduleNested/",
-        "system": "moduleNested-system.js",
-        "esm": "moduleNested-esm.js"
-      }
     }
   ],
   "nodes": [
@@ -93,39 +84,14 @@
       "name": "nodeFour",
       "cache": true,
       "value": "nodeFour value"
-    },
-    {
-      "type": "typeThree",
-      "id": "nodeThreeForNestedTest",
-      "name": "nodeThreeForNestedTest"
-    },
-    {
-      "type": "typeNested",
-      "id": "nodeNested",
-      "name": "nodeNested",
-      "cache": true,
-      "outputId":"$output-id"
-    },
-    {
-      "type": "$input",
-      "id": "$input-id",
-      "input":"typeNested-input-port"
-    },
-    {
-      "type": "$output",
-      "id": "$output-id"
     }
+
   ],
   "links": [
     {
       "port": "typeOnePortOne",
       "target": "nodeOne",
       "source": "nodeTwo"
-    },
-    {
-      "port": "typeOnePortTwo",
-      "target": "nodeOne",
-      "source": "nodeNested"
     },
     {
       "port": "typeTwoPortOne",
@@ -136,23 +102,6 @@
       "port": "typeFivePortOne",
       "target": "nodeFive",
       "source": "nodeFour"
-    },
-    {
-      "port": "typeNested-input-port",
-      "target": "nodeNested",
-      "source": "nodeThreeForNestedTest"
-    },
-    {
-      "port": "typeTwoPortOne",
-      "target": "nodeTwo",
-      "source": "$input-id",
-      "scope": "nodeNested"
-    },
-    {
-      "port": "output",
-      "target": "$output-id",
-      "source": "nodeTwo",
-      "scope": "nodeNested"
     }
   ]
 }
