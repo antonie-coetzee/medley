@@ -1,3 +1,4 @@
 export * from "./nodeMetaData";
-export * from "./PartialProxy";
+export * from "./partialProxy";
 export * from "./medleyContext";
+export * from "./chainObjects";

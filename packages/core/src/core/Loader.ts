@@ -1,46 +1,31 @@
 import { Module } from "./Module";
 
-export type ImportFunction = (
-  module: Module,
-  origin: string | null,
-  baseUrl?: URL
-) => Promise<any>;
-
-export class Loader {
+export abstract class Loader {
   public baseUrl?: URL;
-  public origin: string | null = null;
 
-  constructor(private importer?: ImportFunction) {}
-
-  async importModule(module: Module): Promise<any> {
+  async import(module: Module): Promise<any> {
     if (typeof module.import === "function") {
       return module.import();
     }
-    if (this.importer == null) {
-      throw new Error("importer not defined");
+    const url = this.resolveModuleUrl(module, this.moduleType, this.baseUrl);
+    return this.importFromUrl(url.toString());
+  }
+
+  isModule(module: Module): module is Module{
+    if(module[this.moduleType] || module.import){
+      return true;
+    }else{
+      return false;
     }
-    return this.importer(module, this.origin, this.baseUrl);
   }
 
-  public static SystemImportWrapper(
-    importer: (url: string) => Promise<any>
-  ): ImportFunction {
-    return (module: Module, origin: string | null, baseUrl?: URL) =>
-      Loader.import(importer, module, "system", origin, baseUrl);
-  }
+  abstract get moduleType():string;
 
-  public static ESMImportWrapper(
-    importer: (url: string) => Promise<any>
-  ): ImportFunction {
-    return (module: Module, origin: string | null, baseUrl?: URL) =>
-      Loader.import(importer, module, "esm", origin, baseUrl);
-  }
+  abstract importFromUrl(url:string):Promise<any>;
 
-  private static import(
-    importer: (url: string) => Promise<any>,
+  private resolveModuleUrl(
     module: Module,
     moduleType: string,
-    origin: string | null,
     baseUrl?: URL
   ) {
     const moduleUrl = module[moduleType];
@@ -58,9 +43,42 @@ export class Loader {
       resolvedModuleBaseUrl = new URL(module.base.toString(), baseUrl);
     }
     const resolvedUrl = new URL(moduleUrl, resolvedModuleBaseUrl);
-    if (origin) {
-      resolvedUrl.search = `origin=${encodeURIComponent(origin)}`;
-    }
-    return importer(resolvedUrl.toString());
+    return resolvedUrl;
+  }
+}
+
+export class MemoryLoader extends Loader {
+  constructor(){
+    super();
+  }
+  get moduleType(): string {
+    return "memory";
+  }
+  importFromUrl(url: string): Promise<any> {
+    throw new Error("memory loader does not support loading from urls");
+  }
+}
+
+export class SystemLoader extends Loader {
+  constructor(private importFunction:(url: string)=>Promise<any>){
+    super();
+  }
+  get moduleType(): string {
+    return "system";
+  }
+  importFromUrl(url: string): Promise<any> {
+    return this.importFunction(url);
+  }
+}
+
+export class ESMLoader extends Loader {
+  constructor(){
+    super();
+  }
+  get moduleType(): string {
+    return "esm";
+  }
+  importFromUrl(url: string): Promise<any> {
+    return import(url);
   }
 }

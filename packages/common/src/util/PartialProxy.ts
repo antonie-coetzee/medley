@@ -1,4 +1,4 @@
-export function PartialProxy<T extends {}>(
+export function partialProxy<T extends {}>(
   target: T,
   partialProxy: Partial<T>
 ) {

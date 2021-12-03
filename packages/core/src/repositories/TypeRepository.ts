@@ -1,12 +1,12 @@
-import { Type, Loader, isModule, TreeMap, ROOT_SCOPE, Module } from "../core";
+import { Type, Loader, TreeMap, ROOT_SCOPE, Module } from "../core";
 
-export class TypeRepository {
+export class TypeRepository<MType extends Type = Type> {
   /* scope -> type */
-  private typeMap: TreeMap<Type> = new TreeMap();
+  private typeMap: TreeMap<MType> = new TreeMap();
 
   constructor(public loader: Loader) {}
 
-  public set(types: Type[]) {
+  public set(types: MType[]) {
     this.typeMap.clear();
     for (const type of types) {
       this.typeMap.setNodeValue(type, type.scope || ROOT_SCOPE, type.name);
@@ -33,15 +33,15 @@ export class TypeRepository {
     if (redirect) {
       if (typeof redirect === "string") {
         exportName = redirect;
-      } else if ((redirect as { name: string }).name && isModule(redirect)) {
-        exportName = (redirect as { name: string }).name;
+      } else if (redirect.name && this.loader.isModule(redirect)) {
+        exportName = redirect.name.toString();
         moduleInfo = redirect;
-      } else if (isModule(redirect)) {
+      } else if (this.loader.isModule(redirect)) {
         moduleInfo = redirect;
       }
     }
 
-    let module = await this.loader.importModule(moduleInfo);
+    let module = await this.loader.import(moduleInfo);
 
     if (moduleInfo.nameSpace) {
       return module[moduleInfo.nameSpace][exportName];
@@ -50,15 +50,15 @@ export class TypeRepository {
     }
   }
 
-  public getTypes(scopeId: string): Type[] {
+  public getTypes(scopeId: string): MType[] {
     return this.typeMap.getFromPath(false, scopeId);
   }
 
-  public getAllTypes(): Type[] {
+  public getAllTypes(): MType[] {
     return this.typeMap.getAll();
   }
 
-  public getType(scopeId: string, typeName: string): Type | undefined {
+  public getType(scopeId: string, typeName: string): MType | undefined {
     return this.typeMap.getNodeValue(scopeId, typeName);
   }
 
@@ -75,7 +75,7 @@ export class TypeRepository {
     return this.typeMap.deleteNode(scopeId, typeName);
   }
 
-  public addType(scopeId: string, type: Type) {
+  public addType(scopeId: string, type: MType) {
     type.scope = scopeId || ROOT_SCOPE;
     return this.typeMap.setNodeValue(type, type.scope, type.name);
   }

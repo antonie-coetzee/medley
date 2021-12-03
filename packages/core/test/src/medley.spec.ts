@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { URL } from "url";
-import { Loader, Medley, MedleyOptions } from "../../src/index";
+import { Medley, MedleyOptions, SystemLoader } from "../../src/index";
 import "systemjs";
 
 const rootPath = path.resolve(__dirname + "/..");
@@ -9,10 +9,9 @@ const rootPath = path.resolve(__dirname + "/..");
 describe("Medley", function () {
   it("should load and run basic composition without error", async function () {
     const options: MedleyOptions = {
-      loader: new Loader(
-        Loader.SystemImportWrapper((url: string) => {
+      loader: new SystemLoader((url: string) => {
           return System.import(url);
-        })
+        }
       )
     };
     const medley = new Medley(options);
@@ -29,11 +28,10 @@ describe("Medley", function () {
   });
   it("should return the active composition", async function () {
     const options: MedleyOptions = {
-      loader: new Loader(
-        Loader.SystemImportWrapper((url: string) => {
-          return System.import(url);
-        })
-      ),
+      loader: new SystemLoader((url: string) => {
+        return System.import(url);
+      }
+    )
     };
     const medley = new Medley(options);
 

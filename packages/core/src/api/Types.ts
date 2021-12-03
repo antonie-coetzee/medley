@@ -1,13 +1,13 @@
 import { Type } from "../core";
 import { TypeRepository } from "../repositories";
 
-export class Types<TType extends Type = Type> {
+export class Types<MType extends Type = Type> {
   constructor(
     private scopeId: string,
-    private typeRepository: TypeRepository
+    private typeRepository: TypeRepository<MType>
   ) {}
 
-  public setTypes(types: TType[]): void {
+  public setTypes(types: MType[]): void {
     return this.typeRepository.set(types);
   }
 
@@ -26,23 +26,23 @@ export class Types<TType extends Type = Type> {
     return await this.typeRepository.getExport(type, name);
   }
 
-  public getTypes(): TType[] {
-    return this.typeRepository.getTypes(this.scopeId) as TType[];
+  public getTypes(): MType[] {
+    return this.typeRepository.getTypes(this.scopeId);
   }
 
-  public getAllTypes(): TType[] {
-    return this.typeRepository.getAllTypes() as TType[];
+  public getAllTypes(): MType[] {
+    return this.typeRepository.getAllTypes();
   }
 
-  public getType(typeName: string): TType | undefined {
-    return this.typeRepository.getType(this.scopeId, typeName) as TType;
+  public getType(typeName: string): MType | undefined {
+    return this.typeRepository.getType(this.scopeId, typeName);
   }
 
   public hasType(typeName: string): boolean {
     return this.typeRepository.hasType(this.scopeId, typeName);
   }
 
-  public addType(type: TType) {
+  public addType(type: MType) {
     return this.typeRepository.addType(this.scopeId, type);
   }
 }

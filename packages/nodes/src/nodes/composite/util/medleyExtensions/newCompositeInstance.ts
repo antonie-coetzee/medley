@@ -1,19 +1,22 @@
-import { Links, Medley, Nodes, Types } from "@medley-js/core"
-import { CLink, CNode, CType, PartialProxy } from "@medley-js/common"
+import { Links, Medley, Nodes, Types } from "@medley-js/core";
+import { CLink, CNode, CType, chainObjects } from "@medley-js/common";
 
 export const newCompositeInstance = Symbol("newCompositeInstance");
 
 declare module "@medley-js/core" {
   interface Medley {
-    [newCompositeInstance]: (compositeNodeId:string)=>Medley;
+    [newCompositeInstance]: (compositeNodeId: string) => Medley;
   }
 }
 
-Medley.prototype[newCompositeInstance] = function(this: Medley<CNode,CType,CLink>, compositeNodeId:string){ 
+Medley.prototype[newCompositeInstance] = function (
+  this: Medley<CNode, CType, CLink>,
+  compositeNodeId: string
+) {
   const parent = this;
-  const scopedNodes = new Nodes(compositeNodeId, parent.nodeRepository);
-  const scopedTypes = new Types(compositeNodeId, parent.typeRepository);
-  const scopedLinks = new Links(compositeNodeId, parent.linkRepository);
+  const scopedNodes = new Nodes<CNode>(compositeNodeId, parent.nodeRepository);
+  const scopedTypes = new Types<CType>(compositeNodeId, parent.typeRepository);
+  const scopedLinks = new Links<CLink>(compositeNodeId, parent.linkRepository);
 
   const compositeInstance = new Medley({
     scopeId: compositeNodeId,
@@ -22,28 +25,28 @@ Medley.prototype[newCompositeInstance] = function(this: Medley<CNode,CType,CLink
     linkRepository: parent.linkRepository,
     loader: parent.loader,
     cache: parent.cache,
-    types: PartialProxy(scopedTypes, {
+    types: chainObjects<Types<CType>, Partial<Types<CType>>>(scopedTypes, {
       getType: (typeName) => {
         const type = scopedTypes.getType(typeName);
-        if(type){
+        if (type) {
           return type;
-        }else{
+        } else {
           return parent.types.getType(typeName);
         }
-      }
+      },
     }),
-    nodes: PartialProxy(scopedNodes, {
-      getNode: (id:string)=>{
+    nodes: chainObjects<Nodes<CNode>, Partial<Nodes<CNode>>>(scopedNodes, {
+      getNode: (id: string) => {
         const node = scopedNodes.getNode(id);
-        if(node){
+        if (node) {
           return node;
-        }else{
+        } else {
           return parent.nodes.getNode(id);
         }
-      }
+      },
     }),
-    links: scopedLinks
+    links: scopedLinks,
   });
 
   return compositeInstance;
-}
+};

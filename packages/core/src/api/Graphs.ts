@@ -18,7 +18,6 @@ export class Graphs<
   public setGraph<
     TGraph extends Graph<MNode, MType, MLink> = Graph<MNode, MType, MLink>
   >(graph: TGraph, baseUrl: URL) {
-    this.loader.origin = graph.name;
     this.loader.baseUrl = baseUrl;
     this.types.setTypes(graph.types);
     this.nodes.setNodes(graph.nodes);

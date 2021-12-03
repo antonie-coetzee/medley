@@ -6,6 +6,7 @@ import {
   Link,
   ROOT_SCOPE,
   Loader,
+  MemoryLoader,
 } from "./core";
 import { TypeRepository, NodeRepository, LinkRepository } from "./repositories";
 import { Conductor } from "./Conductor";
@@ -17,8 +18,8 @@ export interface MedleyOptions<
   MLink extends Link = Link
 > {
   loader?: Loader;
-  typeRepository?: TypeRepository;
-  nodeRepository?: NodeRepository;
+  typeRepository?: TypeRepository<MType>;
+  nodeRepository?: NodeRepository<MNode>;
   linkRepository?: LinkRepository<MLink>;
   nodes?: Nodes<MNode>;
   types?: Types<MType>;
@@ -36,8 +37,8 @@ export class Medley<
   MLink extends Link = Link
 > {
   public readonly loader: Loader;
-  public readonly nodeRepository: NodeRepository;
-  public readonly typeRepository: TypeRepository;
+  public readonly nodeRepository: NodeRepository<MNode>;
+  public readonly typeRepository: TypeRepository<MType>;
   public readonly linkRepository: LinkRepository<MLink>;
   public readonly cache: Map<string, unknown>;
   public readonly conductor: Conductor<MNode, MType, MLink>;
@@ -51,10 +52,12 @@ export class Medley<
   public readonly graphs: Graphs<MNode, MType, MLink>;
 
   public constructor(options?: MedleyOptions<MNode, MType, MLink>) {
-    this.loader = options?.loader || new Loader();
+    this.loader = options?.loader || new MemoryLoader();
     this.nodeRepository = options?.nodeRepository || new NodeRepository();
-    this.typeRepository = options?.typeRepository || new TypeRepository(this.loader);
-    this.linkRepository = options?.linkRepository || new LinkRepository<MLink>();
+    this.typeRepository =
+      options?.typeRepository || new TypeRepository(this.loader);
+    this.linkRepository =
+      options?.linkRepository || new LinkRepository<MLink>();
     this.cache = options?.cache || new Map();
     this.conductor = options?.conductor || new Conductor(this, this.cache);
 
@@ -63,15 +66,18 @@ export class Medley<
 
     this.links =
       options?.links || new Links<MLink>(this.scopeId, this.linkRepository);
-    this.types = options?.types || new Types(this.scopeId, this.typeRepository);
+    this.types =
+      options?.types || new Types<MType>(this.scopeId, this.typeRepository);
     this.nodes =
       options?.nodes || new Nodes<MNode>(this.scopeId, this.nodeRepository);
-    this.graphs = options?.graphs || new Graphs<MNode, MType, MLink>(
-      this.nodes,
-      this.types,
-      this.links,
-      this.loader
-    );
+    this.graphs =
+      options?.graphs ||
+      new Graphs<MNode, MType, MLink>(
+        this.nodes,
+        this.types,
+        this.links,
+        this.loader
+      );
 
     this.conductor =
       options?.conductor ||
