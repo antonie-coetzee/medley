@@ -6,7 +6,6 @@ export interface TypeVersion {
   version: string;
   module: Module;
   cache?: Cache;
-  composite?: boolean;
   /*
    ** string: (std module).(std export name) -> (std module).(diff export name)
    ** Module: (std module).(std export name) -> (diff module).(std export name)

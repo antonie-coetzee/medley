@@ -19,7 +19,7 @@ export interface MedleyOptions<
   loader?: Loader;
   typeRepository?: TypeRepository;
   nodeRepository?: NodeRepository;
-  linkRepository?: LinkRepository;
+  linkRepository?: LinkRepository<MLink>;
   nodes?: Nodes<MNode>;
   types?: Types<MType>;
   links?: Links<MLink>;
@@ -28,7 +28,6 @@ export interface MedleyOptions<
   cache?: Map<string, unknown>;
   logger?: Logger;
   scopeId?: string;
-  parent?: Medley<MNode, MType, MLink>;
 }
 
 export class Medley<
@@ -39,7 +38,7 @@ export class Medley<
   public readonly loader: Loader;
   public readonly nodeRepository: NodeRepository;
   public readonly typeRepository: TypeRepository;
-  public readonly linkRepository: LinkRepository;
+  public readonly linkRepository: LinkRepository<MLink>;
   public readonly cache: Map<string, unknown>;
   public readonly conductor: Conductor<MNode, MType, MLink>;
 
@@ -51,13 +50,11 @@ export class Medley<
   public readonly links: Links<MLink>;
   public readonly graphs: Graphs<MNode, MType, MLink>;
 
-  private context: { [index: symbol]: unknown } = {};
-
   public constructor(options?: MedleyOptions<MNode, MType, MLink>) {
     this.loader = options?.loader || new Loader();
     this.nodeRepository = options?.nodeRepository || new NodeRepository();
     this.typeRepository = options?.typeRepository || new TypeRepository(this.loader);
-    this.linkRepository = options?.linkRepository || new LinkRepository();
+    this.linkRepository = options?.linkRepository || new LinkRepository<MLink>();
     this.cache = options?.cache || new Map();
     this.conductor = options?.conductor || new Conductor(this, this.cache);
 
@@ -79,16 +76,5 @@ export class Medley<
     this.conductor =
       options?.conductor ||
       new Conductor<MNode, MType, MLink>(this, options?.cache);
-  }
-
-  public createContext<T>(value: T) {
-    const symbol = Symbol();
-    this.context[symbol] = value;
-    return symbol;
-  }
-
-  public useContext<T>(context: symbol) {
-    let contextValue = this.context[context] as T;
-    return contextValue;
   }
 }

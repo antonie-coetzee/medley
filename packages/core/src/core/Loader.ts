@@ -1,4 +1,4 @@
-import { EsmModule, Module, SystemModule, toCustomModule } from "./Module";
+import { Module } from "./Module";
 
 export type ImportFunction = (
   module: Module,
@@ -13,9 +13,8 @@ export class Loader {
   constructor(private importer?: ImportFunction) {}
 
   async importModule(module: Module): Promise<any> {
-    const customModule = toCustomModule(module);
-    if (customModule && customModule.import) {
-      return customModule.import();
+    if (typeof module.import === "function") {
+      return module.import();
     }
     if (this.importer == null) {
       throw new Error("importer not defined");
@@ -26,40 +25,42 @@ export class Loader {
   public static SystemImportWrapper(
     importer: (url: string) => Promise<any>
   ): ImportFunction {
-    return (module: Module, origin: string | null, baseUrl?: URL) => {
-      const systemModule = module as SystemModule;
-      let resolvedModuleBaseUrl: URL | undefined;
-      if (systemModule.base) {
-        resolvedModuleBaseUrl = new URL(systemModule.base.toString(), baseUrl);
-      }
-      const resolvedUrl = new URL(
-        systemModule.system.toString(),
-        resolvedModuleBaseUrl
-      );
-      if (origin) {
-        resolvedUrl.search = `origin=${encodeURIComponent(origin)}`;
-      }
-      return importer(resolvedUrl.toString());
-    };
+    return (module: Module, origin: string | null, baseUrl?: URL) =>
+      Loader.import(importer, module, "system", origin, baseUrl);
   }
 
   public static ESMImportWrapper(
     importer: (url: string) => Promise<any>
   ): ImportFunction {
-    return (module: Module, origin: string | null, baseUrl?: URL) => {
-      const esmModule = module as EsmModule;
-      let resolvedModuleBaseUrl: URL | undefined;
-      if (esmModule.base) {
-        resolvedModuleBaseUrl = new URL(esmModule.base.toString(), baseUrl);
-      }
-      const resolvedUrl = new URL(
-        esmModule.esm.toString(),
-        resolvedModuleBaseUrl
+    return (module: Module, origin: string | null, baseUrl?: URL) =>
+      Loader.import(importer, module, "esm", origin, baseUrl);
+  }
+
+  private static import(
+    importer: (url: string) => Promise<any>,
+    module: Module,
+    moduleType: string,
+    origin: string | null,
+    baseUrl?: URL
+  ) {
+    const moduleUrl = module[moduleType];
+    if (moduleUrl == null) {
+      throw new Error(
+        `module type: '${moduleType}' not valid for: ${JSON.stringify(
+          module,
+          null,
+          2
+        )}`
       );
-      if (origin) {
-        resolvedUrl.search = `origin=${encodeURIComponent(origin)}`;
-      }
-      return importer(resolvedUrl.toString());
-    };
+    }
+    let resolvedModuleBaseUrl: URL | undefined;
+    if (module.base) {
+      resolvedModuleBaseUrl = new URL(module.base.toString(), baseUrl);
+    }
+    const resolvedUrl = new URL(moduleUrl, resolvedModuleBaseUrl);
+    if (origin) {
+      resolvedUrl.search = `origin=${encodeURIComponent(origin)}`;
+    }
+    return importer(resolvedUrl.toString());
   }
 }

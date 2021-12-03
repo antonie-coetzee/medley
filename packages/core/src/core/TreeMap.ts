@@ -2,6 +2,7 @@ type TreeMapNodeValue<T> = {
   tmap?: TreeMapNode<T>;
   value?: T;
 };
+
 type TreeMapNode<T> = {
   [index: string]: TreeMapNodeValue<T>;
 };
@@ -38,7 +39,11 @@ export class TreeMap<T> {
       delete this.rootNode[path[0]];
       wasDeleted = true;
     }
-    const parentNode = this.getNodeFromPath(this.rootNode, false, path.slice(0, -1));
+    const parentNode = this.getNodeFromPath(
+      this.rootNode,
+      false,
+      path.slice(0, -1)
+    );
     if (parentNode && parentNode.tmap) {
       delete parentNode.tmap[path[path.length - 1]];
       wasDeleted = true;
@@ -52,7 +57,7 @@ export class TreeMap<T> {
     if (nodeAtPath) {
       if (!recursive) {
         if (nodeAtPath.tmap) {
-          return Object.values(nodeAtPath.tmap).map(n => n.value as T) || [];
+          return Object.values(nodeAtPath.tmap).map((n) => n.value as T) || [];
         } else {
           return [nodeAtPath.value as T];
         }

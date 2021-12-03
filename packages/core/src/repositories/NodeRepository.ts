@@ -7,11 +7,11 @@ import {
   Writeable,
 } from "../core";
 
-export class NodeRepository {
-  public nodeIndex: Map<string, Node> = new Map();
-  public nodeTreeMap: TreeMap<Node> = new TreeMap();
+export class NodeRepository<MNode extends Node = Node> {
+  public nodeIndex: Map<string, MNode> = new Map();
+  public nodeTreeMap: TreeMap<MNode> = new TreeMap();
 
-  public set(nodes: Node[]): void {
+  public set(nodes: MNode[]): void {
     this.nodeTreeMap.clear();
     this.nodeIndex.clear();
     nodes.forEach((node) => {
@@ -24,17 +24,17 @@ export class NodeRepository {
     return this.nodeTreeMap.getNodeValue(scopeId, id);
   }
 
-  public getNodesByType(scopeId: string, typeName: string): Node[] {
+  public getNodesByType(scopeId: string, typeName: string): MNode[] {
     return this.nodeTreeMap
       .getFromPath(false, scopeId)
       .filter((n) => n.type === typeName);
   }
 
-  public getNodes(scopeId: string): Node[] {
+  public getNodes(scopeId: string): MNode[] {
     return this.nodeTreeMap.getFromPath(false, scopeId);
   }
 
-  public getAllNodes(): Node[] {
+  public getAllNodes(): MNode[] {
     return this.nodeTreeMap.getAll();
   }
 
@@ -56,19 +56,18 @@ export class NodeRepository {
     return Array.from(usedTypes.keys());
   }
 
-  public insertNode(node: NodePart) {
-    let newNode = node as Writeable<Node, "id">;
+  public insertNode(node: NodePart<MNode>) {
     let newId: string;
     do {
       newId = generateId();
-    } while (this.nodeIndex.get(newId));  
-    newNode.id = newId
-    newNode.scope = newNode.scope || ROOT_SCOPE;
-    this.nodeTreeMap.setNodeValue(
-      newNode,
-      newNode.scope,
-      newNode.id
-    );
+    } while (this.nodeIndex.get(newId));
+    let newNode = {
+      ...node,
+      id: newId,
+      scope: node.scope || ROOT_SCOPE,
+    } as MNode;
+
+    this.nodeTreeMap.setNodeValue(newNode, newNode.scope || ROOT_SCOPE, newNode.id);
     this.nodeIndex.set(newNode.id, newNode);
     return newNode;
   }

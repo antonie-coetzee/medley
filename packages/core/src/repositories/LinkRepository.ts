@@ -3,17 +3,19 @@ import {
   ROOT_SCOPE,
   TreeMap,
   PortLink,
+  isPortLink,
+  AnyLink,
 } from "../core";
 
-export class LinkRepository {
+export class LinkRepository<MLink extends Link = Link> {
   private updateSourceToPortMap: boolean = false;
 
   /* scope -> port -> target -> source -> link */
-  private portToSourceMap: TreeMap<PortLink<Link>>;
+  private portToSourceMap: TreeMap<PortLink<MLink>>;
   /* scope -> source -> target -> port -> link */
-  private sourceToPortMap: TreeMap<PortLink<Link>>;
+  private sourceToPortMap: TreeMap<PortLink<MLink>>;
   /* scope -> target -> source */
-  private targetToSourceMap: TreeMap<Link>;
+  private targetToSourceMap: TreeMap<MLink>;
 
   constructor() {
     this.portToSourceMap = new TreeMap();
@@ -21,13 +23,13 @@ export class LinkRepository {
     this.targetToSourceMap = new TreeMap();
   }
 
-  public set(links: Link[]) {
+  public set(links: AnyLink<MLink>[]) {
     this.portToSourceMap.clear();
     this.sourceToPortMap.clear();
     this.targetToSourceMap.clear();
     for (const link of links) {
-      if (link.port) {
-        this.addToPortToSourceMap(link as PortLink);
+      if (isPortLink(link)) {
+        this.addToPortToSourceMap(link);
       } else {
         this.addToTargetToSourceMap(link);
       }
@@ -35,8 +37,13 @@ export class LinkRepository {
     this.updateSourceToPortMap = true;
   }
 
-  public getLink(scopeId: string, target: string, source: string, port?:string) {
-    if(port){
+  public getLink(
+    scopeId: string,
+    target: string,
+    source: string,
+    port?: string
+  ) {
+    if (port) {
       const links = this.portToSourceMap.getFromPath(
         false,
         scopeId,
@@ -47,7 +54,7 @@ export class LinkRepository {
       if (links.length > 0) {
         return links[0];
       }
-    }else{
+    } else {
       const links = this.targetToSourceMap.getFromPath(
         false,
         scopeId,
@@ -60,11 +67,11 @@ export class LinkRepository {
     }
   }
 
-  public addLink(link: Link) {
-    if(link.port){
+  public addLink(link: AnyLink<MLink>) {
+    if (isPortLink(link)) {
       this.updateSourceToPortMap = true;
-      return this.addToPortToSourceMap(link as PortLink);
-    }else{
+      return this.addToPortToSourceMap(link);
+    } else {
       return this.addToTargetToSourceMap(link);
     }
   }
@@ -88,22 +95,22 @@ export class LinkRepository {
     return this.targetToSourceMap.getFromPath(true, scopeId, target);
   }
 
-  public getLinks(scopeId: string) {
+  public getLinks(scopeId: string): AnyLink<MLink>[] {
     return [
       ...this.portToSourceMap.getFromPath(true, scopeId),
       ...this.targetToSourceMap.getFromPath(true, scopeId),
     ];
   }
 
-  public getAllLinks(){
+  public getAllLinks(): AnyLink<MLink>[] {
     return [
       ...this.portToSourceMap.getAll(),
       ...this.targetToSourceMap.getAll(),
     ];
   }
 
-  public deleteLink(link: Link) {
-    if(link.port){
+  public deleteLink(link: AnyLink<MLink>) {
+    if (isPortLink(link)) {
       this.updateSourceToPortMap = true;
       return this.portToSourceMap.deleteNode(
         link.scope || ROOT_SCOPE,
@@ -111,7 +118,7 @@ export class LinkRepository {
         link.target,
         link.source
       );
-    }else{
+    } else {
       return this.targetToSourceMap.deleteNode(
         link.scope || ROOT_SCOPE,
         link.target,
@@ -120,7 +127,7 @@ export class LinkRepository {
     }
   }
 
-  private addToPortToSourceMap(link: PortLink<Link>) {
+  private addToPortToSourceMap(link: PortLink<MLink>) {
     return this.portToSourceMap.setNodeValue(
       link,
       link.scope || ROOT_SCOPE,
@@ -130,7 +137,7 @@ export class LinkRepository {
     );
   }
 
-  private addToSourceToPortMap(link: PortLink<Link>) {
+  private addToSourceToPortMap(link: PortLink<MLink>) {
     this.sourceToPortMap.setNodeValue(
       link,
       link.scope || ROOT_SCOPE,
@@ -140,7 +147,7 @@ export class LinkRepository {
     );
   }
 
-  private addToTargetToSourceMap(link: Link) {
+  private addToTargetToSourceMap(link: MLink) {
     return this.targetToSourceMap.setNodeValue(
       link,
       link.scope || ROOT_SCOPE,

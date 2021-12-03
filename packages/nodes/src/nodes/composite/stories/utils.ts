@@ -12,6 +12,7 @@ import {
   TEditNodeComponent,
   Coordinates
 } from "@medley-js/common";
+import "../util/medleyExtensions/newCompositeInstance"
 import { observable } from "mobx";
 import { CompositeNode } from "..";
 import { OutputNode } from "../scopedTypes/output/node";
@@ -32,7 +33,7 @@ export const createEmptyCompositeNode = (medley: Medley<CNode>) => {
         type: CompositeType.name,
 
       });
-    const compositeScope = Medley.getChildInstance(
+    const compositeScope = Medley.newCompositeInstance(
     medley.getRootInstance(),
     compositeNode.id
     );
@@ -53,7 +54,7 @@ export const createBasicCompositeNode = (medley: Medley<CNode>, position?:Coordi
     position:position
   }));
 
-  const compositeScope = Medley.getScopedInstance(
+  const compositeScope = Medley.ne(
     medley.getRootInstance(),
     compositeNode.id,
     true
