@@ -8,7 +8,7 @@ declare module "@medley-js/core" {
   interface Medley {
     createContext: <T>(value: T) => MedleyContext;
     setContext: <T>(context: MedleyContext, value: T) => void;
-    useContext: <T>(context: MedleyContext) => T;
+    useContext: <T>(context: MedleyContext) => T | undefined;
     context: { [index: symbol]: unknown };
   }
 }
@@ -26,5 +26,5 @@ Medley.prototype.setContext = function <T>(context: MedleyContext, value: T) {
 };
 
 Medley.prototype.useContext = function <T>(context: MedleyContext) {
-  return this.context[context.key] as T;
+  return this.context[context.key] as T | undefined;
 };

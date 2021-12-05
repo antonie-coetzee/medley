@@ -9,9 +9,9 @@ import { Cache } from "./core/Cache";
 import { BaseContext } from ".";
 
 export type InputProvider<
-  MNode extends Node = Node,
-  MType extends Type = Type,
-  MLink extends Link = Link
+  MNode extends Node,
+  MType extends Type,
+  MLink extends Link
 > = {
   [index: string]: (context: BaseContext<MNode, MType, MLink>) => Promise<any>;
 };
@@ -78,7 +78,7 @@ export class Conductor<
     return nodeFunction(context, args);
   }
 
-  private async inputProviderInput<T, TNode extends Node = Node>(
+  private async inputProviderInput<T, TNode extends MNode>(
     this: {
       context: ExecutionContext<TNode, MNode, MType, MLink>;
       conductor: Conductor<MNode, MType, MLink>;

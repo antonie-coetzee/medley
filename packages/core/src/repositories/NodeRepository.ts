@@ -7,7 +7,7 @@ import {
   Writeable,
 } from "../core";
 
-export class NodeRepository<MNode extends Node = Node> {
+export class NodeRepository<MNode extends Node> {
   public nodeIndex: Map<string, MNode> = new Map();
   public nodeTreeMap: TreeMap<MNode> = new TreeMap();
 
@@ -15,8 +15,7 @@ export class NodeRepository<MNode extends Node = Node> {
     this.nodeTreeMap.clear();
     this.nodeIndex.clear();
     nodes.forEach((node) => {
-      this.nodeIndex.set(node.id, node);
-      this.nodeTreeMap.setNodeValue(node, node.scope || ROOT_SCOPE, node.id);
+      this.setNode(node);
     });
   }
 
@@ -56,20 +55,24 @@ export class NodeRepository<MNode extends Node = Node> {
     return Array.from(usedTypes.keys());
   }
 
-  public insertNode(node: NodePart<MNode>) {
+  public insertNode(nodePart: NodePart<MNode>) {
     let newId: string;
     do {
       newId = generateId();
     } while (this.nodeIndex.get(newId));
     let newNode = {
-      ...node,
+      ...nodePart,
       id: newId,
-      scope: node.scope || ROOT_SCOPE,
+      scope: nodePart.scope || ROOT_SCOPE,
     } as MNode;
 
-    this.nodeTreeMap.setNodeValue(newNode, newNode.scope || ROOT_SCOPE, newNode.id);
-    this.nodeIndex.set(newNode.id, newNode);
+    this.setNode(newNode);
     return newNode;
+  }
+
+  public setNode(node: MNode) {
+    this.nodeTreeMap.setNodeValue(node, node.scope || ROOT_SCOPE, node.id);
+    this.nodeIndex.set(node.id, node);
   }
 
   public removeNode(node: Node) {

@@ -1,28 +1,15 @@
 import React, { useEffect } from "react";
-import { Medley, NodeContext } from "@medley-js/core";
+import { NodeContext } from "@medley-js/core";
 import { CNode, TNodeComponent } from "@medley-js/common";
-import { Position, useUpdateNodeInternals } from "react-flow-renderer";
-import { InputType } from "../scopedTypes/input";
-import { OutputType } from "../scopedTypes/output";
-import { Box, styled } from "@mui/system";
+import { useUpdateNodeInternals } from "react-flow-renderer";
+import { Box } from "@mui/system";
 import {
-  Badge,
-  BadgeProps,
   Card,
   CardContent,
   CardHeader,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Slider,
-  Tooltip,
-  Typography,
 } from "@mui/material";
-import { Info, GroupWork, DragIndicator, Close, Public, Sync, AutoAwesome, AutoAwesomeMotion, HelpOutline, AccountTree, AccountTreeOutlined, Refresh } from "@mui/icons-material";
+import { DragIndicator, Close, HelpOutline, Refresh } from "@mui/icons-material";
 import { Handle } from "../../../components";
-import { InputNode } from "../scopedTypes/input/InputNode";
-import { OutputNode } from "../scopedTypes/output/node";
 import { CompositeNode } from "../CompositeNode";
 import { NodeStore } from "../stores/NodeStore";
 

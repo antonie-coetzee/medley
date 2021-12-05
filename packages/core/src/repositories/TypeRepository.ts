@@ -1,4 +1,4 @@
-import { Type, Loader, TreeMap, ROOT_SCOPE, Module } from "../core";
+import { Type, Loader, TreeMap, ROOT_SCOPE } from "../core";
 
 export class TypeRepository<MType extends Type = Type> {
   /* scope -> type */

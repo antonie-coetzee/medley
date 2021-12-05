@@ -2,9 +2,9 @@ import { Links, Nodes, Types } from ".";
 import { Graph, Link, Type, Node, Loader } from "../core";
 
 export class Graphs<
-  MNode extends Node = Node,
-  MType extends Type = Type,
-  MLink extends Link = Link
+  MNode extends Node,
+  MType extends Type,
+  MLink extends Link
 > {
   private graph?: Graph<MNode, MType, MLink>;
 

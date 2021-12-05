@@ -12,13 +12,16 @@ import {
   TEditNodeComponent,
   Coordinates
 } from "@medley-js/common";
-import "../util/medleyExtensions/newCompositeInstance"
+import "../extensions/medley"
 import { observable } from "mobx";
 import { CompositeNode } from "..";
 import { OutputNode } from "../scopedTypes/output/node";
 import { InputNode } from "../scopedTypes/input/InputNode";
 import { IdentityNode } from "@/nodes/identity";
 import { TryRounded } from "@mui/icons-material";
+import { newCompositeScope } from "../extensions/medley";
+import { onNodesChange } from "../extensions";
+import { compositeScope } from "../CompositeNode";
 
 export const addTypes = (medley: Medley<CNode>) => {
     medley.types.addType(CompositeType);
@@ -47,20 +50,16 @@ export const createEmptyCompositeNode = (medley: Medley<CNode>) => {
     return [compositeScope, compositeNode] as const
 }
 
-export const createBasicCompositeNode = (medley: Medley<CNode>, position?:Coordinates) => {
+export const createBasicCompositeNode = (medley: Medley<CNode,CType,CLink>, position?:Coordinates) => {
   const compositeNode = medley.nodes.insertNode<CompositeNode>(observable({
     name: "Basic Composite",
     type: CompositeType.name,
     position:position
   }));
 
-  const compositeScope = Medley.ne(
-    medley.getRootInstance(),
-    compositeNode.id,
-    true
-  );
-
-  const id_0 = compositeScope.nodes.insertNode<InputNode>(
+  const cs = medley[newCompositeScope](compositeNode.id);
+  compositeNode[compositeScope] = cs;
+  const id_0 = cs.nodes.insertNode<InputNode>(
     observable({
       name: "INPUT1",
       position: [0, 50],
@@ -69,7 +68,7 @@ export const createBasicCompositeNode = (medley: Medley<CNode>, position?:Coordi
     })
   );
 
-  const id_00 = compositeScope.nodes.insertNode<InputNode>(
+  const id_00 = cs.nodes.insertNode<InputNode>(
     observable({
       name: "abc",
       position: [0, 100],
@@ -78,7 +77,7 @@ export const createBasicCompositeNode = (medley: Medley<CNode>, position?:Coordi
     })
   );
 
-  const id_01 = compositeScope.nodes.insertNode<InputNode>(
+  const id_01 = cs.nodes.insertNode<InputNode>(
     observable({
       name: "INPUT3",
       position: [0, 150],
@@ -87,7 +86,7 @@ export const createBasicCompositeNode = (medley: Medley<CNode>, position?:Coordi
     })
   );
 
-  const id_1 = compositeScope.nodes.insertNode<IdentityNode>(
+  const id_1 = cs.nodes.insertNode<IdentityNode>(
     observable({
       name: "Test_1",
       cache: Cache.scope,
@@ -96,7 +95,7 @@ export const createBasicCompositeNode = (medley: Medley<CNode>, position?:Coordi
       value: {}
     })
   );
-  const id_2 = compositeScope.nodes.insertNode<IdentityNode>(
+  const id_2 = cs.nodes.insertNode<IdentityNode>(
     observable({
       name: "Test_2",
       cache: Cache.scope,
@@ -105,7 +104,7 @@ export const createBasicCompositeNode = (medley: Medley<CNode>, position?:Coordi
       value: {}
     })
   );
-  const id_3 = compositeScope.nodes.insertNode<IdentityNode>(
+  const id_3 = cs.nodes.insertNode<IdentityNode>(
     observable({
       name: "Test_3",
       cache: Cache.scope,
@@ -114,7 +113,7 @@ export const createBasicCompositeNode = (medley: Medley<CNode>, position?:Coordi
       value: {}
     })
   );
-  const id_4 = compositeScope.nodes.insertNode<OutputNode>(
+  const id_4 = cs.nodes.insertNode<OutputNode>(
     observable({
       name: "OUTPUT",
       position: [1400, 50],
@@ -122,30 +121,30 @@ export const createBasicCompositeNode = (medley: Medley<CNode>, position?:Coordi
     })
   );
 
-  compositeScope.links.addLink({
+  cs.links.addLink({
     source: id_0.id,
     target: id_1.id,
     port: "input1",
     scope: compositeNode.id,
   });
-  compositeScope.links.addLink({
+  cs.links.addLink({
     source: id_1.id,
     target: id_2.id,
     port: "input1",
     scope: compositeNode.id,
   });
-  compositeScope.links.addLink({
+  cs.links.addLink({
     source: id_2.id,
     target: id_3.id,
     port: "input1",
     scope: compositeNode.id,
   });
-  compositeScope.links.addLink({
+  cs.links.addLink({
     source: id_3.id,
     target: id_4.id,
     port: id_4.id,
     scope: compositeNode.id,
   });
 
-  return [compositeScope, compositeNode] as const
+  return [cs, compositeNode] as const
 };
