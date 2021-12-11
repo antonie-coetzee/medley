@@ -1,5 +1,5 @@
 import { Medley } from "./Medley";
-import { Link, Node, Type, Port, Unwrap } from "./core";
+import { Port, Unwrap, BaseTypes } from "./core";
 import { Input, ExecutionContext } from "./Context";
 import {
   NodeFunction,
@@ -8,24 +8,13 @@ import {
 import { Cache } from "./core/Cache";
 import { BaseContext } from ".";
 
-export type InputProvider<
-  MNode extends Node,
-  MType extends Type,
-  MLink extends Link
-> = {
-  [index: string]: (context: BaseContext<MNode, MType, MLink>) => Promise<any>;
+export type InputProvider<BT extends BaseTypes = BaseTypes> = {
+  [index: string]: (context: BaseContext<BT>) => Promise<any>;
 };
 
-export class Conductor<
-  MNode extends Node = Node,
-  MType extends Type = Type,
-  MLink extends Link = Link
-> {
+export class Conductor<BT extends BaseTypes = BaseTypes> {
   private resultCache: Map<string, unknown>;
-  constructor(
-    private medley: Medley<MNode, MType, MLink>,
-    cache?: Map<string, unknown>
-  ) {
+  constructor(private medley: Medley<BT>, cache?: Map<string, unknown>) {
     this.resultCache = cache || new Map();
   }
 
@@ -38,7 +27,7 @@ export class Conductor<
 
   public async runNodeWithInputs<T = unknown>(
     nodeId: string,
-    inputProvider: InputProvider<MNode, MType, MLink> | null,
+    inputProvider: InputProvider<BT> | null,
     ...args: T extends (...args: any) => any ? Parameters<T> : any[]
   ): Promise<Unwrap<T>> {
     const node = this.medley.nodes.getNode(nodeId);
@@ -46,21 +35,22 @@ export class Conductor<
       throw new Error(`node with id: '${nodeId}', not found`);
     }
     const nodeFunction = await this.medley.types.getExportFunction<
-      NodeFunction<MNode, MNode, MType, MLink>
+      NodeFunction<BT["node"], BT>
     >(node.type, nodeFunctionExportName);
 
     if (nodeFunction == null) {
       throw new Error(`node function for type: '${node.type}', not valid`);
     }
 
-    const context = {
-      medley: this.medley,
-      node,
-      logger: this.medley.logger.child({
+    const context = new ExecutionContext<BT["node"], BT>(
+      this.medley,
+      this.medley.logger.child({
         typeName: node.type,
         nodeId: node.id,
       }),
-    } as ExecutionContext<MNode, MNode, MType, MLink>;
+      node,
+      {} as Input
+    );
 
     if (inputProvider == null) {
       context.input = this.portInput.bind({
@@ -78,15 +68,15 @@ export class Conductor<
     return nodeFunction(context, args);
   }
 
-  private async inputProviderInput<T, TNode extends MNode>(
+  private async inputProviderInput(
     this: {
-      context: ExecutionContext<TNode, MNode, MType, MLink>;
-      conductor: Conductor<MNode, MType, MLink>;
-      inputProvider: InputProvider<MNode, MType, MLink>;
+      context: ExecutionContext<BT["node"], BT>;
+      conductor: Conductor<BT>;
+      inputProvider: InputProvider<BT>;
     },
     port: Port,
     ...args: any[]
-  ): Promise<T | undefined> {
+  ): Promise<unknown | undefined> {
     const inputFunction = this.inputProvider[port.name];
     if (inputFunction == null && port.required) {
       throw new Error(`port: '${port.name}' requires input`);
@@ -96,15 +86,15 @@ export class Conductor<
 
   private async portInput(
     this: {
-      context: ExecutionContext<MNode, MNode, MType, MLink>;
-      conductor: Conductor<MNode, MType, MLink>;
+      context: ExecutionContext<BT["node"], BT>;
+      conductor: Conductor<BT>;
     },
     port: Port,
     ...args: any[]
   ): Promise<unknown | undefined> {
     let links = this.conductor.medley.links.getPortLinks(
       port.name,
-      this.context.node.id
+      this.context.node!.id
     );
     if (links == null || (links.length === 0 && !port.required)) {
       return;

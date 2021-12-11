@@ -1,9 +1,5 @@
-export interface BaseModule {
-  base?: URL;
-  nameSpace?: string;
-  import?: () => Promise<any>;
-}
+export interface Module {}
 
-export type Module = BaseModule & {
-  [moduleType: string]: URL;
-};
+export interface MemoryModule extends Module {
+  import: () => Promise<{ [key: string]: any }>;
+}

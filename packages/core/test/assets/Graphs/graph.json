@@ -16,10 +16,10 @@
       "module": {
         "base": "../modules/moduleTwo/",
         "system": "moduleTwo-system.js",
-        "esm": "moduleTwo-esm.js"
-      },
-      "exportMap": {
-        "nodeFunction": "typeTwoNodeFunction"
+        "esm": "moduleTwo-esm.js",
+        "exportMap": {
+          "nodeFunction": "typeTwoNodeFunction"
+        }
       }
     },
     {
@@ -28,10 +28,10 @@
       "module": {
         "base": "../modules/moduleTwo/",
         "system": "moduleTwo-system.js",
-        "esm": "moduleTwo-esm.js"
-      },
-      "exportMap": {
-        "nodeFunction": "typeFiveNodeFunction"
+        "esm": "moduleTwo-esm.js",
+        "exportMap": {
+          "nodeFunction": "typeFiveNodeFunction"
+        }
       }
     },
     {

@@ -1,13 +1,18 @@
-import { NodePart } from "@medley-js/core";
+import { NodeContext, NodePart } from "@medley-js/core";
 import { CNode } from "@medley-js/common";
-
-const isObservableNode = Symbol("isObservableNode");
-export const getObservableNode = Symbol("getObservableNode");
+import { observable, isObservable, toJS } from "mobx";
 
 declare module "@medley-js/core" {
-  interface NodeContext {
-    [getObservableNode]?: () => void;
+  interface NodeContext<TNode> {
+    getObservableNode: () => TNode;
   }
 }
 
-NodeContext.prototype[newCompositeScope] = function (
+NodeContext.prototype.getObservableNode = function <TNode extends CNode>(this:NodeContext<TNode>){
+  if(isObservable(this.node)){
+    return this.node;
+  }
+  const observableNode = observable.object(this.node);
+  this.medley.nodes.setNode(observableNode);
+  return observableNode;
+}

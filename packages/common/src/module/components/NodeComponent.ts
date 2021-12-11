@@ -2,10 +2,10 @@ import { VFC } from "react";
 import {
   NodeContext
 } from "@medley-js/core";
-import { CLink, CNode, CType, Host } from "../../types";
+import { CBaseTypes, CNode, Host } from "../../types";
 
 export type TNodeComponentProps<TNode extends CNode = CNode> = {
-  context: NodeContext<TNode, CNode, CType, CLink>;
+  context: NodeContext<TNode, CBaseTypes>;
   host: Host;
   selected: boolean;
 };

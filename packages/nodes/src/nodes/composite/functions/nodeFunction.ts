@@ -1,4 +1,5 @@
-import { NF, Input, Medley } from "@medley-js/core";
+import { CBaseTypes } from "@/../../common/dist";
+import { NF, Input, Medley, BaseModule } from "@medley-js/core";
 import { CompositeNode } from "../CompositeNode";
 import { InputType } from "../scopedTypes/input";
 import { OutputType } from "../scopedTypes/output";
@@ -37,7 +38,7 @@ function addInputType(scopedInstance: Medley, input: Input): void {
   });
 }
 
-function addOutputType(scopedInstance: Medley): void {
+function addOutputType(scopedInstance: Medley<CBaseTypes>): void {
   const nodeFunction: NF = ({ node, input }) => {
     return input({
       name: node.id,
@@ -52,6 +53,6 @@ function addOutputType(scopedInstance: Medley): void {
         Promise.resolve({
           nodeFunction,
         }),
-    },
+    } as BaseModule,
   });
 }

@@ -1,4 +1,11 @@
-import { Link, Logger, Node, Type, Port, NodePart, Unwrap } from "./core";
+import {
+  Logger,
+  Node,
+  Port,
+  NodePart,
+  Unwrap,
+  BaseTypes,
+} from "./core";
 import { Medley } from "./Medley";
 
 type TypeOfPort<T> = T extends Port<infer X> ? X : never;
@@ -10,38 +17,40 @@ export type Input = <TypedPort extends Port>(
     : any[]
 ) => Promise<Unwrap<TypeOfPort<TypedPort>> | undefined>;
 
-export type BaseContext<
-  MNode extends Node = Node,
-  MType extends Type = Type,
-  MLink extends Link = Link
-> = {
-  medley: Medley<MNode, MType, MLink>;
-  logger: Logger;
-};
+export class BaseContext<BT extends BaseTypes> {
+  constructor(public medley: Medley<BT>, public logger: Logger) {}
+}
 
-export type NodePartContext<
-  TNodePart extends NodePart = NodePart,
-  MNode extends Node = Node,
-  MType extends Type = Type,
-  MLink extends Link = Link
-> = BaseContext<MNode, MType, MLink> & {
-  node: TNodePart;
-};
+export class NodePartContext<
+  TNodePart extends NodePart<BT["node"]> = NodePart<Node>,
+  BT extends Required<BaseTypes> = Required<BaseTypes>
+> implements BaseContext<BT> {
+  constructor(
+    public medley: Medley<BT>,
+    public logger: Logger,
+    public nodePart: TNodePart
+  ) {}
+}
 
-export type NodeContext<
-  TNode extends Node = Node,
-  MNode extends Node = Node,
-  MType extends Type = Type,
-  MLink extends Link = Link
-> = BaseContext<MNode, MType, MLink> & {
-  node: TNode;
-};
+export class NodeContext<
+  TNode extends BT["node"] = Node,
+  BT extends BaseTypes = BaseTypes
+> implements BaseContext<BT> {
+  constructor(
+    public medley: Medley<BT>,
+    public logger: Logger,
+    public node: TNode
+  ) {}
+}
 
-export type ExecutionContext<
-  TNode extends Node = Node,
-  MNode extends Node = Node,
-  MType extends Type = Type,
-  MLink extends Link = Link
-> = NodeContext<TNode, MNode, MType, MLink> & {
-  input: Input;
-};
+export class ExecutionContext<
+  TNode extends BT["node"] = Node,
+  BT extends BaseTypes = BaseTypes
+> implements NodeContext<TNode, BT> {
+  constructor(
+    public medley: Medley<BT>,
+    public logger: Logger,
+    public node: TNode,
+    public input: Input
+  ) {}
+}

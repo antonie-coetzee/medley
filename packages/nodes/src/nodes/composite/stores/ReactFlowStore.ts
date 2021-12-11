@@ -10,7 +10,7 @@ import { getReactFlowEvents } from "../util";
 import { EditStore } from "./EditStore";
 import { InputNode } from "../scopedTypes/input/InputNode";
 import { InputType } from "../scopedTypes/input";
-import { NodeStore } from "./NodeStore";
+import { NodeStore } from "../util/getNodeStore";
 import { OutputNode } from "../scopedTypes/output/node";
 import { OutputType } from "../scopedTypes/output";
 

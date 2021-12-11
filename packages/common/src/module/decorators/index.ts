@@ -1,9 +1,9 @@
 import { CSSProperties, ReactNode, VFC } from "react";
 import { NodeContext } from "@medley-js/core";
-import { CLink, CNode, CType } from "../../types";
+import { CBaseTypes, CLink, CNode, CType } from "../../types";
 
 export type DecorateNode<TNode extends CNode = CNode> = (
-  context: NodeContext<TNode, CNode, CType, CLink>
+  context: NodeContext<TNode, CBaseTypes>
 ) => Promise<
   Partial<{
     selectable: boolean;
@@ -16,7 +16,7 @@ export type DecorateNode<TNode extends CNode = CNode> = (
 >;
 
 export type DecorateLink<TNode extends CNode = CNode> = (
-  context: NodeContext<TNode, CNode, CType, CLink>
+  context: NodeContext<TNode, CBaseTypes>
 ) => Promise<
   Partial<{
     label: string | ReactNode;

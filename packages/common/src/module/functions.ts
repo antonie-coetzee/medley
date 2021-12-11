@@ -1,12 +1,12 @@
 import { BaseContext, NodeContext, NodePartContext } from "@medley-js/core";
-import { CLink, CNode, CNodePart, CPort, CType, RType } from "../types";
+import { CBaseTypes, CLink, CNode, CNodePart, CPort, CType, RType } from "../types";
 
 export type CreateNode<TNode extends CNode = CNode> = (
-  context: NodePartContext<CNodePart<TNode>, CNode, CType, CLink>
+  context: NodePartContext<CNodePart<TNode>, CBaseTypes>
 ) => Promise<boolean>;
 
 export interface GetTargetType<TNode extends CNode = CNode> {
-  (context: NodeContext<TNode, CNode, CType, CLink>, portName: string): RType;
+  (context: NodeContext<TNode, CBaseTypes>, portName: string): RType;
 }
 
 export type CompareTypesResult = {
@@ -15,12 +15,12 @@ export type CompareTypesResult = {
 }
 
 export interface GetSourceType<TNode extends CNode = CNode> {
-  (context: NodeContext<TNode, CNode, CType, CLink>): RType;
+  (context: NodeContext<TNode, CBaseTypes>): RType;
 }
 
 export interface CompareTypes<TNode extends CNode = CNode> {
   (
-    context: NodeContext<TNode, CNode, CType, CLink>,
+    context: NodeContext<TNode, CBaseTypes>,
     sourceType: RType,
     targetType: RType
   ): CompareTypesResult;

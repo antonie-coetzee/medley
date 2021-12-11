@@ -1,12 +1,7 @@
-import { Type, Link, Node } from ".";
+import { BaseTypes } from ".";
 
-export interface Graph<
-  TNode extends Node = Node,
-  TType extends Type = Type,
-  TLink extends Link = Link
-> {
-  name: string;
-  types: TType[];
-  nodes: TNode[];
-  links: TLink[];
+export interface Graph<BT extends BaseTypes = BaseTypes> {
+  types: NonNullable<BT["type"]>[];
+  nodes: NonNullable<BT["node"]>[];
+  links: NonNullable<BT["link"]>[];
 }

@@ -16,7 +16,6 @@ export const NodeComponent: TNodeComponent<InputNode> = ({
     mouseX: number;
     mouseY: number;
   } | null>(null);
-
   const handleContextMenu = (event: React.MouseEvent) => {
     event.preventDefault();
     setContextMenu(

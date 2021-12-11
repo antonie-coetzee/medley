@@ -15,18 +15,22 @@ import {
   TCreateNodeComponentProps,
   CType,
   TEditNodeComponent,
+  Host,
+  CLink,
 } from "@medley-js/common";
 import { CompositeNode } from "../CompositeNode";
 import { Fragment, ReactNode } from "react";
 import React from "react";
 import { DialogStore } from "./DialogStore";
 import { observer } from "mobx-react";
+import { NodeContext } from "@medley-js/core";
 
 export class EditStore {
   public createComponent: ReactNode | null = null;
 
   constructor(
-    private props: TEditNodeComponentProps<CompositeNode>,
+    private context: NodeContext<CompositeNode, CNode, CType, CLink>,
+    private host: Host,
     private dialogStore: DialogStore
   ) {
     makeAutoObservable(this, { createComponent: observable.ref });
@@ -45,14 +49,14 @@ export class EditStore {
    * into the current scope
    */
   async createNode(type: CType, position?: Coordinates) {
-    if (this.props.host.constructNode) {
+    if (this.host.constructNode) {
       const newNodePart = await this.props.host.constructNode(
-        this.props.context,
+        this.context,
         type
       );
       if (newNodePart) {
         newNodePart.position = position;
-        this.props.context.medley.nodes.insertNode<CNode>(observable(newNodePart));
+        this.context.medley.nodes.insertNode<CNode>(observable(newNodePart));
       }
     } else {
       await this.createNodeFallback(type, position);
@@ -60,7 +64,7 @@ export class EditStore {
   }
 
   private async createNodeFallback(type: CType, position?: Coordinates) {
-    const medley = this.props.context.medley;
+    const medley = this.context.medley;
     const newNodePart: CNodePart = { type: type.name, name: "", position};
     // first construct/initialize the nodepart with nodeCreate if
     // available
@@ -68,7 +72,7 @@ export class EditStore {
       await medley.types.runExportFunction<CreateNode<CNode>>(
         type.name,
         constants.createNode,
-        { ...this.props.context, node: newNodePart }
+        { ...this.context, node: newNodePart }
       );
 
       const ncf = await medley.types.getExportFunction<
@@ -76,7 +80,7 @@ export class EditStore {
       >(type.name, constants.createNode);
       if (ncf) {
         const doCreate = await ncf({
-          ...this.props.context,
+          ...this.context,
           node: newNodePart,
         });
         if (!doCreate) {

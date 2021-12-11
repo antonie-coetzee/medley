@@ -6,6 +6,9 @@ import { Medley, NodeContext } from "@medley-js/core";
 import { InputType } from "../scopedTypes/input";
 import { OutputType } from "../scopedTypes/output";
 
+import { observable, isObservable, toJS } from "mobx";
+
+
 export class NodeStore {
   public inputNodes: InputNode[] = [];
   public outputNode: OutputNode | undefined;

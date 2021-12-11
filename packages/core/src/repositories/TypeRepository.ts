@@ -1,6 +1,6 @@
-import { Type, Loader, TreeMap, ROOT_SCOPE } from "../core";
+import { Type, Loader, TreeMap, ROOT_SCOPE, Module } from "../core";
 
-export class TypeRepository<MType extends Type = Type> {
+export class TypeRepository<MType extends Type<Module> = Type<Module>> {
   /* scope -> type */
   private typeMap: TreeMap<MType> = new TreeMap();
 
@@ -27,27 +27,7 @@ export class TypeRepository<MType extends Type = Type> {
   }
 
   public async getExport(type: Type, name: string) {
-    let moduleInfo = type.module;
-    let exportName = name;
-    const redirect = type.exportMap?.[name];
-    if (redirect) {
-      if (typeof redirect === "string") {
-        exportName = redirect;
-      } else if (redirect.name && this.loader.isModule(redirect)) {
-        exportName = redirect.name.toString();
-        moduleInfo = redirect;
-      } else if (this.loader.isModule(redirect)) {
-        moduleInfo = redirect;
-      }
-    }
-
-    let module = await this.loader.import(moduleInfo);
-
-    if (moduleInfo.nameSpace) {
-      return module[moduleInfo.nameSpace][exportName];
-    } else {
-      return module[exportName];
-    }
+    return this.loader.import(type.module, name);
   }
 
   public getTypes(scopeId: string): MType[] {

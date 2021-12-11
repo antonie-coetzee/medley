@@ -11,10 +11,10 @@ import {
 import { DragIndicator, Close, HelpOutline, Refresh } from "@mui/icons-material";
 import { Handle } from "../../../components";
 import { CompositeNode } from "../CompositeNode";
-import { NodeStore } from "../stores/NodeStore";
+import { NodeStore } from "../util/getNodeStore";
 
 function getHandles(context:NodeContext<CNode>) {
-  const nodeStore = NodeStore.get(context);
+  const nodeStore = context.getNodeStore();
   const inputHandles = nodeStore.inputNodes.slice().
     sort((a, b) => a.name.localeCompare(b.name))
     .map((n) => {
@@ -34,6 +34,8 @@ export const NodeComponent: TNodeComponent<CompositeNode> = ({
   context,
   selected,
 }) => { 
+  const nodeStore = context.getNodeStore(()=>"asd");
+  const node = context.getObservableNode();
   const updateNodeInternals = useUpdateNodeInternals();
   useEffect(()=>{
     updateNodeInternals(context.node.id);
@@ -85,7 +87,7 @@ export const NodeComponent: TNodeComponent<CompositeNode> = ({
             paddingRight: "8px",
             "& .MuiCardHeader-subheader": {}
           }}
-          subheader={`${context.node.name}`}
+          subheader={`${node.name}`}
         ></CardHeader>
         <CardContent style={{ padding: "0px" }}>
           <Box sx={{

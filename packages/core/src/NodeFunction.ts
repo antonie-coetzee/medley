@@ -1,23 +1,19 @@
 import { ExecutionContext } from "./Context";
-import { Link, Type, Node } from "./core";
+import { Link, Type, Node, BaseTypes } from "./core";
 
 export const nodeFunction = "nodeFunction";
 
 export interface NodeFunction<
-  TNode extends Node = Node,
-  MNode extends Node = Node,
-  MType extends Type = Type,
-  MLink extends Link = Link
+  TNode extends BT["node"] = Node,
+  BT extends BaseTypes = BaseTypes
 > {
   (
-    context: ExecutionContext<TNode, MNode, MType, MLink>,
+    context: ExecutionContext<TNode, BT>,
     ...args: any[]
   ): any;
 }
 
 export type NF<
-  TNode extends Node = Node,
-  MNode extends Node = Node,
-  MType extends Type = Type,
-  MLink extends Link = Link
-> = NodeFunction<TNode, MNode, MType, MLink>;
+  TNode extends BT["node"] = Node,
+  BT extends BaseTypes = BaseTypes
+> = NodeFunction<TNode, BT>;

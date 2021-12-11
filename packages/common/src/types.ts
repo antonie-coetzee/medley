@@ -5,8 +5,8 @@ import {
   Port,
   Type,
   BaseContext,
-  TypeVersion,
   Graph,
+  BaseTypes,
 } from "@medley-js/core";
 
 export type Location = "left" | "top" | "right" | "bottom";
@@ -18,7 +18,13 @@ export type RType = {
   type: unknown;
 };
 
-export type CNode = Node & {
+export interface CBaseTypes extends BaseTypes {
+  node: CNode,
+  type: CType,
+  link: CLink
+}
+
+export interface CNode extends Node {
   name: string;
   position?: Coordinates;
 };
@@ -27,13 +33,13 @@ export type CNodeWithValue<T> = CNode & {
   value: T;
 };
 
-export type CLink = Link & {
+export interface CLink extends Link {
   position?: Coordinates;
 };
 
 export type CNodePart<TNode extends CNode = CNode> = NodePart<TNode>;
 
-export type CType = Type & {
+export interface CType extends Type {
   label?: string;
   category?: string[];
   icon?: URL;
@@ -42,13 +48,13 @@ export type CType = Type & {
 
 export type CPort = Port;
 
-export type CGraph = Graph & {
+export interface CGraph extends Graph {
   repos?:TypeRepository[]
 }
 
 export type Host = {
   openNodeEdit?: (
-    context: BaseContext<CNode, CType, CLink>,
+    context: BaseContext<CBaseTypes>,
     node: CNode
   ) => void;
   doDialog?: <T>(
@@ -56,7 +62,7 @@ export type Host = {
   ) => Promise<T | undefined>;
   displayMessage?: () => void;
   constructNode?: (
-    context: BaseContext<CNode, CType, CLink>,
+    context: BaseContext<CBaseTypes>,
     type?: CType
   ) => Promise<CNodePart | undefined>;
   selectNode?: () => Promise<CNode>;
