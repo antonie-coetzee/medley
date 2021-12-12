@@ -1,19 +1,20 @@
 import { ExecutionContext } from "./Context";
-import { Link, Type, Node, BaseTypes } from "./core";
+import { Node } from "./core";
+import { MedleyTypes } from "./MedleyTypes";
 
 export const nodeFunction = "nodeFunction";
 
 export interface NodeFunction<
-  TNode extends BT["node"] = Node,
-  BT extends BaseTypes = BaseTypes
+  TNode extends MT["node"] = Node,
+  MT extends MedleyTypes = MedleyTypes
 > {
   (
-    context: ExecutionContext<TNode, BT>,
+    context: ExecutionContext<TNode, MT>,
     ...args: any[]
   ): any;
 }
 
 export type NF<
-  TNode extends BT["node"] = Node,
-  BT extends BaseTypes = BaseTypes
-> = NodeFunction<TNode, BT>;
+  TNode extends MT["node"] = Node,
+  MT extends MedleyTypes = MedleyTypes
+> = NodeFunction<TNode, MT>;

@@ -1,5 +1,5 @@
 import { NodeContext } from "@medley-js/core";
-import { CLink, CNode, CNodePart, constants, CType } from "@medley-js/common";
+import { CMedleyTypes, CLink, CNode, CNodePart, constants, CType } from "@medley-js/common";
 import React from "react";
 import { CompositeNode } from "../CompositeNode";
 import { Connection, Edge, Node as RFNode } from "react-flow-renderer";
@@ -13,7 +13,7 @@ import { InputNode } from "../scopedTypes/input/InputNode";
 import { OutputNode } from "../scopedTypes/output/node";
 
 function getAddInputNode(
-  context: NodeContext<CompositeNode, CNode, CType, CLink>
+  context: NodeContext<CompositeNode, CMedleyTypes>
 ): React.VFC<{ close: () => void; mouseX?: number; mouseY?: number }> {
   return ({ close, mouseX, mouseY }) => {
     const addInput = () => {
@@ -43,7 +43,7 @@ function getAddInputNode(
 }
 
 function getAddOutputNode(
-  context: NodeContext<CompositeNode, CNode, CType, CLink>
+  context: NodeContext<CompositeNode, CMedleyTypes>
 ): React.VFC<{ close: () => void; mouseX?: number; mouseY?: number }> {
   return ({ close, mouseX, mouseY }) => {
     const addOutput = () => {
@@ -73,7 +73,7 @@ function getAddOutputNode(
 }
 
 function getRunOption(
-  context: NodeContext<CompositeNode, CNode, CType, CLink>
+  context: NodeContext<CompositeNode, CMedleyTypes>
 ): React.VFC<{ close: () => void; mouseX?: number; mouseY?: number }> {
   return ({ close, mouseX, mouseY }) => {
     const run = async () => {
@@ -106,7 +106,7 @@ function getRunOption(
 }
 
 export function getContextMenu(
-  context: NodeContext<CompositeNode, CNode, CType, CLink>
+  context: NodeContext<CompositeNode, CMedleyTypes>
 ) {
   return [
     getAddInputNode(context),

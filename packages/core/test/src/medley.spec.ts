@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { URL } from "url";
-import { BaseTypes, Medley, MedleyOptions } from "../../src/index";
+import { MedleyTypes, Medley, MedleyOptions } from "../../src/index";
 import "systemjs";
 
 const rootPath = path.resolve(__dirname + "/..");
@@ -10,24 +10,27 @@ describe("Medley", function () {
   it("should load and run basic composition without error", async function () {
     const baseUrl = new URL(`file:///${rootPath}/fixtures/graphs/`);
 
-    interface medleyTypes extends BaseTypes {
+    type testTypes = MedleyTypes & {
       module: {
         base: string,
         system: string,
         exportMap?: {
           [key:string]:string;
         }
+      },
+      node: {
+        asd:string
       }
     }
 
-    const options: MedleyOptions<medleyTypes> = {
+    const options: MedleyOptions<testTypes> = {
       loader: {
-        import: async (module:medleyTypes["module"], name:string) => {
+        import: async (module, name) => {
           const resolvedModuleBaseUrl = new URL(module.base, baseUrl);
           const resolvedUrl = new URL(module.system, resolvedModuleBaseUrl);       
           const mod =  await System.import(resolvedUrl.toString());
           return mod[module.exportMap?.[name] || name];
-        }
+        }       
       }
     };
     const medley = new Medley(options);

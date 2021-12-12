@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { NodeContext } from "@medley-js/core";
-import { CNode, TNodeComponent } from "@medley-js/common";
+import { CMedleyTypes, CNode, TNodeComponent } from "@medley-js/common";
 import { useUpdateNodeInternals } from "react-flow-renderer";
 import { Box } from "@mui/system";
 import {
@@ -11,9 +11,9 @@ import {
 import { DragIndicator, Close, HelpOutline, Refresh } from "@mui/icons-material";
 import { Handle } from "../../../components";
 import { CompositeNode } from "../CompositeNode";
-import { NodeStore } from "../util/getNodeStore";
 
-function getHandles(context:NodeContext<CNode>) {
+
+function getHandles(context:NodeContext<CNode, CMedleyTypes>) {
   const nodeStore = context.getNodeStore();
   const inputHandles = nodeStore.inputNodes.slice().
     sort((a, b) => a.name.localeCompare(b.name))

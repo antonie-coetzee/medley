@@ -1,9 +1,9 @@
 import { VFC } from "react";
 import { BaseContext } from "@medley-js/core";
-import { CBaseTypes, Host } from "../../types";
+import { CMedleyTypes, Host } from "../../types";
 
 export type TTypeComponentProps = {
-  context: BaseContext<CBaseTypes>;
+  context: BaseContext<CMedleyTypes>;
   host: Host;
 };
 

@@ -1,5 +1,3 @@
-export interface Module {}
-
-export interface MemoryModule extends Module {
-  import: () => Promise<{ [key: string]: any }>;
+export interface Module {
+  import?: () => Promise<{ [key: string]: any }>;
 }

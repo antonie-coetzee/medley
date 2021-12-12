@@ -1,57 +1,62 @@
 import {
-  Node,
-  Type,
   Logger,
   nullLogger,
-  Link,
   ROOT_SCOPE,
   Loader,
   MemoryLoader,
-  BaseTypes,
   Graph,
+  NonNullableType,
 } from "./core";
 import { TypeRepository, NodeRepository, LinkRepository } from "./repositories";
 import { Conductor } from "./Conductor";
 import { Types, Nodes, Links } from "./api";
+import { MedleyTypes } from "./MedleyTypes";
 
-export interface MedleyOptions<BT extends BaseTypes = BaseTypes> {
-  loader?: Loader<NonNullable<BT["module"]>>;
-  typeRepository?: TypeRepository<NonNullable<BT["type"]>>;
-  nodeRepository?: NodeRepository<NonNullable<BT["node"]>>;
-  linkRepository?: LinkRepository<NonNullable<BT["link"]>>;
-  nodes?: Nodes<NonNullable<BT["node"]>>;
-  types?: Types<NonNullable<BT["type"]>>;
-  links?: Links<NonNullable<BT["link"]>>;
-  conductor?: Conductor<BT>;
+export interface MedleyOptions<
+  MT extends MedleyTypes = MedleyTypes,
+  M extends NonNullableType<MT> = NonNullableType<MT>
+> {
+  loader?: Loader<M["module"]>;
+  typeRepository?: TypeRepository<M["type"]>;
+  nodeRepository?: NodeRepository<M["node"]>;
+  linkRepository?: LinkRepository<M["link"]>;
+  nodes?: Nodes<M["node"]>;
+  types?: Types<M["type"]>;
+  links?: Links<M["link"]>;
+  conductor?: Conductor<M>;
   cache?: Map<string, unknown>;
   logger?: Logger;
   scopeId?: string;
 }
 
-export class Medley<BT extends BaseTypes = BaseTypes> {
-  public readonly loader: Loader;
-  public readonly nodeRepository: NodeRepository<NonNullable<BT["node"]>>;
-  public readonly typeRepository: TypeRepository<NonNullable<BT["type"]>>;
-  public readonly linkRepository: LinkRepository<NonNullable<BT["link"]>>;
+export class Medley<
+  MT extends MedleyTypes = MedleyTypes,
+  M extends NonNullableType<MT> = NonNullableType<MT>
+> {
+  public readonly loader: Loader<M["module"]>;
+  public readonly nodeRepository: NodeRepository<M["node"]>;
+  public readonly typeRepository: TypeRepository<M["type"]>;
+  public readonly linkRepository: LinkRepository<M["link"]>;
   public readonly cache: Map<string, unknown>;
-  public readonly conductor: Conductor<BT>;
+  public readonly conductor: Conductor<MT>;
 
   public readonly scopeId: string;
   public readonly logger: Logger;
 
-  public readonly nodes: Nodes<NonNullable<BT["node"]>>;
-  public readonly types: Types<NonNullable<BT["type"]>>;
-  public readonly links: Links<NonNullable<BT["link"]>>;
+  public readonly nodes: Nodes<M["node"]>;
+  public readonly types: Types<M["type"]>;
+  public readonly links: Links<M["link"]>;
 
-  private graph?:  Graph<BT>;
+  private graph?: Graph<M>;
 
-  public constructor(options?: MedleyOptions<BT>) {
+  public constructor(options?: MedleyOptions<M>) {
     this.loader = options?.loader || new MemoryLoader();
-    this.nodeRepository = options?.nodeRepository || new NodeRepository();
+    this.nodeRepository =
+      options?.nodeRepository || new NodeRepository<M["node"]>();
     this.typeRepository =
-      options?.typeRepository || new TypeRepository(this.loader);
+      options?.typeRepository || new TypeRepository<M["type"]>(this.loader);
     this.linkRepository =
-      options?.linkRepository || new LinkRepository<NonNullable<BT["link"]>>();
+      options?.linkRepository || new LinkRepository<M["link"]>();
     this.cache = options?.cache || new Map();
     this.conductor = options?.conductor || new Conductor(this, this.cache);
 
@@ -59,42 +64,37 @@ export class Medley<BT extends BaseTypes = BaseTypes> {
     this.logger = options?.logger || nullLogger;
 
     this.links =
-      options?.links || new Links<NonNullable<BT["link"]>>(this.scopeId, this.linkRepository);
+      options?.links || new Links<M["link"]>(this.scopeId, this.linkRepository);
     this.types =
-      options?.types || new Types<NonNullable<BT["type"]>>(this.scopeId, this.typeRepository);
+      options?.types || new Types<M["type"]>(this.scopeId, this.typeRepository);
     this.nodes =
-      options?.nodes || new Nodes<NonNullable<BT["node"]>>(this.scopeId, this.nodeRepository);
+      options?.nodes || new Nodes<M["node"]>(this.scopeId, this.nodeRepository);
     this.conductor =
-      options?.conductor ||
-      new Conductor<BT>(this, options?.cache);
+      options?.conductor || new Conductor(this, options?.cache);
   }
 
-  public setGraph<
-  TGraph extends Graph<BT> = Graph<BT>
->(graph: TGraph) {
-  this.types.setTypes(graph.types);
-  this.nodes.setNodes(graph.nodes);
-  this.links.setLinks(graph.links);
-  this.graph = graph;
-}
+  public setGraph<TGraph extends Graph<M> = Graph<M>>(graph: TGraph) {
+    this.types.setTypes(graph.types);
+    this.nodes.setNodes(graph.nodes);
+    this.links.setLinks(graph.links);
+    this.graph = graph;
+  }
 
-public getGraph<
-  TGraph extends Graph<BT> = Graph<BT>
->() {
-  const types = this.types
-    .getAllTypes()
-    .filter((t) => t.volatile == null || t.volatile === false);
-  const nodes = this.nodes
-    .getAllNodes()
-    .filter((n) => n.volatile == null || n.volatile === false);
-  const links = this.links
-    .getAllLinks()
-    .filter((l) => l.volatile == null || l.volatile === false);
-  return {
-    ...this.graph,
-    types,
-    nodes,
-    links,
-  } as TGraph;
-}
+  public getGraph<TGraph extends Graph<M> = Graph<M>>() {
+    const types = this.types
+      .getAllTypes()
+      .filter((t) => t.volatile == null || t.volatile === false);
+    const nodes = this.nodes
+      .getAllNodes()
+      .filter((n) => n.volatile == null || n.volatile === false);
+    const links = this.links
+      .getAllLinks()
+      .filter((l) => l.volatile == null || l.volatile === false);
+    return {
+      ...this.graph,
+      types,
+      nodes,
+      links,
+    } as TGraph;
+  }
 }

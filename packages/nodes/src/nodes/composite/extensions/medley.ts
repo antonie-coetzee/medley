@@ -6,7 +6,7 @@ import {
   Nodes,
   Types,
 } from "@medley-js/core";
-import { CLink, CNode, CType, chainObjects, CBaseTypes } from "@medley-js/common";
+import { CLink, CNode, CType, chainObjects, CMedleyTypes } from "@medley-js/common";
 
 import { onNodeInsert, onNodesChange } from "./nodes";
 import { onLinksChange } from "./links";
@@ -15,12 +15,12 @@ export const newCompositeScope = Symbol("newCompositeScope");
 
 declare module "@medley-js/core" {
   interface Medley {
-    [newCompositeScope]: (compositeNodeId: string) => Medley<CBaseTypes>;
+    [newCompositeScope]: (compositeNodeId: string) => Medley<CMedleyTypes>;
   }
 }
 
 Medley.prototype[newCompositeScope] = function (
-  this: Medley<CBaseTypes>,
+  this: Medley<CMedleyTypes>,
   compositeNodeId: string
 ) {
   const parent = this;
@@ -29,7 +29,7 @@ Medley.prototype[newCompositeScope] = function (
   const scopedTypes = new Types<CType>(compositeNodeId, parent.typeRepository);
   const scopedLinks = new Links<CLink>(compositeNodeId, parent.linkRepository);
 
-  const compositeScope = new Medley<CBaseTypes>({
+  const compositeScope = new Medley<CMedleyTypes>({
     scopeId: compositeNodeId,
     nodeRepository: parent.nodeRepository,
     typeRepository: parent.typeRepository,

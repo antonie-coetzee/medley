@@ -1,5 +1,5 @@
 import { Medley } from "./Medley";
-import { Port, Unwrap, BaseTypes } from "./core";
+import { Port, Unwrap } from "./core";
 import { Input, ExecutionContext } from "./Context";
 import {
   NodeFunction,
@@ -7,14 +7,15 @@ import {
 } from "./NodeFunction";
 import { Cache } from "./core/Cache";
 import { BaseContext } from ".";
+import { MedleyTypes } from "./MedleyTypes";
 
-export type InputProvider<BT extends BaseTypes = BaseTypes> = {
-  [index: string]: (context: BaseContext<BT>) => Promise<any>;
+export type InputProvider<MT extends MedleyTypes = MedleyTypes> = {
+  [index: string]: (context: BaseContext<MT>) => Promise<any>;
 };
 
-export class Conductor<BT extends BaseTypes = BaseTypes> {
+export class Conductor<MT extends MedleyTypes = MedleyTypes> {
   private resultCache: Map<string, unknown>;
-  constructor(private medley: Medley<BT>, cache?: Map<string, unknown>) {
+  constructor(private medley: Medley<MT>, cache?: Map<string, unknown>) {
     this.resultCache = cache || new Map();
   }
 
@@ -27,7 +28,7 @@ export class Conductor<BT extends BaseTypes = BaseTypes> {
 
   public async runNodeWithInputs<T = unknown>(
     nodeId: string,
-    inputProvider: InputProvider<BT> | null,
+    inputProvider: InputProvider<MT> | null,
     ...args: T extends (...args: any) => any ? Parameters<T> : any[]
   ): Promise<Unwrap<T>> {
     const node = this.medley.nodes.getNode(nodeId);
@@ -35,14 +36,14 @@ export class Conductor<BT extends BaseTypes = BaseTypes> {
       throw new Error(`node with id: '${nodeId}', not found`);
     }
     const nodeFunction = await this.medley.types.getExportFunction<
-      NodeFunction<BT["node"], BT>
+      NodeFunction<MT["node"], MT>
     >(node.type, nodeFunctionExportName);
 
     if (nodeFunction == null) {
       throw new Error(`node function for type: '${node.type}', not valid`);
     }
 
-    const context = new ExecutionContext<BT["node"], BT>(
+    const context = new ExecutionContext<MT["node"], MT>(
       this.medley,
       this.medley.logger.child({
         typeName: node.type,
@@ -70,9 +71,9 @@ export class Conductor<BT extends BaseTypes = BaseTypes> {
 
   private async inputProviderInput(
     this: {
-      context: ExecutionContext<BT["node"], BT>;
-      conductor: Conductor<BT>;
-      inputProvider: InputProvider<BT>;
+      context: ExecutionContext<MT["node"], MT>;
+      conductor: Conductor<MT>;
+      inputProvider: InputProvider<MT>;
     },
     port: Port,
     ...args: any[]
@@ -86,8 +87,8 @@ export class Conductor<BT extends BaseTypes = BaseTypes> {
 
   private async portInput(
     this: {
-      context: ExecutionContext<BT["node"], BT>;
-      conductor: Conductor<BT>;
+      context: ExecutionContext<MT["node"], MT>;
+      conductor: Conductor<MT>;
     },
     port: Port,
     ...args: any[]

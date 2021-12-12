@@ -1,3 +1,7 @@
+export type NonNullableType<T> = {
+  [Property in keyof T]: NonNullable<T[Property]>;
+};
+
 export type Writeable<T, K extends keyof T> = Omit<T, K> &
   { -readonly [P in K]: T[K] };
 

@@ -4,7 +4,7 @@ export class TypeRepository<MType extends Type<Module> = Type<Module>> {
   /* scope -> type */
   private typeMap: TreeMap<MType> = new TreeMap();
 
-  constructor(public loader: Loader) {}
+  constructor(public loader: Loader<MType["module"]>) {}
 
   public set(types: MType[]) {
     this.typeMap.clear();

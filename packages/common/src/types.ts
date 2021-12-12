@@ -6,7 +6,8 @@ import {
   Type,
   BaseContext,
   Graph,
-  BaseTypes,
+  MedleyTypes,
+  Module,
 } from "@medley-js/core";
 
 export type Location = "left" | "top" | "right" | "bottom";
@@ -18,10 +19,19 @@ export type RType = {
   type: unknown;
 };
 
-export interface CBaseTypes extends BaseTypes {
+export interface CModule extends Module {
+  system?: string,
+  esm?: string,
+  exportMap?: {
+    [key:string]:string;
+  }
+}
+
+export interface CMedleyTypes extends MedleyTypes {
   node: CNode,
   type: CType,
-  link: CLink
+  link: CLink,
+  module: CModule
 }
 
 export interface CNode extends Node {
@@ -54,7 +64,7 @@ export interface CGraph extends Graph {
 
 export type Host = {
   openNodeEdit?: (
-    context: BaseContext<CBaseTypes>,
+    context: BaseContext<CMedleyTypes>,
     node: CNode
   ) => void;
   doDialog?: <T>(
@@ -62,7 +72,7 @@ export type Host = {
   ) => Promise<T | undefined>;
   displayMessage?: () => void;
   constructNode?: (
-    context: BaseContext<CBaseTypes>,
+    context: BaseContext<CMedleyTypes>,
     type?: CType
   ) => Promise<CNodePart | undefined>;
   selectNode?: () => Promise<CNode>;

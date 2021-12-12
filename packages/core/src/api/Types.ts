@@ -23,7 +23,7 @@ export class Types<MType extends Type<Module> = Type<Module>> {
   }
 
   public async getExport<T>(type: Type, name: string): Promise<T | undefined> {
-    return await this.typeRepository.getExport(type, name);
+    return await this.typeRepository.getExport(type, name) as T;
   }
 
   public getTypes(): MType[] {

@@ -3,10 +3,10 @@ import {
   Node,
   Port,
   NodePart,
-  Unwrap,
-  BaseTypes,
+  Unwrap
 } from "./core";
 import { Medley } from "./Medley";
+import { MedleyTypes } from "./MedleyTypes";
 
 type TypeOfPort<T> = T extends Port<infer X> ? X : never;
 
@@ -17,38 +17,38 @@ export type Input = <TypedPort extends Port>(
     : any[]
 ) => Promise<Unwrap<TypeOfPort<TypedPort>> | undefined>;
 
-export class BaseContext<BT extends BaseTypes> {
-  constructor(public medley: Medley<BT>, public logger: Logger) {}
+export class BaseContext<MT extends MedleyTypes> {
+  constructor(public medley: Medley<MT>, public logger: Logger) {}
 }
 
 export class NodePartContext<
-  TNodePart extends NodePart<BT["node"]> = NodePart<Node>,
-  BT extends Required<BaseTypes> = Required<BaseTypes>
-> implements BaseContext<BT> {
+  TNodePart extends NodePart<MT["node"]> = NodePart<Node>,
+  MT extends Required<MedleyTypes> = Required<MedleyTypes>
+> implements BaseContext<MT> {
   constructor(
-    public medley: Medley<BT>,
+    public medley: Medley<MT>,
     public logger: Logger,
     public nodePart: TNodePart
   ) {}
 }
 
 export class NodeContext<
-  TNode extends BT["node"] = Node,
-  BT extends BaseTypes = BaseTypes
-> implements BaseContext<BT> {
+  TNode extends MT["node"] = Node,
+  MT extends MedleyTypes = MedleyTypes
+> implements BaseContext<MT> {
   constructor(
-    public medley: Medley<BT>,
+    public medley: Medley<MT>,
     public logger: Logger,
     public node: TNode
   ) {}
 }
 
 export class ExecutionContext<
-  TNode extends BT["node"] = Node,
-  BT extends BaseTypes = BaseTypes
-> implements NodeContext<TNode, BT> {
+  TNode extends MT["node"] = Node,
+  MT extends MedleyTypes = MedleyTypes
+> implements NodeContext<TNode, MT> {
   constructor(
-    public medley: Medley<BT>,
+    public medley: Medley<MT>,
     public logger: Logger,
     public node: TNode,
     public input: Input

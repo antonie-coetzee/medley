@@ -1,11 +1,11 @@
 import { VFC } from "react";
 import { NodePartContext } from "@medley-js/core";
-import { CBaseTypes, CLink, CNode, CNodePart, CType, Host } from "../../types";
+import { CMedleyTypes, CLink, CNode, CNodePart, CType, Host } from "../../types";
 
 export type TCreateNodeComponentProps<
   TNodePart extends CNodePart = CNodePart
 > = {
-  context: NodePartContext<TNodePart, CBaseTypes>;
+  context: NodePartContext<TNodePart, CMedleyTypes>;
   host: Host;
   close: (construct:boolean) => void;
 };

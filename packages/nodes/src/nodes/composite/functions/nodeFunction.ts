@@ -1,4 +1,4 @@
-import { CBaseTypes } from "@/../../common/dist";
+import { CMedleyTypes } from "@/../../common/dist";
 import { NF, Input, Medley, BaseModule } from "@medley-js/core";
 import { CompositeNode } from "../CompositeNode";
 import { InputType } from "../scopedTypes/input";
@@ -38,7 +38,7 @@ function addInputType(scopedInstance: Medley, input: Input): void {
   });
 }
 
-function addOutputType(scopedInstance: Medley<CBaseTypes>): void {
+function addOutputType(scopedInstance: Medley<CMedleyTypes>): void {
   const nodeFunction: NF = ({ node, input }) => {
     return input({
       name: node.id,
