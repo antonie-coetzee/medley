@@ -5,7 +5,6 @@ import {
   constants,
   CPort,
   CType,
-  GetPorts,
   TEditNodeComponentProps
 } from "@medley-js/common";
 import React from "react";
