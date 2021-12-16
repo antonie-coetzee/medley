@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { URL } from "url";
-import { MedleyTypes, Medley, MedleyOptions } from "../../src/index";
+import { MedleyTypes, Medley, MedleyOptions } from "../../dist/medley.cjs";
 import "systemjs";
 
 const rootPath = path.resolve(__dirname + "/..");
@@ -17,9 +17,6 @@ describe("Medley", function () {
         exportMap?: {
           [key:string]:string;
         }
-      },
-      node: {
-        asd:string
       }
     }
 

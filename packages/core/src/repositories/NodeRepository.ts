@@ -12,7 +12,7 @@ export class NodeRepository<MNode extends Node> {
   public nodeTreeMap: TreeMap<MNode> = new TreeMap();
 
   public set(nodes: MNode[]): void {
-    this.nodeTreeMap.clear();
+    this.nodeTreeMap.clearAllNodes();
     this.nodeIndex.clear();
     nodes.forEach((node) => {
       this.setNode(node);
@@ -34,7 +34,7 @@ export class NodeRepository<MNode extends Node> {
   }
 
   public getAllNodes(): MNode[] {
-    return this.nodeTreeMap.getAll();
+    return this.nodeTreeMap.getAllNodes();
   }
 
   public getUsedTypes(scopeId: string): string[] {
@@ -47,7 +47,7 @@ export class NodeRepository<MNode extends Node> {
   }
 
   public getAllUsedTypes(): string[] {
-    const nodes = this.nodeTreeMap.getAll();
+    const nodes = this.nodeTreeMap.getAllNodes();
     const usedTypes = nodes.reduce((acc, node) => {
       acc.add(node.type);
       return acc;

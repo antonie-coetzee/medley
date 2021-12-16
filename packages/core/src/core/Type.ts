@@ -1,4 +1,3 @@
-import { Cache } from "./Cache";
 import { Module } from "./Module";
 import { Scoped } from "./Scoped";
 

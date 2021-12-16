@@ -1,5 +1,4 @@
 import {
-  Logger,
   Node,
   Port,
   NodePart,
@@ -18,7 +17,7 @@ export type Input = <TypedPort extends Port>(
 ) => Promise<Unwrap<TypeOfPort<TypedPort>> | undefined>;
 
 export class BaseContext<MT extends MedleyTypes> {
-  constructor(public medley: Medley<MT>, public logger: Logger) {}
+  constructor(public medley: Medley<MT>) {}
 }
 
 export class NodePartContext<
@@ -27,7 +26,6 @@ export class NodePartContext<
 > implements BaseContext<MT> {
   constructor(
     public medley: Medley<MT>,
-    public logger: Logger,
     public nodePart: TNodePart
   ) {}
 }
@@ -38,7 +36,6 @@ export class NodeContext<
 > implements BaseContext<MT> {
   constructor(
     public medley: Medley<MT>,
-    public logger: Logger,
     public node: TNode
   ) {}
 }
@@ -49,7 +46,6 @@ export class ExecutionContext<
 > implements NodeContext<TNode, MT> {
   constructor(
     public medley: Medley<MT>,
-    public logger: Logger,
     public node: TNode,
     public input: Input
   ) {}

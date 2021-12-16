@@ -1,3 +1,3 @@
 export interface Module {
-  import?: () => Promise<{ [key: string]: any }>;
+  import?: () => Promise<{ [key: string]: unknown }>;
 }

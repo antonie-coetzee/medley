@@ -1,4 +1,4 @@
-import { TreeMap } from "../../src";
+import { TreeMap } from "../../dist/medley.cjs";
 
 describe("treemap", function () {
   it("can add and retrieve a value", function () {

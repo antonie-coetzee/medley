@@ -66,7 +66,7 @@ export default [
   },
   {
     input: "dist/dts/index.d.ts",
-    output: [{ file: "dist/medley.d.ts", format: "es" }],
+    output: [{ file: "dist/medley.esm.d.ts", format: "es" }, {file: "dist/medley.cjs.d.ts", format: "es" },  {file: "dist/medley.sjs.d.ts", format: "es" }],
     plugins: [
       dts(),
       del({

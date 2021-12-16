@@ -69,16 +69,16 @@ export class TreeMap<T> {
     }
   }
 
-  public getAll(): T[] {
+  public getAllNodes(): T[] {
     const childNodes = Object.values(this.rootNode);
     return childNodes.flatMap((cn) => this.getNodeValuesRecursive(cn)) || [];
   }
 
-  public clear() {
+  public clearAllNodes() {
     return (this.rootNode = {});
   }
 
-  public toJson() {
+  public toJSON() {
     return JSON.stringify(this.rootNode, null, " ");
   }
 

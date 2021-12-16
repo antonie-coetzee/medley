@@ -24,9 +24,9 @@ export class LinkRepository<MLink extends Link = Link> {
   }
 
   public set(links: AnyLink<MLink>[]) {
-    this.portToSourceMap.clear();
-    this.sourceToPortMap.clear();
-    this.targetToSourceMap.clear();
+    this.portToSourceMap.clearAllNodes();
+    this.sourceToPortMap.clearAllNodes();
+    this.targetToSourceMap.clearAllNodes();
     for (const link of links) {
       if (isPortLink(link)) {
         this.addToPortToSourceMap(link);
@@ -82,8 +82,8 @@ export class LinkRepository<MLink extends Link = Link> {
 
   public getSourceToPortLinks(scopeId: string, source: string) {
     if (this.updateSourceToPortMap) {
-      this.sourceToPortMap.clear();
-      const allLinks = this.portToSourceMap.getAll();
+      this.sourceToPortMap.clearAllNodes();
+      const allLinks = this.portToSourceMap.getAllNodes();
       for (const link of allLinks) {
         this.addToSourceToPortMap(link);
       }
@@ -104,8 +104,8 @@ export class LinkRepository<MLink extends Link = Link> {
 
   public getAllLinks(): AnyLink<MLink>[] {
     return [
-      ...this.portToSourceMap.getAll(),
-      ...this.targetToSourceMap.getAll(),
+      ...this.portToSourceMap.getAllNodes(),
+      ...this.targetToSourceMap.getAllNodes(),
     ];
   }
 

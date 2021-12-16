@@ -1,6 +1,4 @@
 import {
-  Logger,
-  nullLogger,
   ROOT_SCOPE,
   Loader,
   MemoryLoader,
@@ -25,7 +23,6 @@ export interface MedleyOptions<
   links?: Links<M["link"]>;
   conductor?: Conductor<M>;
   cache?: Map<string, unknown>;
-  logger?: Logger;
   scopeId?: string;
 }
 
@@ -41,7 +38,6 @@ export class Medley<
   public readonly conductor: Conductor<MT>;
 
   public readonly scopeId: string;
-  public readonly logger: Logger;
 
   public readonly nodes: Nodes<M["node"]>;
   public readonly types: Types<M["type"]>;
@@ -61,7 +57,6 @@ export class Medley<
     this.conductor = options?.conductor || new Conductor(this, this.cache);
 
     this.scopeId = options?.scopeId || ROOT_SCOPE;
-    this.logger = options?.logger || nullLogger;
 
     this.links =
       options?.links || new Links<M["link"]>(this.scopeId, this.linkRepository);

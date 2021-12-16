@@ -7,7 +7,7 @@ export class TypeRepository<MType extends Type<Module> = Type<Module>> {
   constructor(public loader: Loader<MType["module"]>) {}
 
   public set(types: MType[]) {
-    this.typeMap.clear();
+    this.typeMap.clearAllNodes();
     for (const type of types) {
       this.typeMap.setNodeValue(type, type.scope || ROOT_SCOPE, type.name);
     }
@@ -35,7 +35,7 @@ export class TypeRepository<MType extends Type<Module> = Type<Module>> {
   }
 
   public getAllTypes(): MType[] {
-    return this.typeMap.getAll();
+    return this.typeMap.getAllNodes();
   }
 
   public getType(scopeId: string, typeName: string): MType | undefined {

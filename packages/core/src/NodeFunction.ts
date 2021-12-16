@@ -8,10 +8,7 @@ export interface NodeFunction<
   TNode extends MT["node"] = Node,
   MT extends MedleyTypes = MedleyTypes
 > {
-  (
-    context: ExecutionContext<TNode, MT>,
-    ...args: any[]
-  ): any;
+  (context: ExecutionContext<TNode, MT>, ...args: any[]): any;
 }
 
 export type NF<

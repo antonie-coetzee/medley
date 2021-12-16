@@ -1,7 +1,6 @@
 import { NF, Port} from "@medley-js/core";
 
-export const nodeFunction: NF = async ({ logger, input }, testArg: string) => {
-  logger.info("log from ModuleOne.typeOne");
+export const nodeFunction: NF = async ({ input }, testArg: string) => {
   const portOneValue = await input(portOne);
   const portTwoValue = await input(portTwo);
 

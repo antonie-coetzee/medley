@@ -1,11 +1,10 @@
 import { Medley } from "./Medley";
-import { Port, Unwrap } from "./core";
+import { Port, ROOT_SCOPE, Unwrap } from "./core";
 import { Input, ExecutionContext } from "./Context";
 import {
   NodeFunction,
   nodeFunction as nodeFunctionExportName,
 } from "./NodeFunction";
-import { Cache } from "./core/Cache";
 import { BaseContext } from ".";
 import { MedleyTypes } from "./MedleyTypes";
 
@@ -45,10 +44,6 @@ export class Conductor<MT extends MedleyTypes = MedleyTypes> {
 
     const context = new ExecutionContext<MT["node"], MT>(
       this.medley,
-      this.medley.logger.child({
-        typeName: node.type,
-        nodeId: node.id,
-      }),
       node,
       {} as Input
     );
@@ -56,7 +51,7 @@ export class Conductor<MT extends MedleyTypes = MedleyTypes> {
     if (inputProvider == null) {
       context.input = this.portInput.bind({
         conductor: this,
-        context,
+        nodeId,
       }) as Input;
     } else {
       context.input = this.inputProviderInput.bind({
@@ -75,8 +70,7 @@ export class Conductor<MT extends MedleyTypes = MedleyTypes> {
       conductor: Conductor<MT>;
       inputProvider: InputProvider<MT>;
     },
-    port: Port,
-    ...args: any[]
+    port: Port
   ): Promise<unknown | undefined> {
     const inputFunction = this.inputProvider[port.name];
     if (inputFunction == null && port.required) {
@@ -87,7 +81,7 @@ export class Conductor<MT extends MedleyTypes = MedleyTypes> {
 
   private async portInput(
     this: {
-      context: ExecutionContext<MT["node"], MT>;
+      nodeId: string;
       conductor: Conductor<MT>;
     },
     port: Port,
@@ -95,7 +89,7 @@ export class Conductor<MT extends MedleyTypes = MedleyTypes> {
   ): Promise<unknown | undefined> {
     let links = this.conductor.medley.links.getPortLinks(
       port.name,
-      this.context.node!.id
+      this.nodeId
     );
     if (links == null || (links.length === 0 && !port.required)) {
       return;
@@ -119,7 +113,7 @@ export class Conductor<MT extends MedleyTypes = MedleyTypes> {
     func: () => Promise<T>
   ) {
     const cacheItem = this.checkCache(nodeId, args);
-    if (cacheItem && cacheItem.result) {
+    if (cacheItem && cacheItem.hit) {
       return cacheItem.result as T;
     }
     const result = func();
@@ -131,28 +125,20 @@ export class Conductor<MT extends MedleyTypes = MedleyTypes> {
 
   private checkCache(nodeId: string, ...args: any[]) {
     const node = this.medley.nodes.getNode(nodeId);
-    if (node == null || node.cache == null || node.cache === Cache.none) {
+    if (node == null) {
       return null;
     }
-    let key = "";
-    switch (node.cache) {
-      case Cache.scope:
-        key = `${this.medley.scopeId}${node.id}${
-          args !== [] && JSON.stringify(args)
-        }`;
-        break;
-      case Cache.global:
-        key = `${node.id}${args !== [] && JSON.stringify(args)}`;
-        break;
-      default:
-        return null;
-    }
+    const key = `${node.scope || ROOT_SCOPE}${node.id}${
+      args !== [] && JSON.stringify(args)
+    }`;
+
     if (this.resultCache.has(key)) {
       return {
         addToCache: false,
+        hit: true,
         result: this.resultCache.get(key),
       };
     }
-    return { addToCache: true, key };
+    return { addToCache: true, hit: false, key };
   }
 }
