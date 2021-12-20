@@ -23,7 +23,7 @@ export class LinkRepository<MLink extends Link = Link> {
     this.targetToSourceMap = new TreeMap();
   }
 
-  public set(links: AnyLink<MLink>[]) {
+  public setAllLinks(links: AnyLink<MLink>[]) {
     this.portToSourceMap.clearAllNodes();
     this.sourceToPortMap.clearAllNodes();
     this.targetToSourceMap.clearAllNodes();

@@ -50,9 +50,9 @@ export class Medley<
   }
 
   public setGraph<TGraph extends Graph<M> = Graph<M>>(graph: TGraph) {
-    this.typeRepository.set(graph.types);
-    this.nodeRepository.set(graph.nodes);
-    this.linkRepository.set(graph.links);
+    this.typeRepository.setAllTypes(graph.types);
+    this.nodeRepository.setAllNodes(graph.nodes);
+    this.linkRepository.setAllLinks(graph.links);
     this.graph = graph;
   }
 

@@ -91,7 +91,7 @@ export class Conductor<MT extends MedleyTypes = MedleyTypes> {
       port.name,
       this.nodeId
     );
-    if (links == null || (links.length === 0 && !port.required)) {
+    if ((links == null || links.length === 0) && !port.required) {
       return;
     }
     if (links.length === 0 && port.required === true) {

@@ -11,7 +11,7 @@ export class NodeRepository<MNode extends Node> {
   public nodeIndex: Map<string, MNode> = new Map();
   public nodeTreeMap: TreeMap<MNode> = new TreeMap();
 
-  public set(nodes: MNode[]): void {
+  public setAllNodes(nodes: MNode[]): void {
     this.nodeTreeMap.clearAllNodes();
     this.nodeIndex.clear();
     nodes.forEach((node) => {
@@ -23,12 +23,6 @@ export class NodeRepository<MNode extends Node> {
     return this.nodeTreeMap.getNodeValue(scopeId, id);
   }
 
-  // public getNodesByType(scopeId: string, typeName: string): MNode[] {
-  //   return this.nodeTreeMap
-  //     .getFromPath(false, scopeId)
-  //     .filter((n) => n.type === typeName);
-  // }
-
   public getNodes(scopeId: string): MNode[] {
     return this.nodeTreeMap.getFromPath(false, scopeId);
   }
@@ -37,25 +31,7 @@ export class NodeRepository<MNode extends Node> {
     return this.nodeTreeMap.getAllNodes();
   }
 
-  // public getUsedTypes(scopeId: string): string[] {
-  //   const nodes = this.nodeTreeMap.getFromPath(false, scopeId);
-  //   const usedTypes = nodes.reduce((acc, node) => {
-  //     acc.add(node.type);
-  //     return acc;
-  //   }, new Set<string>());
-  //   return Array.from(usedTypes.keys());
-  // }
-
-  // public getAllUsedTypes(): string[] {
-  //   const nodes = this.nodeTreeMap.getAllNodes();
-  //   const usedTypes = nodes.reduce((acc, node) => {
-  //     acc.add(node.type);
-  //     return acc;
-  //   }, new Set<string>());
-  //   return Array.from(usedTypes.keys());
-  // }
-
-  public insertNode(nodePart: NodePart<MNode>) {
+  public insertNode(scopeId: string, nodePart: NodePart<MNode>) {
     let newId: string;
     do {
       newId = generateId();
@@ -63,7 +39,7 @@ export class NodeRepository<MNode extends Node> {
     let newNode = {
       ...nodePart,
       id: newId,
-      scope: nodePart.scope || ROOT_SCOPE,
+      scope: scopeId
     } as MNode;
 
     this.setNode(newNode);
@@ -75,7 +51,7 @@ export class NodeRepository<MNode extends Node> {
     this.nodeIndex.set(node.id, node);
   }
 
-  public removeNode(node: Node) {
+  public deleteNode(node: Node) {
     const storedNode = this.nodeIndex.get(node.id);
     if (storedNode == null) {
       return;

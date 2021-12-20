@@ -6,7 +6,7 @@ export class TypeRepository<MType extends Type<Module> = Type<Module>> {
 
   constructor(public loader: Loader<MType["module"]>) {}
 
-  public set(types: MType[]) {
+  public setAllTypes(types: MType[]) {
     this.typeMap.clearAllNodes();
     for (const type of types) {
       this.typeMap.setNodeValue(type, type.scope || ROOT_SCOPE, type.name);

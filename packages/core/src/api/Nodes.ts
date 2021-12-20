@@ -16,19 +16,17 @@ export class Nodes<MNode extends Node = Node> {
   }
 
   public setNode<TNode extends MNode>(node:TNode){
-    node.scope = this.scopeId;
     this.nodeRepository.setNode(node);
   }
 
   public insertNode<
     TNode extends MNode
   >(nodePart: NodePart<TNode>) {
-    nodePart.scope = this.scopeId;
-    return this.nodeRepository.insertNode(nodePart) as TNode;
+    return this.nodeRepository.insertNode(this.scopeId, nodePart) as TNode;
   }
 
   public deleteNode<TNode extends MNode>(node: TNode) {
-    const deletedNode = this.nodeRepository.removeNode(node);
+    const deletedNode = this.nodeRepository.deleteNode(node);
     return deletedNode ? true : false;
   }
 }
