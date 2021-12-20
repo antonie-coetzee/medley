@@ -7,10 +7,6 @@ export class Links<MLink extends Link = Link> {
     private linkRepo: LinkRepository<MLink>
   ) {}
 
-  public setLinks(links: AnyLink<MLink>[]) {
-    this.linkRepo.set(links);
-  }
-
   public getPortLinks(port: string, target: string): PortLink<MLink>[] {
     return this.linkRepo.getPortLinks(this.scopeId, port, target);
   }
@@ -24,6 +20,7 @@ export class Links<MLink extends Link = Link> {
   }
 
   public addLink(newLink: AnyLink<MLink>): boolean {
+    newLink.scope = this.scopeId;
     return this.linkRepo.addLink(newLink);
   }
 
@@ -37,10 +34,6 @@ export class Links<MLink extends Link = Link> {
 
   public getLinks(): AnyLink<MLink>[] {
     return this.linkRepo.getLinks(this.scopeId);
-  }
-
-  public getAllLinks(): AnyLink<MLink>[] {
-    return this.linkRepo.getAllLinks();
   }
 
   public deleteLink(link: MLink): boolean {

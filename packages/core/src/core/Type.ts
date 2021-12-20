@@ -12,3 +12,7 @@ export interface Type<MModule extends Module = Module>
     Scoped {
   name: string;
 }
+
+export function isType<T extends Type>(type: unknown): type is T {
+  return (type as T).name ? true : false;
+}

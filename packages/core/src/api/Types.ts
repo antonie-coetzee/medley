@@ -7,31 +7,12 @@ export class Types<MType extends Type<Module> = Type<Module>> {
     private typeRepository: TypeRepository<MType>
   ) {}
 
-  public setTypes(types: MType[]): void {
-    return this.typeRepository.set(types);
-  }
-
-  public async getExportFunction<T extends Function = Function>(
-    typeName: string,
-    functionName: string
-  ): Promise<T | undefined> {
-    return await this.typeRepository.getExportFunction<T>(
-      this.scopeId,
-      typeName,
-      functionName
-    );
-  }
-
-  public async getExport<T>(type: Type, name: string): Promise<T | undefined> {
-    return await this.typeRepository.getExport(type, name) as T;
+  public async getExport<T>(typeName: string, exportName: string): Promise<T | undefined> {
+    return await this.typeRepository.getExport(this.scopeId, typeName, exportName) as T;
   }
 
   public getTypes(): MType[] {
     return this.typeRepository.getTypes(this.scopeId);
-  }
-
-  public getAllTypes(): MType[] {
-    return this.typeRepository.getAllTypes();
   }
 
   public getType(typeName: string): MType | undefined {

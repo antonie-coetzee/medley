@@ -23,11 +23,11 @@ export class NodeRepository<MNode extends Node> {
     return this.nodeTreeMap.getNodeValue(scopeId, id);
   }
 
-  public getNodesByType(scopeId: string, typeName: string): MNode[] {
-    return this.nodeTreeMap
-      .getFromPath(false, scopeId)
-      .filter((n) => n.type === typeName);
-  }
+  // public getNodesByType(scopeId: string, typeName: string): MNode[] {
+  //   return this.nodeTreeMap
+  //     .getFromPath(false, scopeId)
+  //     .filter((n) => n.type === typeName);
+  // }
 
   public getNodes(scopeId: string): MNode[] {
     return this.nodeTreeMap.getFromPath(false, scopeId);
@@ -37,23 +37,23 @@ export class NodeRepository<MNode extends Node> {
     return this.nodeTreeMap.getAllNodes();
   }
 
-  public getUsedTypes(scopeId: string): string[] {
-    const nodes = this.nodeTreeMap.getFromPath(false, scopeId);
-    const usedTypes = nodes.reduce((acc, node) => {
-      acc.add(node.type);
-      return acc;
-    }, new Set<string>());
-    return Array.from(usedTypes.keys());
-  }
+  // public getUsedTypes(scopeId: string): string[] {
+  //   const nodes = this.nodeTreeMap.getFromPath(false, scopeId);
+  //   const usedTypes = nodes.reduce((acc, node) => {
+  //     acc.add(node.type);
+  //     return acc;
+  //   }, new Set<string>());
+  //   return Array.from(usedTypes.keys());
+  // }
 
-  public getAllUsedTypes(): string[] {
-    const nodes = this.nodeTreeMap.getAllNodes();
-    const usedTypes = nodes.reduce((acc, node) => {
-      acc.add(node.type);
-      return acc;
-    }, new Set<string>());
-    return Array.from(usedTypes.keys());
-  }
+  // public getAllUsedTypes(): string[] {
+  //   const nodes = this.nodeTreeMap.getAllNodes();
+  //   const usedTypes = nodes.reduce((acc, node) => {
+  //     acc.add(node.type);
+  //     return acc;
+  //   }, new Set<string>());
+  //   return Array.from(usedTypes.keys());
+  // }
 
   public insertNode(nodePart: NodePart<MNode>) {
     let newId: string;

@@ -7,37 +7,16 @@ export class Nodes<MNode extends Node = Node> {
     private nodeRepository: NodeRepository<MNode>
   ) {}
 
-  public setNodes(nodes: MNode[]) {
-    this.nodeRepository.set(nodes);
-  }
-
   public getNode(id: string): MNode | undefined {
     return this.nodeRepository.getNode(this.scopeId, id) as MNode;
-  }
-
-  public getNodesByType<TNode extends MNode>(
-    typeName: string
-  ): TNode[] {
-    return this.nodeRepository.getNodesByType(
-      this.scopeId,
-      typeName
-    ) as TNode[];
   }
 
   public getNodes(): MNode[] {
     return this.nodeRepository.getNodes(this.scopeId) as MNode[];
   }
 
-  public getAllNodes(): MNode[] {
-    return this.nodeRepository.getAllNodes() as MNode[];
-  }
-
-  public getUsedTypes(): string[] {
-    const scopeTypes = this.nodeRepository.getUsedTypes(this.scopeId);
-    return scopeTypes;
-  }
-
   public setNode<TNode extends MNode>(node:TNode){
+    node.scope = this.scopeId;
     this.nodeRepository.setNode(node);
   }
 

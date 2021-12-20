@@ -1,4 +1,4 @@
-import { Type, Loader, TreeMap, ROOT_SCOPE, Module } from "../core";
+import { Type, Loader, TreeMap, ROOT_SCOPE, Module, isType } from "../core";
 
 export class TypeRepository<MType extends Type<Module> = Type<Module>> {
   /* scope -> type */
@@ -13,21 +13,12 @@ export class TypeRepository<MType extends Type<Module> = Type<Module>> {
     }
   }
 
-  public async getExportFunction<T extends Function = Function>(
-    scope: string,
-    typeName: string,
-    functionName: string
-  ) {
-    const type = this.typeMap.getNodeValue(scope, typeName);
-    if (type == null) {
+  public async getExport(scopeId:string, typeName: string, exportName: string) {
+    const typeObj = this.typeMap.getNodeValue(scopeId, typeName);
+    if (typeObj == null) {
       return;
     }
-    const moduleFunction = await this.getExport(type, functionName);
-    return moduleFunction as T;
-  }
-
-  public async getExport(type: Type, name: string) {
-    return this.loader.import(type.module, name);
+    return this.loader.import(typeObj.module, exportName);
   }
 
   public getTypes(scopeId: string): MType[] {

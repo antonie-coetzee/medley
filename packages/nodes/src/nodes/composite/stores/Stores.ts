@@ -20,7 +20,7 @@ export class Stores {
 
   constructor(context: NodeContext<CompositeNode, CMedleyTypes>, host:Host) {
     this.dialogStore = new DialogStore();
-    this.editStore = new EditStore(props, this.dialogStore);
+    this.editStore = new EditStore(props, host, this.dialogStore);
     this.reactFlowStore = new ReactFlowStore(props, this.editStore);
     this.contextMenuStore = new ContextMenuStore(props, this.editStore);
   }

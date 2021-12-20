@@ -44,26 +44,19 @@ export class LinkRepository<MLink extends Link = Link> {
     port?: string
   ) {
     if (port) {
-      const links = this.portToSourceMap.getFromPath(
+      return this.portToSourceMap.getFromPath(
         false,
         scopeId,
         port,
         target,
-        source
-      );
-      if (links.length > 0) {
-        return links[0];
-      }
+        source)?.[0];
     } else {
-      const links = this.targetToSourceMap.getFromPath(
+      return this.targetToSourceMap.getFromPath(
         false,
         scopeId,
         target,
         source
-      );
-      if (links.length > 0) {
-        return links[0];
-      }
+      )?.[0];
     }
   }
 

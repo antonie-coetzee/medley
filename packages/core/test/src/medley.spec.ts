@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { URL } from "url";
-import { MedleyTypes, Medley, MedleyOptions } from "../../dist/medley.cjs";
+import { MedleyTypes, Medley, MedleySetup} from "../../dist/medley.cjs";
 import "systemjs";
 
 const rootPath = path.resolve(__dirname + "/..");
@@ -20,7 +20,7 @@ describe("Medley", function () {
       }
     }
 
-    const options: MedleyOptions<testTypes> = {
+    const setup: MedleySetup<testTypes> = {
       loader: {
         import: async (module, name) => {
           const resolvedModuleBaseUrl = new URL(module.base, baseUrl);
@@ -30,7 +30,8 @@ describe("Medley", function () {
         }       
       }
     };
-    const medley = new Medley(options);
+    
+    const medley = new Medley(setup);
 
     const graphJson = await fs.readFile(new URL("graph.json", baseUrl), {
       encoding: "utf-8",
@@ -50,7 +51,7 @@ describe("Medley", function () {
       }
     }
 
-    const options: MedleyOptions<basetypes> = {
+    const options: MedleySetup<basetypes> = {
         // loader: new SystemLoader((url: string) => {
         //   return System.import(url);
         // }

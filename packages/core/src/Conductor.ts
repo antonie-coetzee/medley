@@ -34,7 +34,7 @@ export class Conductor<MT extends MedleyTypes = MedleyTypes> {
     if (node == null) {
       throw new Error(`node with id: '${nodeId}', not found`);
     }
-    const nodeFunction = await this.medley.types.getExportFunction<
+    const nodeFunction = await this.medley.types.getExport<
       NodeFunction<MT["node"], MT>
     >(node.type, nodeFunctionExportName);
 

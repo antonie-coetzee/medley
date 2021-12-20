@@ -1,8 +1,6 @@
 import {
   makeAutoObservable,
-  makeObservable,
   observable,
-  runInAction,
 } from "mobx";
 import {
   CNode,
@@ -16,20 +14,19 @@ import {
   CType,
   TEditNodeComponent,
   Host,
-  CLink,
+  CMedleyTypes,
 } from "@medley-js/common";
 import { CompositeNode } from "../CompositeNode";
-import { Fragment, ReactNode } from "react";
+import { ReactNode } from "react";
 import React from "react";
 import { DialogStore } from "./DialogStore";
-import { observer } from "mobx-react";
 import { NodeContext } from "@medley-js/core";
 
 export class EditStore {
   public createComponent: ReactNode | null = null;
 
   constructor(
-    private context: NodeContext<CompositeNode, CNode, CType, CLink>,
+    private context: NodeContext<CompositeNode, CMedleyTypes>,
     private host: Host,
     private dialogStore: DialogStore
   ) {
@@ -50,7 +47,7 @@ export class EditStore {
    */
   async createNode(type: CType, position?: Coordinates) {
     if (this.host.constructNode) {
-      const newNodePart = await this.props.host.constructNode(
+      const newNodePart = await this.host.constructNode(
         this.context,
         type
       );
@@ -113,11 +110,11 @@ export class EditStore {
     newNodePart: CNodePart
   ) {
     const props: TCreateNodeComponentProps = {
-      context: { ...this.props.context, node: newNodePart },
-      host: this.props.host,
+      context: { ...this.context, node: newNodePart },
+      host: this.host,
       close: (create: boolean) => {
         if (create) {
-          this.props.context.medley.nodes.insertNode<CNode>(observable(newNodePart));
+          this.context.medley.nodes.insertNode<CNode>(observable(newNodePart));
         } else {
           this.createComponent = null;
         }
@@ -131,15 +128,15 @@ export class EditStore {
    * open EditNodeComponent for the provided node
    */
   async editNode(node: CNode) {
-    if (this.props.host.openNodeEdit) {
-      await this.props.host.openNodeEdit(this.props.context, node);
+    if (this.host.openNodeEdit) {
+      await this.host.openNodeEdit(this.context, node);
     } else {
       await this.openNodeEditFallback(node);
     }
   }
 
   async openNodeEditFallback(node: CNode) {
-    const medley = this.props.context.medley;
+    const medley = this.context.medley;
     try {
       const nec = await medley.types.getExportFunction<TEditNodeComponent>(
         node.type,
@@ -159,8 +156,8 @@ export class EditStore {
     node: CNode
   ) {
     const props: TEditNodeComponentProps = {
-      context: { ...this.props.context, node: node },
-      host: this.props.host,
+      context: { ...this.context, node: node },
+      host: this.host,
       close: () => {
         this.dialogStore.closeDialog();
       },

@@ -1,30 +1,12 @@
-import {
-  ROOT_SCOPE,
-  Loader,
-  MemoryLoader,
-  Graph,
-  NonNullableType,
-} from "./core";
-import { TypeRepository, NodeRepository, LinkRepository } from "./repositories";
+import { Links, Nodes, Types } from "./api";
 import { Conductor } from "./Conductor";
-import { Types, Nodes, Links } from "./api";
+import {
+  Graph, Loader,
+  MemoryLoader, NonNullableType, ROOT_SCOPE
+} from "./core";
+import { MedleySetup } from "./MedleySetup";
 import { MedleyTypes } from "./MedleyTypes";
-
-export interface MedleyOptions<
-  MT extends MedleyTypes = MedleyTypes,
-  M extends NonNullableType<MT> = NonNullableType<MT>
-> {
-  loader?: Loader<M["module"]>;
-  typeRepository?: TypeRepository<M["type"]>;
-  nodeRepository?: NodeRepository<M["node"]>;
-  linkRepository?: LinkRepository<M["link"]>;
-  nodes?: Nodes<M["node"]>;
-  types?: Types<M["type"]>;
-  links?: Links<M["link"]>;
-  conductor?: Conductor<M>;
-  cache?: Map<string, unknown>;
-  scopeId?: string;
-}
+import { LinkRepository, NodeRepository, TypeRepository } from "./repositories";
 
 export class Medley<
   MT extends MedleyTypes = MedleyTypes,
@@ -45,44 +27,43 @@ export class Medley<
 
   private graph?: Graph<M>;
 
-  public constructor(options?: MedleyOptions<M>) {
-    this.loader = options?.loader || new MemoryLoader();
+  public constructor(setup?: MedleySetup<M>) {
+    this.loader = setup?.loader || new MemoryLoader();
     this.nodeRepository =
-      options?.nodeRepository || new NodeRepository<M["node"]>();
+      setup?.nodeRepository || new NodeRepository<M["node"]>();
     this.typeRepository =
-      options?.typeRepository || new TypeRepository<M["type"]>(this.loader);
+      setup?.typeRepository || new TypeRepository<M["type"]>(this.loader);
     this.linkRepository =
-      options?.linkRepository || new LinkRepository<M["link"]>();
-    this.cache = options?.cache || new Map();
-    this.conductor = options?.conductor || new Conductor(this, this.cache);
+      setup?.linkRepository || new LinkRepository<M["link"]>();
+    this.cache = setup?.cache || new Map();
+    this.conductor = setup?.conductor || new Conductor(this, this.cache);
 
-    this.scopeId = options?.scopeId || ROOT_SCOPE;
+    this.scopeId = setup?.scopeId || ROOT_SCOPE;
 
     this.links =
-      options?.links || new Links<M["link"]>(this.scopeId, this.linkRepository);
+      setup?.links || new Links<M["link"]>(this.scopeId, this.linkRepository);
     this.types =
-      options?.types || new Types<M["type"]>(this.scopeId, this.typeRepository);
+      setup?.types || new Types<M["type"]>(this.scopeId, this.typeRepository);
     this.nodes =
-      options?.nodes || new Nodes<M["node"]>(this.scopeId, this.nodeRepository);
-    this.conductor =
-      options?.conductor || new Conductor(this, options?.cache);
+      setup?.nodes || new Nodes<M["node"]>(this.scopeId, this.nodeRepository);
+    this.conductor = setup?.conductor || new Conductor(this, setup?.cache);
   }
 
   public setGraph<TGraph extends Graph<M> = Graph<M>>(graph: TGraph) {
-    this.types.setTypes(graph.types);
-    this.nodes.setNodes(graph.nodes);
-    this.links.setLinks(graph.links);
+    this.typeRepository.set(graph.types);
+    this.nodeRepository.set(graph.nodes);
+    this.linkRepository.set(graph.links);
     this.graph = graph;
   }
 
   public getGraph<TGraph extends Graph<M> = Graph<M>>() {
-    const types = this.types
+    const types = this.typeRepository
       .getAllTypes()
       .filter((t) => t.volatile == null || t.volatile === false);
-    const nodes = this.nodes
+    const nodes = this.nodeRepository
       .getAllNodes()
       .filter((n) => n.volatile == null || n.volatile === false);
-    const links = this.links
+    const links = this.linkRepository
       .getAllLinks()
       .filter((l) => l.volatile == null || l.volatile === false);
     return {
