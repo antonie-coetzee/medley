@@ -1,8 +1,9 @@
 import React from "react";
 import { Meta } from "@storybook/react";
-import { Cache, Medley, nullLogger } from "@medley-js/core";
+import { Medley, NodeContext} from "@medley-js/core";
 import {
   CLink,
+  CMedleyTypes,
   CNode,
   constants,
   CType,
@@ -27,12 +28,12 @@ export default {
 } as Meta;
 
 export const SideBySide = componentStory(async () => {
-  const medley = new Medley<CNode, CType, CLink>();
+  const medley = new Medley<CMedleyTypes>();
   addTypes(medley);
   const [ecn, cn] = createEmptyCompositeNode(medley);
   const [bcnScope, bcn] = createBasicCompositeNode(ecn, [200, 200]);
 
-  const EditNodeComponent = await medley.types.getExportFunction<TEditNodeComponent>(
+  const EditNodeComponent = await medley.types.getExport<TEditNodeComponent>(
     CompositeType.name,
     constants.EditNodeComponent
   );
@@ -45,11 +46,7 @@ export const SideBySide = componentStory(async () => {
         <Paper>
           <Box style={{position:"absolute", padding:"5px"}}>Node View</Box>
           <EditNodeComponent
-            context={{
-              logger: nullLogger,
-              medley: ecn,
-              node: cn,
-            }}
+            context={new NodeContext(ecn,cn)}
             host={{}}
             close={()=>{}}
           />
@@ -59,11 +56,7 @@ export const SideBySide = componentStory(async () => {
         <Paper>
           <Box style={{position:"absolute", padding:"5px"}}>Edit View</Box>
           <EditNodeComponent
-            context={{
-              logger: nullLogger,
-              medley: bcnScope,
-              node: bcn,
-            }}
+            context={new NodeContext(bcnScope,bcn)}
             host={{}}
             close={()=>{}}
           />

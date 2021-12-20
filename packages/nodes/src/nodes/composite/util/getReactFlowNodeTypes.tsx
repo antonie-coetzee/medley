@@ -11,6 +11,7 @@ import {
   TLinkComponentProps,
   LinkProps,
   TLinkComponent,
+  CMedleyTypes,
 } from "@medley-js/common";
 import React from "react";
 import { getNodes } from ".";
@@ -18,7 +19,7 @@ import { observable } from "mobx";
 import { observer } from "mobx-react";
 
 export async function getReactFlowTypes(
-  context: BaseContext<CNode>,
+  context: BaseContext<CMedleyTypes>,
   host: Host
 ): Promise<{
   nodeTypes: { [index: string]: ReactNode };
@@ -32,10 +33,10 @@ export async function getReactFlowTypes(
   ];
   const types = await Promise.all(
     typeNames.map(async (typeName) => {
-      const nodeComponent = await context.medley.types.getExportFunction<
+      const nodeComponent = await context.medley.types.getExport<
         TNodeComponent<CNode>
       >(typeName, constants.NodeComponent);
-      const linkComponent = await context.medley.types.getExportFunction<
+      const linkComponent = await context.medley.types.getExport<
         TLinkComponent<CNode>
       >(typeName, constants.LinkComponent);
       return { typeName, nodeComponent, linkComponent };
@@ -72,7 +73,7 @@ function wrapNodeComponent(
 ) {
   const nodeWrapper: VFC<{
     id: string;
-    data: NodeContext<CNode, CNode, CType, CLink>;
+    data: NodeContext<CNode, CMedleyTypes>;
     selected: boolean;
     sourcePosition: string;
     targetPosition: string;
@@ -100,7 +101,7 @@ function wrapLinkComponent(
   const linkWrapper: VFC<
     Omit<LinkProps, "data"> & {
       data: {
-        context: NodeContext<CNode, CNode, CType, CLink>;
+        context: NodeContext<CNode, CMedleyTypes>;
         link: CLink;
       };
     }

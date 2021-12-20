@@ -1,16 +1,11 @@
 import { IdentityType } from "../../index";
-import { Cache, Medley } from "@medley-js/core";
+import { Medley } from "@medley-js/core";
 import { InputType } from "../scopedTypes/input";
 import { OutputType } from "../scopedTypes/output";
 import { CompositeType } from "../type";
 import {
-  CLink,
-  CNode,
-  CNodePart,
-  constants,
-  CType,
-  TEditNodeComponent,
-  Coordinates
+  Coordinates,
+  CMedleyTypes
 } from "@medley-js/common";
 import "../extensions/medley"
 import { observable } from "mobx";
@@ -18,28 +13,23 @@ import { CompositeNode } from "..";
 import { OutputNode } from "../scopedTypes/output/node";
 import { InputNode } from "../scopedTypes/input/InputNode";
 import { IdentityNode } from "@/nodes/identity";
-import { TryRounded } from "@mui/icons-material";
 import { newCompositeScope } from "../extensions/medley";
-import { onNodesChange } from "../extensions";
 import { compositeScope } from "../CompositeNode";
 
-export const addTypes = (medley: Medley<CNode>) => {
+export const addTypes = (medley: Medley<CMedleyTypes>) => {
     medley.types.addType(CompositeType);
     medley.types.addType(IdentityType);
     medley.types.addType(InputType);
     medley.types.addType(OutputType);
 }
 
-export const createEmptyCompositeNode = (medley: Medley<CNode>) => {
+export const createEmptyCompositeNode = (medley: Medley<CMedleyTypes>) => {
     const compositeNode = medley.nodes.insertNode<CompositeNode>({
         name: "empty_composite",
         type: CompositeType.name,
 
       });
-    const compositeScope = Medley.newCompositeInstance(
-    medley.getRootInstance(),
-    compositeNode.id
-    );
+    const compositeScope = medley[newCompositeScope](compositeNode.id);
     const id_4 = compositeScope.nodes.insertNode<OutputNode>(
       observable({
         name: "OUTPUT",
@@ -50,7 +40,7 @@ export const createEmptyCompositeNode = (medley: Medley<CNode>) => {
     return [compositeScope, compositeNode] as const
 }
 
-export const createBasicCompositeNode = (medley: Medley<CNode,CType,CLink>, position?:Coordinates) => {
+export const createBasicCompositeNode = (medley: Medley<CMedleyTypes>, position?:Coordinates) => {
   const compositeNode = medley.nodes.insertNode<CompositeNode>(observable({
     name: "Basic Composite",
     type: CompositeType.name,
@@ -60,65 +50,62 @@ export const createBasicCompositeNode = (medley: Medley<CNode,CType,CLink>, posi
   const cs = medley[newCompositeScope](compositeNode.id);
   compositeNode[compositeScope] = cs;
   const id_0 = cs.nodes.insertNode<InputNode>(
-    observable({
+    {
       name: "INPUT1",
       position: [0, 50],
       type: InputType.name,
       value:{color:"green"}
-    })
+    }
   );
 
   const id_00 = cs.nodes.insertNode<InputNode>(
-    observable({
+    {
       name: "abc",
       position: [0, 100],
       type: InputType.name,
       value:{color:"red"}
-    })
+    }
   );
 
   const id_01 = cs.nodes.insertNode<InputNode>(
-    observable({
+    {
       name: "INPUT3",
       position: [0, 150],
       type: InputType.name,
       value:{color:"blue"}
-    })
+    }
   );
 
   const id_1 = cs.nodes.insertNode<IdentityNode>(
-    observable({
+    {
       name: "Test_1",
-      cache: Cache.scope,
       position: [200, 50],
       type: IdentityType.name,
       value: {}
-    })
+    }
   );
   const id_2 = cs.nodes.insertNode<IdentityNode>(
-    observable({
+    {
       name: "Test_2",
-      cache: Cache.scope,
       position: [600, 50],
       type: IdentityType.name,
       value: {}
-    })
+    }
   );
   const id_3 = cs.nodes.insertNode<IdentityNode>(
-    observable({
+    {
       name: "Test_3",
-      cache: Cache.scope,
       position: [1000, 300],
       type: IdentityType.name,
       value: {}
-    })
+    }
   );
   const id_4 = cs.nodes.insertNode<OutputNode>(
-    observable({
+    {
       name: "OUTPUT",
       position: [1400, 50],
       type: OutputType.name,
-    })
+    }
   );
 
   cs.links.addLink({

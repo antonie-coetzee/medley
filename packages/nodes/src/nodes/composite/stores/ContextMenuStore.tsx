@@ -8,6 +8,7 @@ import { EditStore } from "./EditStore";
 import React from "react";
 import { ExitToApp } from "@mui/icons-material";
 import { InputType } from "../scopedTypes/input/type";
+import { NodeContext } from "@medley-js/core";
 
 export class ContextMenuStore {
   public contextMenu: {
@@ -22,7 +23,7 @@ export class ContextMenuStore {
   }>[] = [];
 
   constructor(
-    private props: TEditNodeComponentProps<CompositeNode>,
+    private context: NodeContext<CompositeNode>,
     private editStore: EditStore
   ) {
     this.menuItems.push(this.menuAddInputNode());

@@ -1,24 +1,22 @@
 import { NodeContext, Node, MedleyTypes } from "@medley-js/core";
 import { isObservable, observable } from "mobx";
 
-export const nodeStore = Symbol("nodeStore");
-
 declare module "@medley-js/core" {
   interface NodeContext<TNode extends MT["node"], MT extends MedleyTypes> {
-    getNodeStore: <T>(provider?:(context:NodeContext<TNode,MT>)=>T) => T;
+    getNodeMetadata: <T>(key: symbol, provider?:(context:NodeContext<TNode,MT>)=>T) => T;
     getObservableNode: () => TNode;
   }
 
   interface Node {
-    [nodeStore]?: unknown;
+    [key:symbol]: unknown;
   }
 }
 
-NodeContext.prototype.getNodeStore = function <T>(this: NodeContext, provider?:(context:NodeContext)=>T) {
-  if(this.node[nodeStore] == null && provider){
-    this.node[nodeStore] = provider(this);
+NodeContext.prototype.getNodeMetadata = function <T>(this: NodeContext, key: symbol, provider?:(context:NodeContext)=>T) {
+  if(this.node[key] == null && provider){
+    this.node[key] = provider(this);
   }
-  return this.node[nodeStore] as T;
+  return this.node[key] as T;
 };
 
 NodeContext.prototype.getObservableNode = function <TNode extends Node>(this:NodeContext<TNode>){

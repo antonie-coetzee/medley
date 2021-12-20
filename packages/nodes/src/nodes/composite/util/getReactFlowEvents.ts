@@ -1,12 +1,5 @@
 import { NodeContext } from "@medley-js/core";
-import {
-  CLink,
-  CNode,
-  constants,
-  CPort,
-  CType,
-  TEditNodeComponentProps
-} from "@medley-js/common";
+import { CMedleyTypes } from "@medley-js/common";
 import React from "react";
 import { CompositeNode } from "../CompositeNode";
 import {
@@ -16,12 +9,13 @@ import {
   Node as RFNode,
   OnLoadParams,
 } from "react-flow-renderer";
-import { EditStore } from "../stores/EditStore";
 import { ReactFlowStore } from "../stores/ReactFlowStore";
 import { runInAction } from "mobx";
 
-export function getReactFlowEvents(reactFlowStore:ReactFlowStore, {context, host}: TEditNodeComponentProps<CompositeNode>,
-editStore: EditStore) {
+export function getReactFlowEvents(
+  reactFlowStore: ReactFlowStore,
+  context: NodeContext<CompositeNode, CMedleyTypes>
+) {
   const onConnect = (edge: Connection | Edge) => {
     context.medley.links.addLink({
       source: edge.source || "",
@@ -31,13 +25,13 @@ editStore: EditStore) {
     });
   };
 
-  const onLoad: (instance:OnLoadParams) => void = (instance)=>{
+  const onLoad: (instance: OnLoadParams) => void = (instance) => {
     reactFlowStore.reactFlowInstance = instance;
-    runInAction(()=>{
-      console.log("asd")
+    runInAction(() => {
+      console.log("asd");
       instance.fitView();
-    })
-  }
+    });
+  };
 
   const onNodeDragStop: (
     event: React.MouseEvent<Element, MouseEvent>,
@@ -46,7 +40,7 @@ editStore: EditStore) {
     const mNode = context.medley.nodes.getNode(rfNode.id);
     if (mNode) {
       const pos = rfNode.position;
-      mNode.position = [pos.x,pos.y];
+      mNode.position = [pos.x, pos.y];
     }
   };
 
@@ -80,5 +74,5 @@ editStore: EditStore) {
     }
   };
 
-  return { onConnect, onNodeDragStop, onElementsRemove,onLoad };
+  return { onConnect, onNodeDragStop, onElementsRemove, onLoad };
 }

@@ -2,6 +2,7 @@ import {
   BaseContext,
   Graph,
   Link,
+  Medley,
   MedleyTypes,
   Module,
   Node,
@@ -28,6 +29,8 @@ export interface CModule extends Module {
   };
 }
 
+export type CMedley = Medley<CMedleyTypes>;
+
 export interface CMedleyTypes extends MedleyTypes {
   node: CNode;
   type: CType;
@@ -50,7 +53,7 @@ export interface CLink extends Link {
 
 export type CNodePart<TNode extends CNode = CNode> = NodePart<TNode>;
 
-export interface CType extends Type {
+export interface CType extends Type<CModule> {
   label?: string;
   category?: string[];
   icon?: URL;

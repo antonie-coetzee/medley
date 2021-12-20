@@ -62,23 +62,23 @@ export class EditStore {
 
   private async createNodeFallback(type: CType, position?: Coordinates) {
     const medley = this.context.medley;
-    const newNodePart: CNodePart = { type: type.name, name: "", position};
+    const nodePart: CNodePart = { type: type.name, name: "", position};
     // first construct/initialize the nodepart with nodeCreate if
     // available
     try {
       await medley.types.runExportFunction<CreateNode<CNode>>(
         type.name,
         constants.createNode,
-        { ...this.context, node: newNodePart }
+        { ...this.context, nodePart }
       );
 
-      const ncf = await medley.types.getExportFunction<
+      const ncf = await medley.types.getExport<
         CreateNode<CNode>
       >(type.name, constants.createNode);
       if (ncf) {
         const doCreate = await ncf({
           ...this.context,
-          node: newNodePart,
+          nodePart,
         });
         if (!doCreate) {
           return;
@@ -90,14 +90,14 @@ export class EditStore {
     }
     // then further customize with CreateNodeComponent if available
     try {
-      const ncc = await medley.types.getExportFunction<TCreateNodeComponent>(
+      const ncc = await medley.types.getExport<TCreateNodeComponent>(
         type.name,
         constants.CreateNodeComponent
       );
       if (ncc) {
-        this.doCreateNodeComponent(ncc, newNodePart);
+        this.doCreateNodeComponent(ncc, nodePart);
       } else {
-        medley.nodes.insertNode<CNode>(observable(newNodePart));
+        medley.nodes.insertNode<CNode>(observable(nodePart));
       }
     } catch (e) {
       medley.logger.error(e);
@@ -107,14 +107,14 @@ export class EditStore {
 
   private doCreateNodeComponent(
     CreateNodeComponent: TCreateNodeComponent,
-    newNodePart: CNodePart
+    nodePart: CNodePart
   ) {
     const props: TCreateNodeComponentProps = {
-      context: { ...this.context, node: newNodePart },
+      context: { ...this.context, nodePart },
       host: this.host,
       close: (create: boolean) => {
         if (create) {
-          this.context.medley.nodes.insertNode<CNode>(observable(newNodePart));
+          this.context.medley.nodes.insertNode<CNode>(observable(nodePart));
         } else {
           this.createComponent = null;
         }
@@ -138,7 +138,7 @@ export class EditStore {
   async openNodeEditFallback(node: CNode) {
     const medley = this.context.medley;
     try {
-      const nec = await medley.types.getExportFunction<TEditNodeComponent>(
+      const nec = await medley.types.getExport<TEditNodeComponent>(
         node.type,
         constants.EditNodeComponent
       );

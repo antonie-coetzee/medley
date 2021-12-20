@@ -2,7 +2,6 @@ import React from "react";
 import { Handle, Position } from "react-flow-renderer";
 import { TNodeComponent } from "@medley-js/common";
 import Chip from "@mui/material/Chip";
-import ExitToApp from "@mui/icons-material/ExitToApp";
 import { OutputNode } from "./node";
 
 export const NodeComponent: TNodeComponent<OutputNode> = ({

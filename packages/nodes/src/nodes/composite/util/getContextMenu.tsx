@@ -77,7 +77,7 @@ function getRunOption(
 ): React.VFC<{ close: () => void; mouseX?: number; mouseY?: number }> {
   return ({ close, mouseX, mouseY }) => {
     const run = async () => {
-      const rootInstance = context.medley.getRootInstance();
+      const rootInstance = context.medley;
       const nodes = rootInstance.nodes.getNodes();
 
       try {
@@ -85,7 +85,7 @@ function getRunOption(
           return;
         }
         const compositeNode = nodes[0];
-        const res = await rootInstance.runNodeWithInputs(compositeNode.id, {
+        const res = await rootInstance.conductor.runNodeWithInputs(compositeNode.id, {
           input: async () => "Test",
         });
         console.log(res);

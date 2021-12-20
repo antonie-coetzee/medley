@@ -1,14 +1,14 @@
 import { Medley } from "@medley-js/core";
-import { TCreateNodeComponent } from "@medley-js/common";
+import { CMedleyTypes, TCreateNodeComponent } from "@medley-js/common";
 import { Button, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
 import React, { Fragment } from "react";
 import { InputNode } from "../InputNode";
 import { InputType } from "../type";
 
 export const CreateNodeComponent: TCreateNodeComponent<InputNode> = (props) => {
-  const node = props.context.node;
-  node.name = getDefaultName(props.context.medley);
-  node.value = {color:"black"};
+  const nodePart = props.context.nodePart;
+  nodePart.name = getDefaultName(props.context.medley);
+  nodePart.value = {color:"black"};
   return <Fragment>
       <DialogTitle>Create new input terminal</DialogTitle>
       <DialogContent>
@@ -20,8 +20,8 @@ export const CreateNodeComponent: TCreateNodeComponent<InputNode> = (props) => {
             type="text"
             fullWidth
             variant="standard"
-            defaultValue={node.name}
-            onChange={(e)=>{node.name = e.target.value}}
+            defaultValue={nodePart.name}
+            onChange={(e)=>{nodePart.name = e.target.value}}
           />
         </DialogContent>
         <DialogActions>
@@ -31,7 +31,7 @@ export const CreateNodeComponent: TCreateNodeComponent<InputNode> = (props) => {
   </Fragment>
 };
 
-function getDefaultName(medley:Medley){
-  const numInputs = medley.nodes.getNodesByType(InputType.name);
+function getDefaultName(medley:Medley<CMedleyTypes>){
+  const numInputs = medley.nodes.getNodes().filter(n=>n.type === InputType.name);
   return `Input ${numInputs.length + 1}`;
 }

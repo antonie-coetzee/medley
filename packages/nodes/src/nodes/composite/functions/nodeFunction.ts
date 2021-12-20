@@ -1,25 +1,26 @@
-import { CMedleyTypes } from "@/../../common/dist";
-import { NF, Input, Medley, BaseModule } from "@medley-js/core";
+import { CMedley, CMedleyTypes } from "@medley-js/common";
+import { NF, Input, Medley } from "@medley-js/core";
 import { CompositeNode } from "../CompositeNode";
+import { newCompositeScope } from "../extensions";
 import { InputType } from "../scopedTypes/input";
 import { OutputType } from "../scopedTypes/output";
 
-export const nodeFunction: NF<CompositeNode> = async (cntx) => {
+export const nodeFunction: NF<CompositeNode, CMedleyTypes> = async (cntx) => {
   const { node, medley, input } = cntx;
   
-  const scopedInstance = Medley.getScopedInstance(medley.getRootInstance(), node.id);
+  const scopedInstance = medley[newCompositeScope](node.id);
 
   addInputType(scopedInstance, input);
   addOutputType(scopedInstance);
 
-  const outputNode = scopedInstance.nodes.getNodesByType(OutputType.name)[0];
+  const outputNode = scopedInstance.nodes.getNodes().filter(n=>n.type === OutputType.name)[0];
   if (outputNode) {
-    const result = scopedInstance.runNode(outputNode.id);
+    const result = scopedInstance.conductor.runNode(outputNode.id);
     return result;
   }
 };
 
-function addInputType(scopedInstance: Medley, input: Input): void {
+function addInputType(scopedInstance: CMedley, input: Input): void {
   const nodeFunction: NF = ({ node }) => {
     return input({
       name: node.id,
@@ -38,7 +39,7 @@ function addInputType(scopedInstance: Medley, input: Input): void {
   });
 }
 
-function addOutputType(scopedInstance: Medley<CMedleyTypes>): void {
+function addOutputType(scopedInstance: CMedley): void {
   const nodeFunction: NF = ({ node, input }) => {
     return input({
       name: node.id,
@@ -52,7 +53,7 @@ function addOutputType(scopedInstance: Medley<CMedleyTypes>): void {
       import: () =>
         Promise.resolve({
           nodeFunction,
-        }),
-    } as BaseModule,
+        })
+    }
   });
 }

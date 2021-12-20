@@ -11,10 +11,10 @@ import {
 import { DragIndicator, Close, HelpOutline, Refresh } from "@mui/icons-material";
 import { Handle } from "../../../components";
 import { CompositeNode } from "../CompositeNode";
+import { getNodeStore, NodeStore, nodeStoreKey } from "../stores";
 
 
-function getHandles(context:NodeContext<CNode, CMedleyTypes>) {
-  const nodeStore = context.getNodeStore();
+function getHandles(nodeStore: NodeStore) {
   const inputHandles = nodeStore.inputNodes.slice().
     sort((a, b) => a.name.localeCompare(b.name))
     .map((n) => {
@@ -34,7 +34,7 @@ export const NodeComponent: TNodeComponent<CompositeNode> = ({
   context,
   selected,
 }) => { 
-  const nodeStore = context.getNodeStore(()=>"asd");
+  const nodeStore = getNodeStore(context);
   const node = context.getObservableNode();
   const updateNodeInternals = useUpdateNodeInternals();
   useEffect(()=>{
@@ -95,7 +95,7 @@ export const NodeComponent: TNodeComponent<CompositeNode> = ({
               borderBottom: "1px solid #e9e9e9"
             }
           }}>
-            {getHandles(context)}
+            {getHandles(nodeStore)}
           </Box>
         </CardContent>
         {/* <CardContent>

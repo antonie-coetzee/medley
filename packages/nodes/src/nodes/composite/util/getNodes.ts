@@ -1,7 +1,7 @@
 import { BaseContext } from "@medley-js/core";
-import { CLink, CNode, CType } from "@medley-js/common";
+import { CLink, CMedleyTypes, CNode, CType } from "@medley-js/common";
 
-export function getNodes(context: BaseContext<CNode, CType, CLink>) {
+export function getNodes(context: BaseContext<CMedleyTypes>) {
   /* nodes linked to the current scope */
   const linkedNodes = context.medley.links.getSourceLinks(context.medley.scopeId).map((sl) => {
     const linkedNode = context.medley.nodes.getNode(sl.target);

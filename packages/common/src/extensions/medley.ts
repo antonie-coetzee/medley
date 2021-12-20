@@ -1,4 +1,5 @@
 import { Medley } from "@medley-js/core";
+import { Logger, nullLogger } from "../Logger";
 
 export type MedleyContext = {
   key: symbol;
@@ -10,6 +11,8 @@ declare module "@medley-js/core" {
     setContext: <T>(context: MedleyContext, value: T) => void;
     useContext: <T>(context: MedleyContext) => T | undefined;
     context: { [index: symbol]: unknown };
+
+    logger: Logger;
   }
 }
 
@@ -28,3 +31,5 @@ Medley.prototype.setContext = function <T>(context: MedleyContext, value: T) {
 Medley.prototype.useContext = function <T>(context: MedleyContext) {
   return this.context[context.key] as T | undefined;
 };
+
+Medley.prototype.logger = nullLogger;

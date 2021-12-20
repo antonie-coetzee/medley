@@ -7,9 +7,10 @@ import ReactFlow, {
   ReactFlowProvider
 } from "react-flow-renderer";
 import { CompositeNode } from "../CompositeNode";
-import { Stores, useStores } from "../stores";
+import { getStores, Stores, useStores } from "../stores";
 import { ContextMenu } from "./ContextMenu";
 import { DialogManager } from "./DialogManager";
+import "@/extensions";
 
 export const EditComponent: React.VFC = observer(() => {
   const { reactFlowStore: rFS, contextMenuStore: cMS } = useStores();
@@ -33,7 +34,7 @@ export const EditComponent: React.VFC = observer(() => {
 });
 
 export const EditNodeComponent: TEditNodeComponent<CompositeNode> = (props) => {
-  const stores = new Stores(props);
+  const stores = getStores(props.context, props.host);
   return (
     <Provider {...stores}>
       <EditComponent />
