@@ -45,6 +45,14 @@ Medley.prototype[newCompositeScope] = function (
           return parent.types.getType(typeName);
         }
       },
+      getExport: async (typeName, exportName) => {
+        const exportValue = await scopedTypes.getExport(typeName, exportName);
+        if (exportValue) {
+          return exportValue;
+        } else {
+          return parent.types.getExport(typeName, exportName);
+        }
+      },      
     }),
     nodes: chainObjects<Nodes<CNode>>(scopedNodes, {
       insertNode: <TNode extends CNode>(nodePart: NodePart<TNode>) => { 

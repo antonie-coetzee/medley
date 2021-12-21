@@ -28,7 +28,7 @@ export class ReactFlowStore {
     const elements = await getReactFlowElements(context);
     const events = getReactFlowEvents(this, context);
     this.updateReactFlowProps({elements, nodeTypes, edgeTypes, ...events});
-    this.registerMedleyEvents();
+    //this.registerMedleyEvents();
   }
 
   updateReactFlowProps(reactFlowProps: ReactFlowProps) {

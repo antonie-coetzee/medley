@@ -14,7 +14,7 @@ import { InputType } from "../type";
 import { runInAction } from "mobx";
 
 export const EditNodeComponent: TEditNodeComponent<InputNode> = (props) => {
-  const node = props.context.node;
+  const node = props.context.getObservableNode();
 
   console.log(node.value.color);
 

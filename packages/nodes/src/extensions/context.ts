@@ -25,5 +25,6 @@ NodeContext.prototype.getObservableNode = function <TNode extends Node>(this:Nod
   }
   const observableNode = observable.object(this.node);
   this.medley.nodes.setNode(observableNode);
+  this.node = observableNode;
   return observableNode;
 }

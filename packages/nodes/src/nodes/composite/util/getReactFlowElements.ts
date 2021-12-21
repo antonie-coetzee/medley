@@ -28,12 +28,10 @@ async function getReactFlowNodes(
   /* combine props with node type's props */
   return Promise.all(
     mNodes.map(async (node) => {
+      const nodeContext = new NodeContext(context.medley, node)
       const nodeProps = await context.medley.types.runExportFunction<
         DecorateNode<CNode>
-      >(node.type, constants.decorateNode, {
-        ...context,
-        ...{ node },
-      });
+      >(node.type, constants.decorateNode, nodeContext);
       const props = {
         selectable: true,
         draggable: true,
@@ -43,7 +41,7 @@ async function getReactFlowNodes(
         ...nodeProps,
       };
       return {
-        data: { ...context, node },
+        data: nodeContext,
         id: node.id,
         position: { x: node.position?.[0] || 0, y: node.position?.[1] || 0 },
         type: node.type,
