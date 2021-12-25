@@ -1,10 +1,11 @@
+import { CMedleyTypes, CNode } from "@/../../common/dist";
 import { NodeContext, Node, MedleyTypes } from "@medley-js/core";
 import { isObservable, observable } from "mobx";
 
 declare module "@medley-js/core" {
   interface NodeContext<TNode extends MT["node"], MT extends MedleyTypes> {
-    getNodeMetadata: <T>(key: symbol, provider?:(context:NodeContext<TNode,MT>)=>T) => T;
-    getObservableNode: () => TNode;
+    getNodeMetaData: <T>(key: symbol, provider?:(context:NodeContext<TNode,MT>)=>T) => T;
+    get observableNode():TNode;
   }
 
   interface Node {
@@ -12,19 +13,31 @@ declare module "@medley-js/core" {
   }
 }
 
-NodeContext.prototype.getNodeMetadata = function <T>(this: NodeContext, key: symbol, provider?:(context:NodeContext)=>T) {
+NodeContext.prototype.getNodeMetaData = function <T>(this: NodeContext, key: symbol, provider?:(context:NodeContext)=>T) {
   if(this.node[key] == null && provider){
     this.node[key] = provider(this);
   }
   return this.node[key] as T;
 };
 
-NodeContext.prototype.getObservableNode = function <TNode extends Node>(this:NodeContext<TNode>){
-  if(isObservable(this.node)){
-    return this.node;
+
+Object.defineProperty(NodeContext.prototype, "observableNode", {
+  get(this: NodeContext<CNode, CMedleyTypes>){
+    if(isObservable(this.node)){
+      return this.node;
+    }
+    const node = this.medley.nodes.getNode(this.node.id) as CNode;
+    if(node == null){
+      this.node;
+    }
+    if(isObservable(node)){
+      this.node = node;
+      return this.node;
+    }else{
+      const observableNode = observable.object(node!);
+      this.medley.nodes.setNode(observableNode);
+      this.node = observableNode;
+      return observableNode;
+    }    
   }
-  const observableNode = observable.object(this.node);
-  this.medley.nodes.setNode(observableNode);
-  this.node = observableNode;
-  return observableNode;
-}
+})

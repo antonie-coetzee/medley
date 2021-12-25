@@ -28,7 +28,6 @@ export function getReactFlowEvents(
   const onLoad: (instance: OnLoadParams) => void = (instance) => {
     reactFlowStore.reactFlowInstance = instance;
     runInAction(() => {
-      console.log("asd");
       instance.fitView();
     });
   };

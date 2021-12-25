@@ -24,9 +24,6 @@ export interface CModule extends Module {
   system?: string;
   esm?: string;
   nameSpace?: string;
-  exportMap?: {
-    [key: string]: string;
-  };
 }
 
 export type CMedley = Medley<CMedleyTypes>;

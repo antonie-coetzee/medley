@@ -20,7 +20,7 @@ export class NodeRepository<MNode extends Node> {
   }
 
   public getNode(scopeId: string, id: string) {
-    return this.nodeTreeMap.getNodeValue(scopeId, id);
+    return this.nodeIndex.get(`${scopeId}${id}`);
   }
 
   public getNodes(scopeId: string): MNode[] {
@@ -47,17 +47,19 @@ export class NodeRepository<MNode extends Node> {
   }
 
   public setNode(node: MNode) {
-    this.nodeTreeMap.setNodeValue(node, node.scope || ROOT_SCOPE, node.id);
-    this.nodeIndex.set(node.id, node);
+    const scopeId = node.scope || ROOT_SCOPE;
+    this.nodeTreeMap.setNodeValue(node, scopeId, node.id);
+    this.nodeIndex.set(`${scopeId}${node.id}`, node);
   }
 
   public deleteNode(node: Node) {
-    const storedNode = this.nodeIndex.get(node.id);
+    const storedNode = this.nodeIndex.get(`${node.scope}${node.id}`);
     if (storedNode == null) {
       return;
     }
-    this.nodeIndex.delete(node.id);
-    this.nodeTreeMap.deleteNode(node.scope || ROOT_SCOPE, node.id);
+    const scopeId = node.scope || ROOT_SCOPE;
+    this.nodeIndex.delete(`${scopeId}${node.id}`);
+    this.nodeTreeMap.deleteNode(scopeId, node.id);
     return node;
   }
 }

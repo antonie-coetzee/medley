@@ -3,29 +3,37 @@ import { NodeContext } from "@medley-js/core";
 import { CMedleyTypes, CNode, TNodeComponent } from "@medley-js/common";
 import { useUpdateNodeInternals } from "react-flow-renderer";
 import { Box } from "@mui/system";
+import { Card, CardContent, CardHeader } from "@mui/material";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-} from "@mui/material";
-import { DragIndicator, Close, HelpOutline, Refresh } from "@mui/icons-material";
+  DragIndicator,
+  Close,
+  HelpOutline,
+  Refresh,
+} from "@mui/icons-material";
 import { Handle } from "../../../components";
 import { CompositeNode } from "../CompositeNode";
-import { getNodeStore, NodeStore, nodeStoreKey } from "../stores";
-
+import { getStores, NodeStore } from "../stores";
 
 function getHandles(nodeStore: NodeStore) {
-  const inputHandles = nodeStore.inputNodes.slice().
-    sort((a, b) => a.name.localeCompare(b.name))
+  const inputHandles = nodeStore.inputNodes
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name))
     .map((n) => {
       return (
         <Handle id={n.id} key={n.id} label={n.name} color={n.value.color} />
       );
     });
-  let outputHandles:JSX.Element[] = [];
-  const outputNode = nodeStore.outputNode;
-  if(outputNode){
-    outputHandles = [<Handle output id={outputNode.id} key={outputNode.id} label={outputNode.name} />]
+  let outputHandles: JSX.Element[] = [];
+  const outputNode = nodeStore.outputNodes?.[0] || null;
+  if (outputNode) {
+    outputHandles = [
+      <Handle
+        output
+        id={outputNode.id}
+        key={outputNode.id}
+        label={outputNode.name}
+      />,
+    ];
   }
   return [...outputHandles, ...inputHandles];
 }
@@ -33,14 +41,15 @@ function getHandles(nodeStore: NodeStore) {
 export const NodeComponent: TNodeComponent<CompositeNode> = ({
   context,
   selected,
-}) => { 
-  const nodeStore = getNodeStore(context);
-  const node = context.getObservableNode();
+  host,
+}) => {
+  const { nodeStore } = getStores(context, host);
+  const node = context.observableNode;
   const updateNodeInternals = useUpdateNodeInternals();
-  useEffect(()=>{
+  useEffect(() => {
     updateNodeInternals(context.node.id);
   });
-  
+
   return (
     <>
       <Card
@@ -49,7 +58,7 @@ export const NodeComponent: TNodeComponent<CompositeNode> = ({
           overflow: "visible",
           boxSizing: "content-box",
           borderColor: "#e9e9e9",
-          paddingBottom: "0px"
+          paddingBottom: "0px",
         }}
         variant="outlined"
         sx={
@@ -65,15 +74,15 @@ export const NodeComponent: TNodeComponent<CompositeNode> = ({
             alignItems: "center",
             justifyContent: "space-between",
             backgroundColor: "#b7dbff",
-            borderBottom: "1px solid #e9e9e9"
+            borderBottom: "1px solid #e9e9e9",
           }}
         >
           <DragIndicator className="drag-handle" />
-           {/* <Public />  */}
-           {/* <div/> */}
-          { <Refresh /> }
+          {/* <Public />  */}
+          {/* <div/> */}
+          {<Refresh />}
           {/* <AutoAwesomeMotion/> */}
-          <HelpOutline/>
+          <HelpOutline />
           <Close />
         </Box>
         <CardHeader
@@ -85,23 +94,24 @@ export const NodeComponent: TNodeComponent<CompositeNode> = ({
             height: "42px",
             paddingLeft: "8px",
             paddingRight: "8px",
-            "& .MuiCardHeader-subheader": {}
+            "& .MuiCardHeader-subheader": {},
           }}
           subheader={`${node.name}`}
         ></CardHeader>
         <CardContent style={{ padding: "0px" }}>
-          <Box sx={{
-            '& .handle:not(:last-child)' : {
-              borderBottom: "1px solid #e9e9e9"
-            }
-          }}>
+          <Box
+            sx={{
+              "& .handle:not(:last-child)": {
+                borderBottom: "1px solid #e9e9e9",
+              },
+            }}
+          >
             {getHandles(nodeStore)}
           </Box>
         </CardContent>
         {/* <CardContent>
         </CardContent> */}
       </Card>
-      
     </>
   );
 };

@@ -28,7 +28,7 @@ export const NodeComponent: TNodeComponent<InputNode> = ({
     );
   };
 
-  const node = context.getObservableNode();
+  const node = context.observableNode;
   const handleClose = () => {
     setAnchorEl(null);
     setContextMenu(null);

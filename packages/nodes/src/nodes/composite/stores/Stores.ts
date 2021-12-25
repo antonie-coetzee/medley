@@ -9,19 +9,14 @@ import { NodeStore } from "./NodeStore";
 import React from "react";
 import { MobXProviderContext } from "mobx-react";
 
-export const nodeStoreKey = Symbol();
 export const storesKey = Symbol();
 
 export function useStores() {
   return React.useContext(MobXProviderContext) as Stores;
 }
 
-export function getNodeStore(context: NodeContext<CompositeNode, CMedleyTypes>) {
-  return context.getNodeMetadata(nodeStoreKey, NodeStore.Provider);
-}
-
 export function getStores(context: NodeContext<CompositeNode, CMedleyTypes>, host:Host) {
-  return context.getNodeMetadata(storesKey, ()=>new Stores(context, host));
+  return context.getNodeMetaData(storesKey, ()=>new Stores(context, host));
 }
 
 export class Stores {
@@ -29,11 +24,13 @@ export class Stores {
   contextMenuStore:ContextMenuStore;
   reactFlowStore:ReactFlowStore;
   editStore:EditStore;
+  nodeStore:NodeStore;
 
   constructor(context: NodeContext<CompositeNode, CMedleyTypes>, host:Host) {
+    this.nodeStore = new NodeStore(context);
     this.dialogStore = new DialogStore();
-    this.editStore = new EditStore(context, host, this.dialogStore);
-    this.reactFlowStore = new ReactFlowStore(context, this.editStore, host);
+    this.editStore = new EditStore(host, this.dialogStore, this.nodeStore);
+    this.reactFlowStore = new ReactFlowStore(context, this.editStore, this.nodeStore, host);
     this.contextMenuStore = new ContextMenuStore(context, this.editStore);
   }
 }

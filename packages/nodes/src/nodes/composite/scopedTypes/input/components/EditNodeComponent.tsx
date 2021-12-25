@@ -1,23 +1,15 @@
-import { Medley } from "@medley-js/core";
 import { TEditNodeComponent } from "@medley-js/common";
 import {
-  Button,
-  DialogActions,
   DialogContent,
-  DialogTitle,
   TextField,
   Stack
 } from "@mui/material";
-import React, { Fragment, useState } from "react";
+import React, {  } from "react";
 import { InputNode } from "../InputNode";
-import { InputType } from "../type";
 import { runInAction } from "mobx";
 
 export const EditNodeComponent: TEditNodeComponent<InputNode> = (props) => {
-  const node = props.context.getObservableNode();
-
-  console.log(node.value.color);
-
+  const node = props.context.observableNode;
   return (
     <>
       <DialogContent>
@@ -86,5 +78,5 @@ function colourNameToHex(colour:string)
     if (typeof colours[colour.toLowerCase()] != 'undefined')
         return colours[colour.toLowerCase()];
 
-    return false;
+    return colour;
 }

@@ -1,9 +1,4 @@
-import {
-  Node,
-  Port,
-  NodePart,
-  Unwrap
-} from "./core";
+import { Node, Port, NodePart, Unwrap } from "./core";
 import { Medley } from "./Medley";
 import { MedleyTypes } from "./MedleyTypes";
 
@@ -23,30 +18,26 @@ export class BaseContext<MT extends MedleyTypes> {
 export class NodePartContext<
   TNodePart extends NodePart<MT["node"]> = NodePart<Node>,
   MT extends Required<MedleyTypes> = Required<MedleyTypes>
-> implements BaseContext<MT> {
-  constructor(
-    public medley: Medley<MT>,
-    public nodePart: TNodePart
-  ) {}
+> extends BaseContext<MT> {
+  constructor(medley: Medley<MT>, public nodePart: TNodePart) {
+    super(medley);
+  }
 }
 
 export class NodeContext<
   TNode extends MT["node"] = Node,
   MT extends MedleyTypes = MedleyTypes
-> implements BaseContext<MT> {
-  constructor(
-    public medley: Medley<MT>,
-    public node: TNode
-  ) {}
+> extends BaseContext<MT> {
+  constructor(medley: Medley<MT>, public node: TNode) {
+    super(medley);
+  }
 }
 
 export class ExecutionContext<
   TNode extends MT["node"] = Node,
   MT extends MedleyTypes = MedleyTypes
-> implements NodeContext<TNode, MT> {
-  constructor(
-    public medley: Medley<MT>,
-    public node: TNode,
-    public input: Input
-  ) {}
+> extends NodeContext<TNode, MT> {
+  constructor(medley: Medley<MT>, node: TNode, public input: Input) {
+    super(medley, node);
+  }
 }

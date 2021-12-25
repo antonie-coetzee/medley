@@ -28,7 +28,7 @@ async function getReactFlowNodes(
   /* combine props with node type's props */
   return Promise.all(
     mNodes.map(async (node) => {
-      const nodeContext = new NodeContext(context.medley, node)
+      const nodeContext = new NodeContext(context.medley, node);
       const nodeProps = await context.medley.types.runExportFunction<
         DecorateNode<CNode>
       >(node.type, constants.decorateNode, nodeContext);
@@ -73,9 +73,10 @@ async function getReactFlowEdges(context: NodeContext<CompositeNode, CMedleyType
         node.type,
         constants.LinkComponent
       );
-      const linkProps = await decorateLink?.({ ...context, node });
+      const nodeContext = new NodeContext(context.medley, node);
+      const linkProps = await decorateLink?.(nodeContext);
       return {
-        data: { context:{...context, node}, link:pLink },
+        data: { context: nodeContext, link:pLink },
         id: `${pLink.scope}${pLink.source}${pLink.target}${pLink.port}`,
         source: pLink.source,
         target: pLink.target,

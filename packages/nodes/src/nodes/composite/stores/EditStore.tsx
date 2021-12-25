@@ -1,7 +1,4 @@
-import {
-  makeAutoObservable,
-  observable,
-} from "mobx";
+import { makeAutoObservable, observable } from "mobx";
 import {
   CNode,
   CNodePart,
@@ -20,15 +17,16 @@ import { CompositeNode } from "../CompositeNode";
 import { ReactNode } from "react";
 import React from "react";
 import { DialogStore } from "./DialogStore";
-import { NodeContext } from "@medley-js/core";
+import { BaseContext, NodeContext, NodePartContext } from "@medley-js/core";
+import { NodeStore } from ".";
 
 export class EditStore {
   public createComponent: ReactNode | null = null;
 
   constructor(
-    private context: NodeContext<CompositeNode, CMedleyTypes>,
     private host: Host,
-    private dialogStore: DialogStore
+    private dialogStore: DialogStore,
+    private nodeStore: NodeStore
   ) {
     makeAutoObservable(this, { createComponent: observable.ref });
   }
@@ -48,12 +46,12 @@ export class EditStore {
   async createNode(type: CType, position?: Coordinates) {
     if (this.host.constructNode) {
       const newNodePart = await this.host.constructNode(
-        this.context,
+        new BaseContext(this.nodeStore.compositeScope),
         type
       );
       if (newNodePart) {
         newNodePart.position = position;
-        this.context.medley.nodes.insertNode<CNode>(observable(newNodePart));
+        this.nodeStore.compositeScope.nodes.insertNode<CNode>(newNodePart);
       }
     } else {
       await this.createNodeFallback(type, position);
@@ -61,30 +59,31 @@ export class EditStore {
   }
 
   private async createNodeFallback(type: CType, position?: Coordinates) {
-    const medley = this.context.medley;
-    const nodePart: CNodePart = { type: type.name, name: "", position};
+    const medley = this.nodeStore.compositeScope;
+    const nodePart: CNodePart = { type: type.name, name: "", position };
     // first construct/initialize the nodepart with nodeCreate if
     // available
     try {
-      await medley.types.runExportFunction<CreateNode<CNode>>(
-        type.name,
-        constants.createNode,
-        { ...this.context, nodePart }
-      );
+      // await medley.types.runExportFunction<CreateNode<CNode>>(
+      //   type.name,
+      //   constants.createNode,
+      //   { ...this.context, nodePart }
+      // );
 
-      const ncf = await medley.types.getExport<
-        CreateNode<CNode>
-      >(type.name, constants.createNode);
+      const ncf = await medley.types.getExport<CreateNode<CNode>>(
+        type.name,
+        constants.createNode
+      );
       if (ncf) {
-        const doCreate = await ncf({
-          ...this.context,
-          nodePart,
-        });
+        const doCreate = await ncf(
+          new NodePartContext(this.nodeStore.compositeScope, nodePart)
+        );
         if (!doCreate) {
           return;
         }
       }
     } catch (e) {
+      console.log(e);
       medley.logger.error(e);
       return;
     }
@@ -97,7 +96,7 @@ export class EditStore {
       if (ncc) {
         this.doCreateNodeComponent(ncc, nodePart);
       } else {
-        medley.nodes.insertNode<CNode>(observable(nodePart));
+        medley.nodes.insertNode<CNode>(nodePart);
       }
     } catch (e) {
       medley.logger.error(e);
@@ -109,12 +108,13 @@ export class EditStore {
     CreateNodeComponent: TCreateNodeComponent,
     nodePart: CNodePart
   ) {
+    const cs = this.nodeStore.compositeScope;
     const props: TCreateNodeComponentProps = {
-      context: { ...this.context, nodePart },
+      context: new NodePartContext(this.nodeStore.compositeScope, nodePart),
       host: this.host,
       close: (create: boolean) => {
         if (create) {
-          this.context.medley.nodes.insertNode<CNode>(observable(nodePart));
+          cs.nodes.insertNode<CNode>(nodePart);
         } else {
           this.createComponent = null;
         }
@@ -129,14 +129,17 @@ export class EditStore {
    */
   async editNode(node: CNode) {
     if (this.host.openNodeEdit) {
-      await this.host.openNodeEdit(this.context, node);
+      await this.host.openNodeEdit(
+        new BaseContext(this.nodeStore.compositeScope),
+        node
+      );
     } else {
       await this.openNodeEditFallback(node);
     }
   }
 
   async openNodeEditFallback(node: CNode) {
-    const medley = this.context.medley;
+    const medley = this.nodeStore.compositeScope;
     try {
       const nec = await medley.types.getExport<TEditNodeComponent>(
         node.type,
@@ -156,14 +159,14 @@ export class EditStore {
     node: CNode
   ) {
     const props: TEditNodeComponentProps = {
-      context: { ...this.context, node: node },
+      context: new NodeContext(this.nodeStore.compositeScope, node),
       host: this.host,
       close: () => {
         this.dialogStore.closeDialog();
       },
     };
     this.dialogStore.openDialog(() => <EditNodeComponent {...props} />);
-  }  
+  }
 
   /**
    * removes the node from the current scope by either removing the link

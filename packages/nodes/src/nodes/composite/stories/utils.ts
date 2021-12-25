@@ -13,7 +13,6 @@ import { CompositeNode } from "..";
 import { OutputNode } from "../scopedTypes/output/node";
 import { InputNode } from "../scopedTypes/input/InputNode";
 import { IdentityNode } from "@/nodes/identity";
-import { newCompositeScope } from "../extensions/medley";
 import { compositeScope } from "../CompositeNode";
 
 export const addTypes = (medley: Medley<CMedleyTypes>) => {
@@ -29,7 +28,7 @@ export const createEmptyCompositeNode = (medley: Medley<CMedleyTypes>) => {
         type: CompositeType.name,
 
       });
-    const compositeScope = medley[newCompositeScope](compositeNode.id);
+    const compositeScope = medley.compositeScope(compositeNode.id);
     const id_4 = compositeScope.nodes.insertNode<OutputNode>(
       observable({
         name: "OUTPUT",
@@ -41,13 +40,13 @@ export const createEmptyCompositeNode = (medley: Medley<CMedleyTypes>) => {
 }
 
 export const createBasicCompositeNode = (medley: Medley<CMedleyTypes>, position?:Coordinates) => {
-  const compositeNode = medley.nodes.insertNode<CompositeNode>(observable({
+  const compositeNode = medley.nodes.insertNode<CompositeNode>({
     name: "Basic Composite",
     type: CompositeType.name,
     position:position
-  }));
+  });
 
-  const cs = medley[newCompositeScope](compositeNode.id);
+  const cs = medley.compositeScope(compositeNode.id);
   compositeNode[compositeScope] = cs;
   const id_0 = cs.nodes.insertNode<InputNode>(
     {

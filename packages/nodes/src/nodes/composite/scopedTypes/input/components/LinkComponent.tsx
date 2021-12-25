@@ -4,7 +4,7 @@ import { TLinkComponent } from "@medley-js/common";
 import { InputNode } from "../InputNode";
 
 
-export const LinkComponent: TLinkComponent<InputNode> = ({ context:{node}, linkProps:{
+export const LinkComponent: TLinkComponent<InputNode> = ({ context, linkProps:{
     id,
     sourceX,
     sourceY,
@@ -17,6 +17,7 @@ export const LinkComponent: TLinkComponent<InputNode> = ({ context:{node}, linkP
     arrowHeadType,
     markerEndId,
   } }) => {
+    const node = context.observableNode;
     const edgePath = getBezierPath({ sourceX, sourceY, sourcePosition:sourcePosition as Position  , targetX, targetY, targetPosition: targetPosition as  Position});
     const markerEnd = getMarkerEnd(arrowHeadType as ArrowHeadType, markerEndId);
     console.log("updated")
