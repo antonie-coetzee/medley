@@ -1,1 +1,1 @@
-export const ROOT_SCOPE = "root";
+export const DEFAULT_SCOPE = "default";

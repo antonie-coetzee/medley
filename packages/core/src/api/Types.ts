@@ -24,6 +24,6 @@ export class Types<MType extends Type<Module> = Type<Module>> {
   }
 
   public addType(type: MType) {
-    return this.typeRepository.addType(this.scopeId, type);
+    return this.typeRepository.upsertType(this.scopeId, type);
   }
 }

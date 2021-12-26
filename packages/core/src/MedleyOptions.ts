@@ -4,7 +4,7 @@ import { Loader, NonNullableType } from "./core";
 import { MedleyTypes } from "./MedleyTypes";
 import { LinkRepository, NodeRepository, TypeRepository } from "./repositories";
 
-export interface MedleySetup<
+export interface MedleyOptions<
   MT extends MedleyTypes = MedleyTypes,
   M extends NonNullableType<MT> = NonNullableType<MT>
 > {
@@ -16,6 +16,5 @@ export interface MedleySetup<
   types?: Types<M["type"]>;
   links?: Links<M["link"]>;
   conductor?: Conductor<M>;
-  cache?: Map<string, unknown>;
   scopeId?: string;
 }

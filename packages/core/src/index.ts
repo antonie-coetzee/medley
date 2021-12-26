@@ -6,4 +6,4 @@ export * from "./Conductor";
 export * from "./Context";
 export * from "./NodeFunction";
 export * from "./MedleyTypes";
-export * from "./MedleySetup";
+export * from "./MedleyOptions";

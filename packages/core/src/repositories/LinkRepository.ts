@@ -1,6 +1,6 @@
 import {
   Link,
-  ROOT_SCOPE,
+  DEFAULT_SCOPE,
   TreeMap,
   PortLink,
   isPortLink,
@@ -23,18 +23,13 @@ export class LinkRepository<MLink extends Link = Link> {
     this.targetToSourceMap = new TreeMap();
   }
 
-  public setAllLinks(links: AnyLink<MLink>[]) {
-    this.portToSourceMap.clearAllNodes();
-    this.sourceToPortMap.clearAllNodes();
-    this.targetToSourceMap.clearAllNodes();
+  public setLinks(links: MLink[]): void {
+    this.portToSourceMap.clearNodes();
+    this.sourceToPortMap.clearNodes();
+    this.targetToSourceMap.clearNodes();
     for (const link of links) {
-      if (isPortLink(link)) {
-        this.addToPortToSourceMap(link);
-      } else {
-        this.addToTargetToSourceMap(link);
-      }
+      this.upsertLink(link.scope || DEFAULT_SCOPE, link);
     }
-    this.updateSourceToPortMap = true;
   }
 
   public getLink(
@@ -42,7 +37,7 @@ export class LinkRepository<MLink extends Link = Link> {
     target: string,
     source: string,
     port?: string
-  ) {
+  ) : MLink | undefined {
     if (port) {
       return this.portToSourceMap.getFromPath(
         false,
@@ -60,90 +55,103 @@ export class LinkRepository<MLink extends Link = Link> {
     }
   }
 
-  public addLink(link: AnyLink<MLink>) {
+  public upsertLink(scopeId: string, link: AnyLink<MLink>) {
+    const linkScope = link.scope || DEFAULT_SCOPE;
+    if (linkScope !== scopeId) {
+      throw new Error(
+        `link with scope: '${link.scope}' not equal to '${linkScope}'`
+      );
+    }    
     if (isPortLink(link)) {
       this.updateSourceToPortMap = true;
-      return this.addToPortToSourceMap(link);
+      return this.setPortToSourceMap(link);
     } else {
-      return this.addToTargetToSourceMap(link);
+      return this.setTargetToSourceMap(link);
     }
   }
 
-  public getPortLinks(scopeId: string, port: string, target: string) {
+  public getPortLinks(scopeId: string, port: string, target: string): PortLink<MLink>[] {
     return this.portToSourceMap.getFromPath(false, scopeId, port, target);
   }
 
-  public getSourceToPortLinks(scopeId: string, source: string) {
+  public getSourceToPortLinks(scopeId: string, source: string): PortLink<MLink>[] {
     if (this.updateSourceToPortMap) {
-      this.sourceToPortMap.clearAllNodes();
-      const allLinks = this.portToSourceMap.getAllNodes();
+      this.sourceToPortMap.clearNodes();
+      const allLinks = this.portToSourceMap.getNodes();
       for (const link of allLinks) {
-        this.addToSourceToPortMap(link);
+        this.setSourceToPortMap(link);
       }
     }
     return this.sourceToPortMap.getFromPath(true, scopeId, source);
   }
 
-  public getSourceLinks(scopeId: string, target: string) {
+  public getSourceLinks(scopeId: string, target: string): MLink[] {
     return this.targetToSourceMap.getFromPath(true, scopeId, target);
   }
 
-  public getLinks(scopeId: string): AnyLink<MLink>[] {
-    return [
-      ...this.portToSourceMap.getFromPath(true, scopeId),
-      ...this.targetToSourceMap.getFromPath(true, scopeId),
-    ];
+  public getLinks(scopeId?: string): AnyLink<MLink>[] {
+    if(scopeId){
+      return [
+        ...this.portToSourceMap.getFromPath(true, scopeId),
+        ...this.targetToSourceMap.getFromPath(true, scopeId),
+      ];
+    }else{
+      return [
+        ...this.portToSourceMap.getNodes(),
+        ...this.targetToSourceMap.getNodes(),
+      ];
+    }
+
   }
 
-  public getAllLinks(): AnyLink<MLink>[] {
-    return [
-      ...this.portToSourceMap.getAllNodes(),
-      ...this.targetToSourceMap.getAllNodes(),
-    ];
-  }
-
-  public deleteLink(link: AnyLink<MLink>) {
+  public deleteLink(scopeId: string, link: AnyLink<MLink>):boolean {
+    const linkScope = link.scope || DEFAULT_SCOPE;
+    if (linkScope !== scopeId) {
+      throw new Error(
+        `link with scope: '${link.scope}' not equal to '${linkScope}'`
+      );
+    }   
     if (isPortLink(link)) {
       this.updateSourceToPortMap = true;
       return this.portToSourceMap.deleteNode(
-        link.scope || ROOT_SCOPE,
+        linkScope,
         link.port,
         link.target,
         link.source
       );
     } else {
       return this.targetToSourceMap.deleteNode(
-        link.scope || ROOT_SCOPE,
+        linkScope,
         link.target,
         link.source
       );
     }
   }
 
-  private addToPortToSourceMap(link: PortLink<MLink>) {
+  private setPortToSourceMap(link: PortLink<MLink>) {
     return this.portToSourceMap.setNodeValue(
       link,
-      link.scope || ROOT_SCOPE,
+      link.scope || DEFAULT_SCOPE,
       link.port,
       link.target,
       link.source
     );
   }
 
-  private addToSourceToPortMap(link: PortLink<MLink>) {
+  private setSourceToPortMap(link: PortLink<MLink>) {
     this.sourceToPortMap.setNodeValue(
       link,
-      link.scope || ROOT_SCOPE,
+      link.scope || DEFAULT_SCOPE,
       link.source,
       link.target,
       link.port
     );
   }
 
-  private addToTargetToSourceMap(link: MLink) {
+  private setTargetToSourceMap(link: MLink) {
     return this.targetToSourceMap.setNodeValue(
       link,
-      link.scope || ROOT_SCOPE,
+      link.scope || DEFAULT_SCOPE,
       link.target,
       link.source
     );

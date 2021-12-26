@@ -69,12 +69,12 @@ export class TreeMap<T> {
     }
   }
 
-  public getAllNodes(): T[] {
+  public getNodes(): T[] {
     const childNodes = Object.values(this.rootNode);
     return childNodes.flatMap((cn) => this.getNodeValuesRecursive(cn)) || [];
   }
 
-  public clearAllNodes() {
+  public clearNodes() {
     return (this.rootNode = {});
   }
 

@@ -19,9 +19,8 @@ export class Links<MLink extends Link = Link> {
     return this.linkRepo.getSourceLinks(this.scopeId, target);
   }
 
-  public addLink(newLink: AnyLink<MLink>): boolean {
-    newLink.scope = this.scopeId;
-    return this.linkRepo.addLink(newLink);
+  public upsertLink(newLink: AnyLink<MLink>): boolean {
+    return this.linkRepo.upsertLink(this.scopeId, newLink);
   }
 
   public getLink(
@@ -37,6 +36,6 @@ export class Links<MLink extends Link = Link> {
   }
 
   public deleteLink(link: MLink): boolean {
-    return this.linkRepo.deleteLink(link);
+    return this.linkRepo.deleteLink(this.scopeId, link);
   }
 }

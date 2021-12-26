@@ -1,5 +1,5 @@
 import { Medley } from "./Medley";
-import { Port, ROOT_SCOPE, Unwrap } from "./core";
+import { Port, DEFAULT_SCOPE, Unwrap } from "./core";
 import { Input, ExecutionContext } from "./Context";
 import {
   NodeFunction,
@@ -13,10 +13,7 @@ export type InputProvider<MT extends MedleyTypes = MedleyTypes> = {
 };
 
 export class Conductor<MT extends MedleyTypes = MedleyTypes> {
-  private resultCache: Map<string, unknown>;
-  constructor(private medley: Medley<MT>, cache?: Map<string, unknown>) {
-    this.resultCache = cache || new Map();
-  }
+  constructor(private medley: Medley<MT>) {}
 
   public async runNode<T = unknown>(
     nodeId: string,
@@ -101,44 +98,6 @@ export class Conductor<MT extends MedleyTypes = MedleyTypes> {
       throw new Error(`multiple links detected for port: '${port.name}'`);
     }
     const link = links[0];
-
-    return this.conductor.cacheRunner(link.source, args, async () => {
-      return this.conductor.runNode(link.source, null, args);
-    });
-  }
-
-  private async cacheRunner<T>(
-    nodeId: string,
-    args: any[],
-    func: () => Promise<T>
-  ) {
-    const cacheItem = this.checkCache(nodeId, args);
-    if (cacheItem && cacheItem.hit) {
-      return cacheItem.result as T;
-    }
-    const result = func();
-    if (cacheItem && cacheItem.addToCache && cacheItem.key) {
-      this.resultCache.set(cacheItem.key, result);
-    }
-    return result;
-  }
-
-  private checkCache(nodeId: string, ...args: any[]) {
-    const node = this.medley.nodes.getNode(nodeId);
-    if (node == null) {
-      return null;
-    }
-    const key = `${node.scope || ROOT_SCOPE}${node.id}${
-      args !== [] && JSON.stringify(args)
-    }`;
-
-    if (this.resultCache.has(key)) {
-      return {
-        addToCache: false,
-        hit: true,
-        result: this.resultCache.get(key),
-      };
-    }
-    return { addToCache: true, hit: false, key };
+    return this.conductor.runNode(link.source, null, args);
   }
 }

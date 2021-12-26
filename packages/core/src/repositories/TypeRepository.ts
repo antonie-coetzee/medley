@@ -1,4 +1,4 @@
-import { Type, Loader, TreeMap, ROOT_SCOPE, Module, isType } from "../core";
+import { Type, Loader, TreeMap, DEFAULT_SCOPE, Module, isType } from "../core";
 
 export class TypeRepository<MType extends Type<Module> = Type<Module>> {
   /* scope -> type */
@@ -6,27 +6,19 @@ export class TypeRepository<MType extends Type<Module> = Type<Module>> {
 
   constructor(public loader: Loader<MType["module"]>) {}
 
-  public setAllTypes(types: MType[]) {
-    this.typeMap.clearAllNodes();
+  public setTypes(types: MType[]): void {
+    this.typeMap.clearNodes();
     for (const type of types) {
-      this.typeMap.setNodeValue(type, type.scope || ROOT_SCOPE, type.name);
+      this.upsertType(type.scope || DEFAULT_SCOPE, type);
     }
   }
 
-  public async getExport(scopeId:string, typeName: string, exportName: string) {
-    const typeObj = this.typeMap.getNodeValue(scopeId, typeName);
-    if (typeObj == null) {
-      return;
+  public getTypes(scopeId?: string): MType[] {
+    if(scopeId){
+      return this.typeMap.getFromPath(false, scopeId);
+    }else{
+      return this.typeMap.getNodes();
     }
-    return this.loader.import(typeObj.module, exportName);
-  }
-
-  public getTypes(scopeId: string): MType[] {
-    return this.typeMap.getFromPath(false, scopeId);
-  }
-
-  public getAllTypes(): MType[] {
-    return this.typeMap.getAllNodes();
   }
 
   public getType(scopeId: string, typeName: string): MType | undefined {
@@ -42,12 +34,23 @@ export class TypeRepository<MType extends Type<Module> = Type<Module>> {
     }
   }
 
-  public deleteType(scopeId: string, typeName: string) {
+  public deleteType(scopeId: string, typeName: string): boolean {
     return this.typeMap.deleteNode(scopeId, typeName);
   }
 
-  public addType(scopeId: string, type: MType) {
-    type.scope = scopeId || ROOT_SCOPE;
-    return this.typeMap.setNodeValue(type, type.scope, type.name);
+  public upsertType(scopeId: string, type: MType): boolean {
+    const typeScope = type.scope || DEFAULT_SCOPE;
+    if(typeScope !== scopeId){
+      throw new Error(`type: '${type.name}' with scope: '${type.scope}' not equal to '${scopeId}'`);
+    }
+    return this.typeMap.setNodeValue(type, typeScope, type.name);
+  }
+
+  public async getExport(scopeId:string, typeName: string, exportName: string) {
+    const typeObj = this.typeMap.getNodeValue(scopeId, typeName);
+    if (typeObj == null) {
+      return;
+    }
+    return this.loader.import(typeObj.module, exportName);
   }
 }

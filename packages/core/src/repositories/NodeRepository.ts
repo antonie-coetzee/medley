@@ -1,65 +1,66 @@
 import {
-  generateId,
+  DEFAULT_SCOPE, generateId,
   Node,
-  NodePart,
-  ROOT_SCOPE,
-  TreeMap,
-  Writeable,
+  NodePart, TreeMap
 } from "../core";
 
 export class NodeRepository<MNode extends Node> {
   public nodeIndex: Map<string, MNode> = new Map();
   public nodeTreeMap: TreeMap<MNode> = new TreeMap();
 
-  public setAllNodes(nodes: MNode[]): void {
-    this.nodeTreeMap.clearAllNodes();
+  public setNodes(nodes: MNode[]): void {
+    this.nodeTreeMap.clearNodes();
     this.nodeIndex.clear();
-    nodes.forEach((node) => {
-      this.setNode(node);
-    });
+    for (const type of nodes) {
+      this.upsertNode(type.scope || DEFAULT_SCOPE, type);
+    }
   }
 
-  public getNode(scopeId: string, id: string) {
-    return this.nodeIndex.get(`${scopeId}${id}`);
+  public getNodes(scopeId?: string): MNode[] {
+    if(scopeId){
+      return this.nodeTreeMap.getFromPath(false, scopeId);
+    }else{
+      return this.nodeTreeMap.getNodes();
+    }
   }
 
-  public getNodes(scopeId: string): MNode[] {
-    return this.nodeTreeMap.getFromPath(false, scopeId);
+  public getNode(scopeId: string, nodeId: string): MNode | undefined {
+    return this.nodeIndex.get(`${scopeId}${nodeId}`);
   }
 
-  public getAllNodes(): MNode[] {
-    return this.nodeTreeMap.getAllNodes();
-  }
-
-  public insertNode(scopeId: string, nodePart: NodePart<MNode>) {
+  public insertNodePart(scopeId: string, nodePart: NodePart<MNode>): MNode {
     let newId: string;
     do {
       newId = generateId();
-    } while (this.nodeIndex.get(newId));
+    } while (this.nodeIndex.get(`${scopeId}${newId}`));
     let newNode = {
       ...nodePart,
       id: newId,
-      scope: scopeId
+      scope: scopeId,
     } as MNode;
 
-    this.setNode(newNode);
+    this.upsertNode(scopeId, newNode);
     return newNode;
   }
 
-  public setNode(node: MNode) {
-    const scopeId = node.scope || ROOT_SCOPE;
-    this.nodeTreeMap.setNodeValue(node, scopeId, node.id);
-    this.nodeIndex.set(`${scopeId}${node.id}`, node);
+  public upsertNode(scopeId: string, node: MNode): boolean {
+    const nodeScope = node.scope || DEFAULT_SCOPE;
+    if (nodeScope !== scopeId) {
+      throw new Error(
+        `node: '${node.id}' with scope: '${node.scope}' not equal to '${scopeId}'`
+      );
+    }
+    this.nodeIndex.set(`${nodeScope}${node.id}`, node);
+    return this.nodeTreeMap.setNodeValue(node, nodeScope, node.id);
   }
 
-  public deleteNode(node: Node) {
-    const storedNode = this.nodeIndex.get(`${node.scope}${node.id}`);
+  public deleteNode(scopeId: string, nodeId: string): boolean {
+    const storedNode = this.nodeIndex.get(`${scopeId}${nodeId}`);
     if (storedNode == null) {
-      return;
+      return false;
     }
-    const scopeId = node.scope || ROOT_SCOPE;
-    this.nodeIndex.delete(`${scopeId}${node.id}`);
-    this.nodeTreeMap.deleteNode(scopeId, node.id);
-    return node;
+    this.nodeTreeMap.deleteNode(scopeId, nodeId);
+    this.nodeIndex.delete(`${scopeId}${nodeId}`);
+    return true;
   }
 }

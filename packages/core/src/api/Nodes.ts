@@ -7,26 +7,24 @@ export class Nodes<MNode extends Node = Node> {
     private nodeRepository: NodeRepository<MNode>
   ) {}
 
-  public getNode(id: string): MNode | undefined {
-    return this.nodeRepository.getNode(this.scopeId, id) as MNode;
+  public getNode(nodeId: string): MNode | undefined {
+    return this.nodeRepository.getNode(this.scopeId, nodeId) as MNode;
   }
 
   public getNodes(): MNode[] {
     return this.nodeRepository.getNodes(this.scopeId) as MNode[];
   }
 
-  public setNode<TNode extends MNode>(node:TNode){
-    this.nodeRepository.setNode(node);
+  public upsertNode<TNode extends MNode>(node: TNode): void {
+    this.nodeRepository.upsertNode(this.scopeId, node);
   }
 
-  public insertNode<
-    TNode extends MNode
-  >(nodePart: NodePart<TNode>) {
-    return this.nodeRepository.insertNode(this.scopeId, nodePart) as TNode;
+  public insertNodePart<TNode extends MNode>(nodePart: NodePart<TNode>): TNode {
+    return this.nodeRepository.insertNodePart(this.scopeId, nodePart) as TNode;
   }
 
-  public deleteNode<TNode extends MNode>(node: TNode) {
-    const deletedNode = this.nodeRepository.deleteNode(node);
+  public deleteNode(nodeId: string): boolean {
+    const deletedNode = this.nodeRepository.deleteNode(this.scopeId, nodeId);
     return deletedNode ? true : false;
   }
 }
