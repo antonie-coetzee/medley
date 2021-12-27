@@ -1,13 +1,11 @@
-import { Link, Module, Node, Type } from "./core";
+import { Link, Node, Type } from "./core";
 
 export interface MedleyTypes<
-  MModule extends Module = Module,
   MNode extends Node = Node,
-  MType extends Type<MModule> = Type<MModule>,
+  MType extends Type = Type,
   MLink extends Link = Link,
 > {
   node?: MNode;
   type?: MType;
   link?: MLink;
-  module?: MModule;
 }
