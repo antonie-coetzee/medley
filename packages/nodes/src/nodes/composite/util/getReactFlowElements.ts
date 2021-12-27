@@ -28,8 +28,8 @@ async function getReactFlowNodes(
   /* combine props with node type's props */
   return Promise.all(
     mNodes.map(async (node) => {
-      const nodeContext = new NodeContext(context.medley, node);
-      const nodeProps = await context.medley.types.runExportFunction<
+      const nodeContext = new NodeContext(context.compositeScope, node);
+      const nodeProps = await context.compositeScope.types.runExportFunction<
         DecorateNode<CNode>
       >(node.type, constants.decorateNode, nodeContext);
       const props = {
@@ -57,23 +57,23 @@ async function getReactFlowNodes(
 }
 
 async function getReactFlowEdges(context: NodeContext<CompositeNode, CMedleyTypes>): Promise<Edge[]> {
-  const mLinks = context.medley.links.getLinks();
+  const mLinks = context.compositeScope.links.getLinks();
   const edges = await Promise.all(
     mLinks.filter(l=>isPortLink(l)).map(async (l) => {
       const pLink = l as PortLink;
-      const node = context.medley.nodes.getNode(pLink.source);
+      const node = context.compositeScope.nodes.getNode(pLink.source);
       if (node == null) {
         return;
       }
-      const decorateLink = await context.medley.types.getExport<DecorateLink>(
+      const decorateLink = await context.compositeScope.types.getExport<DecorateLink>(
         node.type,
         constants.decorateLink
       );
-      const linkComponent = await context.medley.types.getExport<TLinkComponent>(
+      const linkComponent = await context.compositeScope.types.getExport<TLinkComponent>(
         node.type,
         constants.LinkComponent
       );
-      const nodeContext = new NodeContext(context.medley, node);
+      const nodeContext = new NodeContext(context.compositeScope, node);
       const linkProps = await decorateLink?.(nodeContext);
       return {
         data: { context: nodeContext, link:pLink },

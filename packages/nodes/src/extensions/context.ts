@@ -34,8 +34,8 @@ Object.defineProperty(NodeContext.prototype, "observableNode", {
       this.node = node;
       return this.node;
     }else{
-      const observableNode = observable.object(node!);
-      this.medley.nodes.setNode(observableNode);
+      const observableNode = observable.object(node);
+      this.medley.nodes.upsertNode(observableNode);
       this.node = observableNode;
       return observableNode;
     }    

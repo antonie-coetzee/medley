@@ -1,11 +1,8 @@
 import { CMedley, CMedleyTypes } from "@medley-js/common";
 import {
-  NF,
-  Input,
-  Medley,
-  nodeFunction as nodeFunctionName,
+  Input, NF
 } from "@medley-js/core";
-import { CompositeNode, input } from "../CompositeNode";
+import { CompositeNode } from "../CompositeNode";
 import { inputTypeName } from "../scopedTypes/input";
 import { OutputType } from "../scopedTypes/output";
 
@@ -32,18 +29,16 @@ function upsertInputType(compositeScope: CMedley, input: Input): void {
   };
   const inputType = compositeScope.types.getType(inputTypeName);
   if (inputType) {
-    inputType.module.exportMap = {
-      ...inputType.module.exportMap,
+    inputType.exportMap = {
+      ...inputType.exportMap,
       nodeFunctionName: async () => nodeFunction,
     };
   } else {
-    compositeScope.types.addType({
+    compositeScope.types.upsertType({
       name: inputTypeName,
       version: "1.0.0",
-      module: {
-        exportMap: {
-          nodeFunctionName: async () => nodeFunction,
-        }
+      exportMap: {
+        nodeFunctionName: async () => nodeFunction,
       },
     });
   }
@@ -55,13 +50,11 @@ function addOutputType(compositeScope: CMedley): void {
       name: node.id,
     });
   };
-  compositeScope.types.addType({
+  compositeScope.types.upsertType({
     ...OutputType,
-    module: {
-      import: () =>
-        Promise.resolve({
-          nodeFunction,
-        }),
-    },
+    import: () =>
+      Promise.resolve({
+        nodeFunction,
+      }),
   });
 }

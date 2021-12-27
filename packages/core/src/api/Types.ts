@@ -23,7 +23,7 @@ export class Types<MType extends Type = Type> {
     return this.typeRepository.hasType(this.scopeId, typeName);
   }
 
-  public addType(type: MType) {
+  public upsertType(type: MType) {
     return this.typeRepository.upsertType(this.scopeId, type);
   }
 }

@@ -1,11 +1,10 @@
-import { Type } from "@medley-js/core";
-
-import { inputTypeName } from "./typeName";
+import { CType } from "@medley-js/common";
 import * as exports from "./index";
+import { inputTypeName } from "./typeName";
 
-export const InputType: Type = {
+export const InputType: CType = {
   name: inputTypeName,
   version: "1.0.0",
   volatile: true,
-  module: { import: () => Promise.resolve(exports) },
+  import: () => Promise.resolve(exports),
 };

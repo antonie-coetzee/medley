@@ -1,7 +1,7 @@
 import React from "react";
 import { Meta } from "@storybook/react";
 import { Medley, NodeContext } from "@medley-js/core";
-import { CMedleyTypes, constants, TEditNodeComponent } from "@medley-js/common";
+import { CLoader, CMedleyTypes, constants, TEditNodeComponent } from "@medley-js/common";
 
 import { CompositeType } from "../type";
 import { componentStory } from "../../../util/util.sb";
@@ -12,9 +12,9 @@ export default {
 } as Meta;
 
 export const Edit = componentStory(async () => {
-  const medley = new Medley<CMedleyTypes>();
+  const medley = new Medley<CMedleyTypes>({loader:new CLoader()});
   addTypes(medley);
-  const [bcnScope, bcn] = createBasicCompositeNode(medley, [200, 200]);
+  const bcn = createBasicCompositeNode(medley, [200, 200]);
 
   const EditNodeComponent = await medley.types.getExport<TEditNodeComponent>(
     CompositeType.name,
@@ -25,7 +25,7 @@ export const Edit = componentStory(async () => {
   }
   return () => (
     <EditNodeComponent
-      context={new NodeContext(bcnScope,bcn)}
+      context={new NodeContext(medley, bcn)}
       host={{}}
       close={()=>{}}
     />

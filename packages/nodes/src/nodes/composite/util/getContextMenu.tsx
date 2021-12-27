@@ -17,7 +17,7 @@ function getAddInputNode(
 ): React.VFC<{ close: () => void; mouseX?: number; mouseY?: number }> {
   return ({ close, mouseX, mouseY }) => {
     const addInput = () => {
-      const node = context.medley.nodes.insertNode<InputNode>({
+      const node = context.medley.nodes.insertNodePart<InputNode>({
         name: "INPUT",
         type: InputType.name,
         value: {},
@@ -47,7 +47,7 @@ function getAddOutputNode(
 ): React.VFC<{ close: () => void; mouseX?: number; mouseY?: number }> {
   return ({ close, mouseX, mouseY }) => {
     const addOutput = () => {
-      const node = context.medley.nodes.insertNode<OutputNode>({
+      const node = context.medley.nodes.insertNodePart<OutputNode>({
         name: "OUTPUT",
         type: OutputType.name,
       });

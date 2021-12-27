@@ -51,7 +51,7 @@ export class EditStore {
       );
       if (newNodePart) {
         newNodePart.position = position;
-        this.nodeStore.compositeScope.nodes.insertNode<CNode>(newNodePart);
+        this.nodeStore.compositeScope.nodes.insertNodePart<CNode>(newNodePart);
       }
     } else {
       await this.createNodeFallback(type, position);
@@ -96,7 +96,7 @@ export class EditStore {
       if (ncc) {
         this.doCreateNodeComponent(ncc, nodePart);
       } else {
-        medley.nodes.insertNode<CNode>(nodePart);
+        medley.nodes.insertNodePart<CNode>(nodePart);
       }
     } catch (e) {
       medley.logger.error(e);
@@ -114,7 +114,7 @@ export class EditStore {
       host: this.host,
       close: (create: boolean) => {
         if (create) {
-          cs.nodes.insertNode<CNode>(nodePart);
+          cs.nodes.insertNodePart<CNode>(nodePart);
         } else {
           this.createComponent = null;
         }

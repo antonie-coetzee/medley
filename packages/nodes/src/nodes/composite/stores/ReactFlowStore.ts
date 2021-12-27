@@ -14,7 +14,7 @@ import { debounce } from "@mui/material";
 import { getReactFlowEvents } from "../util";
 import { EditStore } from "./EditStore";
 import { NodeStore } from ".";
-import { onNodeInsert, onNodesChange } from "../extensions";
+import { onLinksChange, onNodeInsert, onNodesChange } from "../extensions";
 import { InputType } from "../scopedTypes/input";
 import { OutputType } from "../scopedTypes/output";
 import { InputNode } from "../scopedTypes/input/InputNode";
@@ -47,6 +47,7 @@ export class ReactFlowStore {
     const elements = await getReactFlowElements(context);
     const events = getReactFlowEvents(this, context);
     this.updateReactFlowProps({ elements, nodeTypes, edgeTypes, ...events });
+    this.nodeStore.updatePorts();
     this.registerMedleyEvents();
   }
 
@@ -60,19 +61,18 @@ export class ReactFlowStore {
     const debouncedUpdateState = debounce(async () => {
       const elements = await getReactFlowElements(context);
       const nodeTypes = await getReactFlowTypes(context, this.host);
-      this.nodeStore.inputNodes = context.medley.nodes
-        .getNodes()
-        .filter((n) => n.type === InputType.name) as InputNode[];
-      this.nodeStore.outputNodes = context.medley.nodes
-        .getNodes()
-        .filter((n) => n.type === OutputType.name) as OutputNode[];
-
+      this.nodeStore.updatePorts();
       this.updateReactFlowProps({ elements, nodeTypes });
     }, 50);
 
     const medley = this.nodeStore.compositeScope;
     if (medley.nodes[onNodesChange] == null) {
       medley.nodes[onNodesChange] = () => {
+        debouncedUpdateState();
+      };
+    }
+    if (medley.links[onLinksChange] == null) {
+      medley.links[onLinksChange] = () => {
         debouncedUpdateState();
       };
     }

@@ -1,136 +1,119 @@
-import { IdentityType } from "../../index";
-import { Medley } from "@medley-js/core";
-import { InputType } from "../scopedTypes/input";
-import { OutputType } from "../scopedTypes/output";
-import { CompositeType } from "../type";
-import {
-  Coordinates,
-  CMedleyTypes
-} from "@medley-js/common";
-import "../extensions/medley"
-import { observable } from "mobx";
-import { CompositeNode } from "..";
-import { OutputNode } from "../scopedTypes/output/node";
-import { InputNode } from "../scopedTypes/input/InputNode";
 import { IdentityNode } from "@/nodes/identity";
+import { CMedleyTypes, Coordinates } from "@medley-js/common";
+import { Medley } from "@medley-js/core";
+import { CompositeNode } from "..";
+import { IdentityType } from "../../index";
 import { compositeScope } from "../CompositeNode";
+import "../extensions/medley";
+import { InputType } from "../scopedTypes/input";
+import { InputNode } from "../scopedTypes/input/InputNode";
+import { OutputType } from "../scopedTypes/output";
+import { OutputNode } from "../scopedTypes/output/node";
+import { CompositeType } from "../type";
 
 export const addTypes = (medley: Medley<CMedleyTypes>) => {
-    medley.types.addType(CompositeType);
-    medley.types.addType(IdentityType);
-    medley.types.addType(InputType);
-    medley.types.addType(OutputType);
-}
+  medley.types.upsertType(CompositeType);
+  medley.types.upsertType(IdentityType);
+  medley.types.upsertType(InputType);
+  medley.types.upsertType(OutputType);
+};
 
 export const createEmptyCompositeNode = (medley: Medley<CMedleyTypes>) => {
-    const compositeNode = medley.nodes.insertNode<CompositeNode>({
-        name: "empty_composite",
-        type: CompositeType.name,
+  const compositeNode = medley.nodes.insertNodePart<CompositeNode>({
+    name: "empty_composite",
+    type: CompositeType.name,
+  });
+  const cs = medley.compositeScope(compositeNode.id);
+  compositeNode[compositeScope] = cs;
+  const id_4 = cs.nodes.insertNodePart<OutputNode>({
+    name: "OUTPUT",
+    position: [600, 200],
+    type: OutputType.name,
+  });
+  return compositeNode;
+};
 
-      });
-    const compositeScope = medley.compositeScope(compositeNode.id);
-    const id_4 = compositeScope.nodes.insertNode<OutputNode>(
-      observable({
-        name: "OUTPUT",
-        position: [600, 200],
-        type: OutputType.name,
-      })
-    );
-    return [compositeScope, compositeNode] as const
-}
-
-export const createBasicCompositeNode = (medley: Medley<CMedleyTypes>, position?:Coordinates) => {
-  const compositeNode = medley.nodes.insertNode<CompositeNode>({
+export const createBasicCompositeNode = (
+  medley: Medley<CMedleyTypes>,
+  position?: Coordinates
+) => {
+  const compositeNode = medley.nodes.insertNodePart<CompositeNode>({
     name: "Basic Composite",
     type: CompositeType.name,
-    position:position
+    position: position,
   });
 
   const cs = medley.compositeScope(compositeNode.id);
   compositeNode[compositeScope] = cs;
-  const id_0 = cs.nodes.insertNode<InputNode>(
-    {
-      name: "INPUT1",
-      position: [0, 50],
-      type: InputType.name,
-      value:{color:"green"}
-    }
-  );
+  const id_0 = cs.nodes.insertNodePart<InputNode>({
+    name: "INPUT1",
+    position: [0, 50],
+    type: InputType.name,
+    value: { color: "green" },
+  });
 
-  const id_00 = cs.nodes.insertNode<InputNode>(
-    {
-      name: "abc",
-      position: [0, 100],
-      type: InputType.name,
-      value:{color:"red"}
-    }
-  );
+  const id_00 = cs.nodes.insertNodePart<InputNode>({
+    name: "abc",
+    position: [0, 100],
+    type: InputType.name,
+    value: { color: "red" },
+  });
 
-  const id_01 = cs.nodes.insertNode<InputNode>(
-    {
-      name: "INPUT3",
-      position: [0, 150],
-      type: InputType.name,
-      value:{color:"blue"}
-    }
-  );
+  const id_01 = cs.nodes.insertNodePart<InputNode>({
+    name: "INPUT3",
+    position: [0, 150],
+    type: InputType.name,
+    value: { color: "blue" },
+  });
 
-  const id_1 = cs.nodes.insertNode<IdentityNode>(
-    {
-      name: "Test_1",
-      position: [200, 50],
-      type: IdentityType.name,
-      value: {}
-    }
-  );
-  const id_2 = cs.nodes.insertNode<IdentityNode>(
-    {
-      name: "Test_2",
-      position: [600, 50],
-      type: IdentityType.name,
-      value: {}
-    }
-  );
-  const id_3 = cs.nodes.insertNode<IdentityNode>(
-    {
-      name: "Test_3",
-      position: [1000, 300],
-      type: IdentityType.name,
-      value: {}
-    }
-  );
-  const id_4 = cs.nodes.insertNode<OutputNode>(
-    {
-      name: "OUTPUT",
-      position: [1400, 50],
-      type: OutputType.name,
-    }
-  );
+  const id_1 = cs.nodes.insertNodePart<IdentityNode>({
+    name: "Test_1",
+    position: [200, 50],
+    type: IdentityType.name,
+    value: {},
+  });
+  const id_2 = cs.nodes.insertNodePart<IdentityNode>({
+    name: "Test_2",
+    position: [600, 50],
+    type: IdentityType.name,
+    value: {},
+  });
+  const id_3 = cs.nodes.insertNodePart<IdentityNode>({
+    name: "Test_3",
+    position: [1000, 300],
+    type: IdentityType.name,
+    value: {},
+  });
+  const id_4 = cs.nodes.insertNodePart<OutputNode>({
+    name: "OUTPUT",
+    position: [1400, 50],
+    type: OutputType.name,
+  });
 
-  cs.links.addLink({
+  cs.links.upsertLink({
     source: id_0.id,
     target: id_1.id,
     port: "input1",
     scope: compositeNode.id,
   });
-  cs.links.addLink({
+  cs.links.upsertLink({
     source: id_1.id,
     target: id_2.id,
     port: "input1",
     scope: compositeNode.id,
   });
-  cs.links.addLink({
+  cs.links.upsertLink({
     source: id_2.id,
     target: id_3.id,
     port: "input1",
     scope: compositeNode.id,
   });
-  cs.links.addLink({
+  cs.links.upsertLink({
     source: id_3.id,
     target: id_4.id,
     port: id_4.id,
     scope: compositeNode.id,
   });
 
-  return [cs, compositeNode] as const
+  return compositeNode;
 };

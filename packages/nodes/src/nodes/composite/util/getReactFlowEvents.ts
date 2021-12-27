@@ -17,7 +17,8 @@ export function getReactFlowEvents(
   context: NodeContext<CompositeNode, CMedleyTypes>
 ) {
   const onConnect = (edge: Connection | Edge) => {
-    context.medley.links.addLink({
+    console.log(edge);
+    context.compositeScope.links.upsertLink({
       source: edge.source || "",
       target: edge.target || "",
       port: edge.targetHandle || "",
@@ -36,7 +37,7 @@ export function getReactFlowEvents(
     event: React.MouseEvent<Element, MouseEvent>,
     node: RFNode<any>
   ) => void = (_, rfNode) => {
-    const mNode = context.medley.nodes.getNode(rfNode.id);
+    const mNode = context.compositeScope.nodes.getNode(rfNode.id);
     if (mNode) {
       const pos = rfNode.position;
       mNode.position = [pos.x, pos.y];
@@ -48,26 +49,26 @@ export function getReactFlowEvents(
       elements.forEach(async (el) => {
         const edge = el as Edge;
         if (edge.source) {
-          const link = context.medley.links.getLink(
+          const link = context.compositeScope.links.getLink(
             edge.targetHandle || "",
             edge.target,
             edge.source
           );
           if (link) {
-            context.medley.links.deleteLink(link);
+            context.compositeScope.links.deleteLink(link);
           }
         } else {
-          const node = context.medley.nodes.getNode(el.id);
+          const node = context.compositeScope.nodes.getNode(el.id);
           if (node == null) {
             return;
           }
-          const links = context.medley.links.getLinks();
+          const links = context.compositeScope.links.getLinks();
           for (const l of links) {
             if (l.source === node.id || l.target === node.id) {
-              context.medley.links.deleteLink(l);
+              context.compositeScope.links.deleteLink(l);
             }
           }
-          context.medley.nodes.deleteNode(node);
+          context.compositeScope.nodes.deleteNode(node.id);
         }
       });
     }

@@ -1,9 +1,8 @@
-import { Type } from "@medley-js/core";
-
+import { CType } from "@medley-js/common";
 import * as exports from "./index";
 
-export const IdentityType: Type = {
+export const IdentityType: CType = {
   name: "identity",
   version: "1.0.0",
-  module: { import: () => Promise.resolve(exports) },
+  import: () => Promise.resolve(exports),
 };

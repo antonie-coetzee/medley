@@ -2,6 +2,7 @@ import React from "react";
 import { Meta } from "@storybook/react";
 import { Medley, NodeContext } from "@medley-js/core";
 import {
+  CLoader,
   CMedleyTypes,
   constants,
   TEditNodeComponent,
@@ -14,16 +15,17 @@ import {
   createBasicCompositeNode,
   createEmptyCompositeNode,
 } from "./utils";
+import { compositeScope } from "../CompositeNode";
 
 export default {
   title: "Nodes/Composite",
 } as Meta;
 
 export const Node = componentStory(async () => {
-  const medley = new Medley<CMedleyTypes>();
+  const medley = new Medley<CMedleyTypes>({loader:new CLoader()});
   addTypes(medley);
-  const [ecn, cn] = createEmptyCompositeNode(medley);
-  createBasicCompositeNode(ecn, [200, 200]);
+  const cn = createEmptyCompositeNode(medley);
+  const bcn = createBasicCompositeNode(cn[compositeScope]!, [200, 200]);
 
   const EditNodeComponent = await medley.types.getExport<TEditNodeComponent>(
     CompositeType.name,
@@ -34,7 +36,7 @@ export const Node = componentStory(async () => {
   }
   return () => (
     <EditNodeComponent
-      context={new NodeContext(ecn,cn)}
+      context={new NodeContext(medley, cn)}
       host={{}}
       close={()=>{}}
     />

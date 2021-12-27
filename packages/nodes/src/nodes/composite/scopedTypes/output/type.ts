@@ -1,10 +1,9 @@
-import { Type } from "@medley-js/core";
-
+import { CType } from "@medley-js/common";
 import * as exports from "./index";
 
-export const OutputType: Type = {
+export const OutputType: CType = {
   name: "$output",
   version: "1.0.0",
   volatile: true,
-  module: { import: () => Promise.resolve(exports) },
+  import: () => Promise.resolve(exports),
 };

@@ -4,7 +4,6 @@ import {
   Link,
   Medley,
   MedleyTypes,
-  Module,
   Node,
   NodePart,
   Port,
@@ -20,19 +19,12 @@ export type RType = {
   type: unknown;
 };
 
-export interface CModule extends Module {
-  system?: string;
-  esm?: string;
-  nameSpace?: string;
-}
-
 export type CMedley = Medley<CMedleyTypes>;
 
 export interface CMedleyTypes extends MedleyTypes {
   node: CNode;
   type: CType;
   link: CLink;
-  module: CModule;
 }
 
 export interface CNode extends Node {
@@ -50,11 +42,19 @@ export interface CLink extends Link {
 
 export type CNodePart<TNode extends CNode = CNode> = NodePart<TNode>;
 
-export interface CType extends Type<CModule> {
+export interface CType extends Type {
+  version: string;
   label?: string;
   category?: string[];
   icon?: URL;
   repository?: string;
+  system?: string;
+  esm?: string;
+  nameSpace?: string;
+  import?: () => Promise<{ [key: string]: unknown }>;
+  exportMap?: {
+    [key: string]: ()=>Promise<unknown>;
+  };
 }
 
 export type CPort = Port;

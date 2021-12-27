@@ -17,9 +17,10 @@ import React from "react";
 import { getNodes } from ".";
 import { observable } from "mobx";
 import { observer } from "mobx-react";
+import { CompositeNode } from "../CompositeNode";
 
 export async function getReactFlowTypes(
-  context: BaseContext<CMedleyTypes>,
+  context: NodeContext<CompositeNode, CMedleyTypes>,
   host: Host
 ): Promise<{
   nodeTypes: { [index: string]: ReactNode };

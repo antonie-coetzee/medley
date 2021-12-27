@@ -7,3 +7,4 @@ export * from "./Context";
 export * from "./NodeFunction";
 export * from "./MedleyTypes";
 export * from "./MedleyOptions";
+export * from "./Graph";
