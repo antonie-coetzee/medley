@@ -1,7 +1,7 @@
-import { Module, Type } from "../core";
+import { Type } from "../core";
 import { TypeRepository } from "../repositories";
 
-export class Types<MType extends Type<Module> = Type<Module>> {
+export class Types<MType extends Type = Type> {
   constructor(
     private scopeId: string,
     private typeRepository: TypeRepository<MType>

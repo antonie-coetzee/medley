@@ -1,10 +1,10 @@
-import { Type, Loader, TreeMap, DEFAULT_SCOPE, Module } from "../core";
+import { Type, TreeMap, DEFAULT_SCOPE, Loader} from "../core";
 
-export class TypeRepository<MType extends Type<Module> = Type<Module>> {
+export class TypeRepository<MType extends Type = Type> {
   /* scope -> type */
   private typeMap: TreeMap<MType> = new TreeMap();
 
-  constructor(public loader: Loader<MType["module"]>) {}
+  constructor(public loader: Loader<MType>) {}
 
   public setTypes(types: MType[]): void {
     this.typeMap.clearNodes();
@@ -47,10 +47,10 @@ export class TypeRepository<MType extends Type<Module> = Type<Module>> {
   }
 
   public async getExport(scopeId:string, typeName: string, exportName: string) {
-    const typeObj = this.typeMap.getNodeValue(scopeId, typeName);
-    if (typeObj == null) {
+    const type = this.typeMap.getNodeValue(scopeId, typeName);
+    if (type == null) {
       return;
     }
-    return this.loader.import(typeObj.module, exportName);
+    return this.loader.import(type, exportName);
   }
 }

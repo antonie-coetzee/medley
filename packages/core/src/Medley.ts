@@ -1,9 +1,7 @@
 import { Links, Nodes, Types } from "./api";
 import { Conductor } from "./Conductor";
-import {
-  Graph, Loader,
-  MemoryLoader, NonNullableType, DEFAULT_SCOPE
-} from "./core";
+import { DEFAULT_SCOPE, Loader, NonNullableType } from "./core";
+import { Graph } from "./Graph";
 import { MedleyOptions } from "./MedleyOptions";
 import { MedleyTypes } from "./MedleyTypes";
 import { LinkRepository, NodeRepository, TypeRepository } from "./repositories";
@@ -12,7 +10,7 @@ export class Medley<
   MT extends MedleyTypes = MedleyTypes,
   M extends NonNullableType<MT> = NonNullableType<MT>
 > {
-  public readonly loader: Loader<M["module"]>;
+  public readonly loader: Loader<M["type"]>;
   public readonly nodeRepository: NodeRepository<M["node"]>;
   public readonly typeRepository: TypeRepository<M["type"]>;
   public readonly linkRepository: LinkRepository<M["link"]>;
@@ -27,7 +25,7 @@ export class Medley<
   private graph?: Graph<M>;
 
   public constructor(options?: MedleyOptions<M>) {
-    this.loader = options?.loader || new MemoryLoader();
+    this.loader = options?.loader || { import: async () => undefined };
 
     this.nodeRepository =
       options?.nodeRepository || new NodeRepository<M["node"]>();

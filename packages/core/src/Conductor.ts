@@ -1,12 +1,11 @@
+import { BaseContext, ExecutionContext, Input } from "./Context";
+import { Port, Unwrap } from "./core";
 import { Medley } from "./Medley";
-import { Port, DEFAULT_SCOPE, Unwrap } from "./core";
-import { Input, ExecutionContext } from "./Context";
+import { MedleyTypes } from "./MedleyTypes";
 import {
   NodeFunction,
-  nodeFunction as nodeFunctionExportName,
+  nodeFunction as nodeFunctionExportName
 } from "./NodeFunction";
-import { BaseContext } from ".";
-import { MedleyTypes } from "./MedleyTypes";
 
 export type InputProvider<MT extends MedleyTypes = MedleyTypes> = {
   [index: string]: (context: BaseContext<MT>) => Promise<any>;

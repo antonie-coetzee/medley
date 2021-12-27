@@ -8,7 +8,7 @@ export interface MedleyOptions<
   MT extends MedleyTypes = MedleyTypes,
   M extends NonNullableType<MT> = NonNullableType<MT>
 > {
-  loader?: Loader<M["module"]>;
+  loader?: Loader<M["type"]>;
   typeRepository?: TypeRepository<M["type"]>;
   nodeRepository?: NodeRepository<M["node"]>;
   linkRepository?: LinkRepository<M["link"]>;
