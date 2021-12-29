@@ -4,7 +4,7 @@ import { Medley } from "./Medley";
 import { MedleyTypes } from "./MedleyTypes";
 import {
   NodeFunction,
-  nodeFunction as nodeFunctionExportName
+  nodeFunction as nodeFunctionExportName,
 } from "./NodeFunction";
 
 export type InputProvider<MT extends MedleyTypes = MedleyTypes> = {
@@ -12,16 +12,16 @@ export type InputProvider<MT extends MedleyTypes = MedleyTypes> = {
 };
 
 export class Conductor<MT extends MedleyTypes = MedleyTypes> {
-  constructor(private medley: Medley<MT>) {}
+  constructor(public medley: Medley<MT>) {}
 
   public async runNode<T = unknown>(
     nodeId: string,
     ...args: T extends (...args: any) => any ? Parameters<T> : any[]
   ): Promise<Unwrap<T>> {
-    return this.runNodeWithInputs(nodeId, null, ...args);
+    return this.runNodeWithProvider(nodeId, null, ...args);
   }
 
-  public async runNodeWithInputs<T = unknown>(
+  public async runNodeWithProvider<T = unknown>(
     nodeId: string,
     inputProvider: InputProvider<MT> | null,
     ...args: T extends (...args: any) => any ? Parameters<T> : any[]
@@ -97,6 +97,6 @@ export class Conductor<MT extends MedleyTypes = MedleyTypes> {
       throw new Error(`multiple links detected for port: '${port.name}'`);
     }
     const link = links[0];
-    return this.conductor.runNode(link.source, null, args);
+    return this.conductor.runNode(link.source, args);
   }
 }

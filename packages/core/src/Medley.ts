@@ -43,7 +43,7 @@ export class Medley<
     this.nodes =
       options?.nodes || new Nodes<M["node"]>(this.scopeId, this.nodeRepository);
 
-    this.conductor = options?.conductor || new Conductor(this);
+    this.conductor = options?.conductor || new Conductor<MT>(this);
   }
 
   public setGraph<TGraph extends Graph<M> = Graph<M>>(graph: TGraph) {
