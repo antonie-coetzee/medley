@@ -1,4 +1,4 @@
-import { Links, Nodes, Types } from "./api";
+import { Links, Nodes, Types } from "./scoped";
 import { Conductor } from "./Conductor";
 import { Loader, NonNullableType } from "./core";
 import { MedleyTypes } from "./MedleyTypes";

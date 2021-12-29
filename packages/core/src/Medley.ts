@@ -1,4 +1,4 @@
-import { Links, Nodes, Types } from "./api";
+import { Links, Nodes, Types } from "./scoped";
 import { Conductor } from "./Conductor";
 import { DEFAULT_SCOPE, Loader, NonNullableType } from "./core";
 import { Graph } from "./Graph";

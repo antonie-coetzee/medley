@@ -1,5 +1,5 @@
 export * from "./repositories";
-export * from "./api";
+export * from "./scoped";
 export * from "./core";
 export * from "./Medley";
 export * from "./Conductor";
