@@ -2,22 +2,22 @@
   "folders": [
     {
       "name": "@medley-js/core",
-      "path": "./packages/core"
+      "path": "./packages/medley-js-core"
     },
     {
-      "name": "@medley-js/composer",
-      "path": "./packages/composer"
+      "name": "@medley-js/ide",
+      "path": "./packages/medley-js-ide"
     },
     {
       "name": "@medley-js/common",
-      "path": "./packages/common"
+      "path": "./packages/medley-js-common"
     },
     {
       "name": "@medley-js/nodes",
-      "path": "./packages/nodes"
+      "path": "./packages/medley-js-nodes"
     },    
   ],
   "settings": {
-    "typescript.tsdk": "@medley-js\\core\\node_modules\\typescript\\lib"
+    "typescript.tsdk": "./node_modules/typescript/lib"
   }
 }

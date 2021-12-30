@@ -1,5 +1,5 @@
 import { Links, Nodes, Types } from "./scoped";
-import { Conductor } from "./Conductor";
+import { Composer } from "./Composer";
 import { Loader, NonNullableType } from "./core";
 import { MedleyTypes } from "./MedleyTypes";
 import { LinkRepository, NodeRepository, TypeRepository } from "./repositories";
@@ -15,6 +15,6 @@ export interface MedleyOptions<
   nodes?: Nodes<M["node"]>;
   types?: Types<M["type"]>;
   links?: Links<M["link"]>;
-  conductor?: Conductor<M>;
+  conductor?: Composer<M>;
   scopeId?: string;
 }

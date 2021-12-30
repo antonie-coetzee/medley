@@ -11,7 +11,7 @@ export type InputProvider<MT extends MedleyTypes = MedleyTypes> = {
   [index: string]: (context: BaseContext<MT>) => Promise<any>;
 };
 
-export class Conductor<MT extends MedleyTypes = MedleyTypes> {
+export class Composer<MT extends MedleyTypes = MedleyTypes> {
   constructor(public medley: Medley<MT>) {}
 
   public async runNode<T = unknown>(
@@ -63,7 +63,7 @@ export class Conductor<MT extends MedleyTypes = MedleyTypes> {
   private async inputProviderInput(
     this: {
       context: ExecutionContext<MT["node"], MT>;
-      conductor: Conductor<MT>;
+      conductor: Composer<MT>;
       inputProvider: InputProvider<MT>;
     },
     port: Port
@@ -78,7 +78,7 @@ export class Conductor<MT extends MedleyTypes = MedleyTypes> {
   private async portInput(
     this: {
       nodeId: string;
-      conductor: Conductor<MT>;
+      conductor: Composer<MT>;
     },
     port: Port,
     ...args: any[]
