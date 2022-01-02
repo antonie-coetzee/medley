@@ -3,7 +3,7 @@ import { CMedleyTypes, TCreateNodeComponent } from "@medley-js/common";
 import { Button, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
 import React, { Fragment } from "react";
 import { InputNode } from "../InputNode";
-import { InputType } from "../type";
+import { inputTypeName } from "../typeName";
 
 export const CreateNodeComponent: TCreateNodeComponent<InputNode> = (props) => {
   const nodePart = props.context.nodePart;
@@ -32,6 +32,6 @@ export const CreateNodeComponent: TCreateNodeComponent<InputNode> = (props) => {
 };
 
 function getDefaultName(medley:Medley<CMedleyTypes>){
-  const numInputs = medley.nodes.getNodes().filter(n=>n.type === InputType.name);
+  const numInputs = medley.nodes.getNodes().filter(n=>n.type === inputTypeName);
   return `Input ${numInputs.length + 1}`;
 }

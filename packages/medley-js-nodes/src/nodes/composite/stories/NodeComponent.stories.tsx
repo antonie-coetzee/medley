@@ -8,14 +8,13 @@ import {
   TEditNodeComponent,
 } from "@medley-js/common";
 
-import { CompositeType } from "../type";
+import { NodeType as CompositeType } from "../";
 import { componentStory } from "../../../util/util.sb";
 import {
   addTypes,
   createBasicCompositeNode,
   createEmptyCompositeNode,
 } from "./utils";
-import { compositeScope } from "../CompositeNode";
 
 export default {
   title: "Nodes/Composite",
@@ -24,8 +23,8 @@ export default {
 export const Node = componentStory(async () => {
   const medley = new Medley<CMedleyTypes>({loader:new CLoader()});
   addTypes(medley);
-  const cn = createEmptyCompositeNode(medley);
-  const bcn = createBasicCompositeNode(cn[compositeScope]!, [200, 200]);
+  const ecnContext = createEmptyCompositeNode(medley);
+  const bcnContext = createBasicCompositeNode(ecnContext.compositeScope, [200, 200]);
 
   const EditNodeComponent = await medley.types.getExport<TEditNodeComponent>(
     CompositeType.name,
@@ -36,8 +35,8 @@ export const Node = componentStory(async () => {
   }
   return () => (
     <EditNodeComponent
-      context={new NodeContext(medley, cn)}
-      host={{}}
+      context={ecnContext}
+      host={{executeCommand:(cmd)=>cmd.execute()}}
       close={()=>{}}
     />
   );

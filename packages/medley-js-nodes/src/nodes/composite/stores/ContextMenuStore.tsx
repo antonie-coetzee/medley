@@ -1,14 +1,11 @@
-import { Chip, MenuItem } from "@mui/material";
-import { TEditNodeComponentProps } from "@medley-js/common";
-import { makeAutoObservable, observable, runInAction, toJS } from "mobx";
-import { CompositeNode } from "../CompositeNode";
-import { getContextMenu } from "../util";
-import { ReactFlowStore } from "./ReactFlowStore";
-import { EditStore } from "./EditStore";
-import React from "react";
-import { ExitToApp } from "@mui/icons-material";
-import { InputType } from "../scopedTypes/input/type";
 import { NodeContext } from "@medley-js/core";
+import { ExitToApp } from "@mui/icons-material";
+import { Chip, MenuItem } from "@mui/material";
+import { makeAutoObservable, observable, toJS } from "mobx";
+import React from "react";
+import { CompositeNode } from "../CompositeNode";
+import { InputType } from "../scopedTypes/input";
+import { EditStore } from "./EditStore";
 
 export class ContextMenuStore {
   public contextMenu: {

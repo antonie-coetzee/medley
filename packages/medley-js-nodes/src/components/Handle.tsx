@@ -36,8 +36,8 @@ const HandleWrapper: React.FC<{ output: boolean }> = ({ children, output }) => {
           alignItems: "center",
           paddingRight: output ? "3px" : undefined,
           paddingLeft: !output ? "3px" : undefined,
-          translate: output ? "9px" : "-9px",
-          width: "calc(100%) + 9px",
+          transform: `translate(${output ? "10px" : "-10px"})`,
+          width: "calc(100%) + 10px",
         }}
       >
         {children}

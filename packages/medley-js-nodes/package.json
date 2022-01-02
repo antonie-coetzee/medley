@@ -4,11 +4,14 @@
   "description": "",
   "scripts": {
     "build": "tsc",
+    "package": "npx rollup -c",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
   "devDependencies": {
     "@babel/core": "7.15.5",
+    "@rollup/plugin-commonjs": "19.0.0",
+    "@rollup/plugin-node-resolve": "13.0.0",
     "@rollup/plugin-typescript": "8.2.1",
     "@storybook/addon-actions": "6.3.8",
     "@storybook/addon-essentials": "6.3.8",
@@ -17,10 +20,14 @@
     "@types/react": "17.0.5",
     "@types/react-dom": "17.0.5",
     "babel-loader": "8.2.2",
-    "rollup": "2.45.2",
+    "rollup": "2.48.0",
+    "rollup-plugin-copy": "3.4.0",
+    "rollup-plugin-delete": "2.0.0",
+    "rollup-plugin-dts": "3.0.1",
     "rollup-plugin-postcss": "4.0.0",
+    "rollup-plugin-terser": "7.0.2",
     "storybook-addon-material-ui": "^0.9.0-alpha.24",
-    "typescript": "4.5.24"
+    "typescript": "4.5.2"
   },
   "dependencies": {
     "@emotion/react": "11.4.1",

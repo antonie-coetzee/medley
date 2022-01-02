@@ -11,8 +11,8 @@ export class NodeRepository<MNode extends Node> {
   public setNodes(nodes: MNode[]): void {
     this.nodeTreeMap.clearNodes();
     this.nodeIndex.clear();
-    for (const type of nodes) {
-      this.upsertNode(type.scope || DEFAULT_SCOPE, type);
+    for (const node of nodes) {
+      this.upsertNode(node.scope || DEFAULT_SCOPE, node);
     }
   }
 

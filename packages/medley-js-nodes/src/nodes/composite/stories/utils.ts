@@ -1,15 +1,15 @@
-import { IdentityNode } from "@/nodes/identity";
+
 import { CMedleyTypes, Coordinates } from "@medley-js/common";
-import { Medley } from "@medley-js/core";
-import { CompositeNode } from "..";
-import { IdentityType } from "../../index";
-import { compositeScope } from "../CompositeNode";
+import { Medley, NodeContext } from "@medley-js/core";
 import "../extensions/medley";
 import { InputType } from "../scopedTypes/input";
 import { InputNode } from "../scopedTypes/input/InputNode";
 import { OutputType } from "../scopedTypes/output";
 import { OutputNode } from "../scopedTypes/output/node";
-import { CompositeType } from "../type";
+import { NodeType as CompositeType } from "../";
+import { CompositeNode } from "../CompositeNode";
+import { IdentityType } from "@/nodes/identity";
+import { IdentityNode } from "@/nodes/identity/node";
 
 export const addTypes = (medley: Medley<CMedleyTypes>) => {
   medley.types.upsertType(CompositeType);
@@ -19,18 +19,21 @@ export const addTypes = (medley: Medley<CMedleyTypes>) => {
 };
 
 export const createEmptyCompositeNode = (medley: Medley<CMedleyTypes>) => {
+
   const compositeNode = medley.nodes.insertNodePart<CompositeNode>({
     name: "empty_composite",
     type: CompositeType.name,
   });
-  const cs = medley.compositeScope(compositeNode.id);
-  compositeNode[compositeScope] = cs;
+  
+  const cNodeContext = new NodeContext<CompositeNode, CMedleyTypes>(medley, compositeNode);
+  const cs = cNodeContext.compositeScope;
+
   const id_4 = cs.nodes.insertNodePart<OutputNode>({
     name: "OUTPUT",
     position: [600, 200],
     type: OutputType.name,
   });
-  return compositeNode;
+  return cNodeContext;
 };
 
 export const createBasicCompositeNode = (
@@ -39,12 +42,13 @@ export const createBasicCompositeNode = (
 ) => {
   const compositeNode = medley.nodes.insertNodePart<CompositeNode>({
     name: "Basic Composite",
-    type: CompositeType.name,
+    type: NodeType.name,
     position: position,
   });
 
-  const cs = medley.compositeScope(compositeNode.id);
-  compositeNode[compositeScope] = cs;
+  const cNodeContext = new NodeContext<CompositeNode, CMedleyTypes>(medley, compositeNode);
+  const cs = cNodeContext.compositeScope;
+
   const id_0 = cs.nodes.insertNodePart<InputNode>({
     name: "INPUT1",
     position: [0, 50],
@@ -115,5 +119,5 @@ export const createBasicCompositeNode = (
     scope: compositeNode.id,
   });
 
-  return compositeNode;
+  return cNodeContext;
 };

@@ -2,6 +2,7 @@ import { NodePart } from "@medley-js/core";
 import { CNode } from "@medley-js/common";
 
 export const onNodesChange = Symbol("onNodesChange");
+
 export const onNodeInsert = Symbol("onNodeInsert");
 
 declare module "@medley-js/core" {

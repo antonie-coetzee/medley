@@ -1,8 +1,7 @@
 import { CMedleyTypes, CNode } from "@medley-js/common";
 import { MedleyTypes, NodeContext } from "@medley-js/core";
+import { compositeScopeKey } from "../CompositeNode";
 import { createCompositeScope } from "./util/createCompositeScope";
-
-const compositeScopeKey = Symbol("compositeScopeKey");
 
 declare module "@medley-js/core" {
   interface NodeContext<TNode extends MT["node"], MT extends MedleyTypes> {

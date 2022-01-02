@@ -1,5 +1,10 @@
-export * from "./components";
-export * from "./functions";
-export * from "./decorators";
-export * from  "./type";
-export * from "./typeName";
+import { CType } from "@medley-js/common";
+import * as exports from "./exports";
+import { inputTypeName } from "./typeName";
+
+export const InputType: CType = {
+  name: inputTypeName,
+  version: "1.0.0",
+  volatile: true,
+  import: () => Promise.resolve(exports),
+};

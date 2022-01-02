@@ -14,10 +14,9 @@ export type Location = "left" | "top" | "right" | "bottom";
 
 export type Coordinates = [x: number, y: number];
 
-export type RType = {
-  typeSystem: string;
-  type: unknown;
-};
+export class RType {
+  constructor(public system: string) {}
+}
 
 export type CMedley = Medley<CMedleyTypes>;
 
@@ -53,7 +52,7 @@ export interface CType extends Type {
   nameSpace?: string;
   import?: () => Promise<{ [key: string]: unknown }>;
   exportMap?: {
-    [key: string]: ()=>Promise<unknown>;
+    [key: string]: () => Promise<unknown>;
   };
 }
 
@@ -61,6 +60,11 @@ export type CPort = Port;
 
 export interface CGraph extends Graph {
   repos?: TypeRepository[];
+}
+
+export interface Command {
+  execute: () => Promise<void>;
+  undo?: () => Promise<void>;
 }
 
 export type Host = {
@@ -74,6 +78,7 @@ export type Host = {
     type?: CType
   ) => Promise<CNodePart | undefined>;
   selectNode?: () => Promise<CNode>;
+  executeCommand: (command: Command) => Promise<void>;
 };
 
 export type TypeRepository = {

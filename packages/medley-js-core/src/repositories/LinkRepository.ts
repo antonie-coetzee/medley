@@ -34,8 +34,8 @@ export class LinkRepository<MLink extends Link = Link> {
 
   public getLink(
     scopeId: string,
-    target: string,
     source: string,
+    target: string,
     port?: string
   ) : MLink | undefined {
     if (port) {

@@ -25,12 +25,12 @@ export function createCompositeScope(medley: CMedley, compositeNodeId: string) {
   const scopedLinks = new Links<CLink>(compositeNodeId, parent.linkRepository);
 
   const compositeScope = new Medley<CMedleyTypes>({
-    scopeId: compositeNodeId,
+    scope: compositeNodeId,
     nodeRepository: parent.nodeRepository,
     typeRepository: parent.typeRepository,
     linkRepository: parent.linkRepository,
     loader: parent.loader,
-    conductor: parent.conductor,
+    composer: parent.composer,
     types: chainObjects(scopedTypes, {
       getType: (typeName) => {
         const type = scopedTypes.getType(typeName);

@@ -23,12 +23,12 @@ export class Links<MLink extends Link = Link> {
     return this.linkRepo.upsertLink(this.scopeId, newLink);
   }
 
-  public getLink(
-    target: string,
+  public getLink(  
     source: string,
+    target: string,
     port?: string
   ): MLink | undefined {
-    return this.linkRepo.getLink(this.scopeId, target, source, port);
+    return this.linkRepo.getLink(this.scopeId, source, target, port);
   }
 
   public getLinks(): AnyLink<MLink>[] {

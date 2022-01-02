@@ -1,10 +1,7 @@
-import { CMedleyTypes, CNode, CPort } from "@medley-js/common";
-import { Input, Medley } from "@medley-js/core";
+import { CMedley, CNode } from "@medley-js/common";
 
-export const compositeScope = Symbol("compositeScope");
-export const input = Symbol("input");
+export const compositeScopeKey = Symbol("compositeScopeKey");
 
 export type CompositeNode = CNode & {
-  [compositeScope]?: Medley<CMedleyTypes>;
-  [input]?: Input;
+  [compositeScopeKey]: CMedley;
 };

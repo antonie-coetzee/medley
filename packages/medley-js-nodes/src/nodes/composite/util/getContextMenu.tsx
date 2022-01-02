@@ -1,16 +1,15 @@
+import { CMedleyTypes } from "@medley-js/common";
 import { NodeContext } from "@medley-js/core";
-import { CMedleyTypes, CLink, CNode, CNodePart, constants, CType } from "@medley-js/common";
+import { ExitToApp } from "@mui/icons-material";
+import DirectionsRunIcon from "@mui/icons-material/DirectionsRun";
+import { Button, Chip, Divider, MenuItem } from "@mui/material";
 import React from "react";
 import { CompositeNode } from "../CompositeNode";
-import { Connection, Edge, Node as RFNode } from "react-flow-renderer";
-import { Button, Chip, Divider, ListItemIcon, MenuItem } from "@mui/material";
-import { InputType } from "../scopedTypes/input/type";
-import { ExitToApp, Info } from "@mui/icons-material";
-import { OutputType } from "../scopedTypes/output/type";
-import { IdentityType } from "../../identity/type";
-import DirectionsRunIcon from "@mui/icons-material/DirectionsRun";
+import { InputType } from "../scopedTypes/input";
 import { InputNode } from "../scopedTypes/input/InputNode";
+import { OutputType } from "../scopedTypes/output";
 import { OutputNode } from "../scopedTypes/output/node";
+
 
 function getAddInputNode(
   context: NodeContext<CompositeNode, CMedleyTypes>
@@ -85,9 +84,12 @@ function getRunOption(
           return;
         }
         const compositeNode = nodes[0];
-        const res = await rootInstance.conductor.runNodeWithInputs(compositeNode.id, {
-          input: async () => "Test",
-        });
+        const res = await rootInstance.composer.runNodeWithProvider(
+          compositeNode.id,
+          {
+            input: async () => "Test",
+          }
+        );
         console.log(res);
       } catch (e) {
         console.log(e);

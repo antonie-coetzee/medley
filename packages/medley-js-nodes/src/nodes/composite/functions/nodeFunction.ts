@@ -1,60 +1,57 @@
 import { CMedley, CMedleyTypes } from "@medley-js/common";
-import {
-  Input, NF
-} from "@medley-js/core";
+import { NF } from "@medley-js/core";
 import { CompositeNode } from "../CompositeNode";
-import { inputTypeName } from "../scopedTypes/input";
-import { OutputType } from "../scopedTypes/output";
+import { inputTypeName } from "../scopedTypes/input/typeName";
+import { outputTypeName } from "../scopedTypes/output/typeName";
 
 export const nodeFunction: NF<CompositeNode, CMedleyTypes> = async (cntx) => {
   const compositeScope = cntx.compositeScope;
 
-  upsertInputType(compositeScope, cntx.input);
-  addOutputType(compositeScope);
-
-  const outputNode = compositeScope.nodes
-    .getNodes()
-    .filter((n) => n.type === OutputType.name)[0];
-  if (outputNode) {
-    const result = compositeScope.conductor.runNode(outputNode.id);
-    return result;
-  }
-};
-
-function upsertInputType(compositeScope: CMedley, input: Input): void {
-  const nodeFunction: NF = ({ node }) => {
+  // bridge child input nodes to composite node's input ports using node ids as port names
+  prepareType(compositeScope, inputTypeName, ({ node }) => {
+    return cntx.input({
+      name: node.id,
+    });
+  });
+  // output nodes returns port input, ensure type is present on scope
+  prepareType(compositeScope, outputTypeName, ({ node, input }) => {
     return input({
       name: node.id,
     });
-  };
-  const inputType = compositeScope.types.getType(inputTypeName);
-  if (inputType) {
-    inputType.exportMap = {
-      ...inputType.exportMap,
+  });
+
+  // should only have a single output node - lookup can/should be optimized
+  const outputNode = compositeScope.nodes
+    .getNodes()
+    .filter((n) => n.type === outputTypeName)[0];
+
+  if (outputNode) {
+    return compositeScope.composer.runNode(outputNode.id);
+  }
+};
+
+// adds/updates scoped types - avoids 'linking' to edit dependencies
+function prepareType(
+  compositeScope: CMedley,
+  typeName: string,
+  nodeFunction: NF
+) {
+  const type = compositeScope.types.getType(typeName);
+  if (type?.scope === compositeScope.scope) {
+    // type exists on the current scope - update nodefunction
+    type.exportMap = {
+      ...type.exportMap,
       nodeFunctionName: async () => nodeFunction,
     };
   } else {
+    // type doesn't exist on the current scope - create
     compositeScope.types.upsertType({
-      name: inputTypeName,
+      scope: compositeScope.scope,
+      name: typeName,
       version: "1.0.0",
       exportMap: {
         nodeFunctionName: async () => nodeFunction,
       },
     });
   }
-}
-
-function addOutputType(compositeScope: CMedley): void {
-  const nodeFunction: NF = ({ node, input }) => {
-    return input({
-      name: node.id,
-    });
-  };
-  compositeScope.types.upsertType({
-    ...OutputType,
-    import: () =>
-      Promise.resolve({
-        nodeFunction,
-      }),
-  });
 }

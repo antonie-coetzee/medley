@@ -14,9 +14,9 @@ export class Medley<
   public readonly nodeRepository: NodeRepository<M["node"]>;
   public readonly typeRepository: TypeRepository<M["type"]>;
   public readonly linkRepository: LinkRepository<M["link"]>;
-  public readonly conductor: Composer<MT>;
+  public readonly composer: Composer<MT>;
 
-  public readonly scopeId: string;
+  public readonly scope: string;
 
   public readonly nodes: Nodes<M["node"]>;
   public readonly types: Types<M["type"]>;
@@ -34,16 +34,16 @@ export class Medley<
     this.linkRepository =
       options?.linkRepository || new LinkRepository<M["link"]>();
 
-    this.scopeId = options?.scopeId || DEFAULT_SCOPE;
+    this.scope = options?.scope || DEFAULT_SCOPE;
 
     this.links =
-      options?.links || new Links<M["link"]>(this.scopeId, this.linkRepository);
+      options?.links || new Links<M["link"]>(this.scope, this.linkRepository);
     this.types =
-      options?.types || new Types<M["type"]>(this.scopeId, this.typeRepository);
+      options?.types || new Types<M["type"]>(this.scope, this.typeRepository);
     this.nodes =
-      options?.nodes || new Nodes<M["node"]>(this.scopeId, this.nodeRepository);
+      options?.nodes || new Nodes<M["node"]>(this.scope, this.nodeRepository);
 
-    this.conductor = options?.conductor || new Composer<MT>(this);
+    this.composer = options?.composer || new Composer<MT>(this);
   }
 
   public setGraph<TGraph extends Graph<M> = Graph<M>>(graph: TGraph) {

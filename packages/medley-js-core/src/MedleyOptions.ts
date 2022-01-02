@@ -15,6 +15,6 @@ export interface MedleyOptions<
   nodes?: Nodes<M["node"]>;
   types?: Types<M["type"]>;
   links?: Links<M["link"]>;
-  conductor?: Composer<M>;
-  scopeId?: string;
+  composer?: Composer<M>;
+  scope?: string;
 }

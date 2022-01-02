@@ -8,9 +8,8 @@ import { Medley, NodeContext } from "@medley-js/core";
 import { Box, Grid, Paper } from "@mui/material";
 import { Meta } from "@storybook/react";
 import React from "react";
+import { NodeType as CompositeType } from "..";
 import { componentStory } from "../../../util/util.sb";
-import { compositeScope } from "../CompositeNode";
-import { CompositeType } from "../type";
 import {
   addTypes,
   createBasicCompositeNode,
@@ -24,8 +23,8 @@ export default {
 export const SideBySide = componentStory(async () => {
   const medley = new Medley<CMedleyTypes>({ loader: new CLoader() });
   addTypes(medley);
-  const cn = createEmptyCompositeNode(medley);
-  const bcn = createBasicCompositeNode(cn[compositeScope]!, [200, 200]);
+  const ecnContext = createEmptyCompositeNode(medley);
+  const bcnContext = createBasicCompositeNode(ecnContext.compositeScope, [200, 200]);
 
   const EditNodeComponent = await medley.types.getExport<TEditNodeComponent>(
     CompositeType.name,
@@ -40,8 +39,8 @@ export const SideBySide = componentStory(async () => {
         <Paper>
           <Box style={{ position: "absolute", padding: "5px" }}>Node View</Box>
           <EditNodeComponent
-            context={new NodeContext(medley, cn)}
-            host={{}}
+            context={ecnContext}
+            host={{executeCommand:(cmd)=>cmd.execute()}}
             close={() => {}}
           />
         </Paper>
@@ -50,8 +49,8 @@ export const SideBySide = componentStory(async () => {
         <Paper>
           <Box style={{ position: "absolute", padding: "5px" }}>Edit View</Box>
           <EditNodeComponent
-            context={new NodeContext(medley, bcn)}
-            host={{}}
+            context={bcnContext}
+            host={{executeCommand:(cmd)=>cmd.execute()}}
             close={() => {}}
           />
         </Paper>
