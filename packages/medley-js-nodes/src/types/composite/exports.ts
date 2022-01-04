@@ -1,4 +1,4 @@
-export * from "./functions";
+export * from "./exportsMin";
 export * from "./components";
 export * from "./CompositeNode";
 export * from "./decorators";

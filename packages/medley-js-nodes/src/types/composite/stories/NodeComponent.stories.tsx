@@ -8,8 +8,8 @@ import {
   TEditNodeComponent,
 } from "@medley-js/common";
 
-import { NodeType as CompositeType } from "../";
-import { componentStory } from "../../../util/util.sb";
+import { CompositeType } from "..";
+import { componentStory } from "@/util/util.sb";
 import {
   addTypes,
   createBasicCompositeNode,

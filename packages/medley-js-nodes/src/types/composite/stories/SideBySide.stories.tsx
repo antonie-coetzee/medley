@@ -8,8 +8,8 @@ import { Medley, NodeContext } from "@medley-js/core";
 import { Box, Grid, Paper } from "@mui/material";
 import { Meta } from "@storybook/react";
 import React from "react";
-import { NodeType as CompositeType } from "..";
-import { componentStory } from "../../../util/util.sb";
+import { CompositeType } from "..";
+import { componentStory } from "@/util/util.sb";
 import {
   addTypes,
   createBasicCompositeNode,

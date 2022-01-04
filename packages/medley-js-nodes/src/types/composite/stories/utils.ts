@@ -6,10 +6,10 @@ import { InputType } from "../scopedTypes/input";
 import { InputNode } from "../scopedTypes/input/InputNode";
 import { OutputType } from "../scopedTypes/output";
 import { OutputNode } from "../scopedTypes/output/node";
-import { NodeType as CompositeType } from "../";
+import { CompositeType } from "..";
 import { CompositeNode } from "../CompositeNode";
-import { IdentityType } from "@/nodes/identity";
-import { IdentityNode } from "@/nodes/identity/node";
+import { IdentityType } from "@/types/identity";
+import { IdentityNode } from "@/types/identity/node";
 
 export const addTypes = (medley: Medley<CMedleyTypes>) => {
   medley.types.upsertType(CompositeType);
@@ -42,7 +42,7 @@ export const createBasicCompositeNode = (
 ) => {
   const compositeNode = medley.nodes.insertNodePart<CompositeNode>({
     name: "Basic Composite",
-    type: NodeType.name,
+    type: CompositeType.name,
     position: position,
   });
 

@@ -10,7 +10,7 @@ import { CompositeNode } from "../CompositeNode";
 import { getStores, Stores, useStores } from "../stores";
 import { ContextMenu } from "./ContextMenu";
 import { DialogManager } from "./DialogManager";
-import "@/extensions";
+import "@/lib/extensions";
 
 export const EditComponent: React.VFC = observer(() => {
   const { reactFlowStore: rFS, contextMenuStore: cMS } = useStores();

@@ -7,8 +7,8 @@ import {
 import { Medley } from "@medley-js/core";
 import { Meta } from "@storybook/react";
 import React from "react";
-import { NodeType as CompositeType } from "..";
-import { componentStory } from "../../../util/util.sb";
+import { CompositeType } from "..";
+import { componentStory } from "@/util/util.sb";
 import { addTypes, createBasicCompositeNode } from "./utils";
 
 export default {

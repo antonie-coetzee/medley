@@ -10,7 +10,7 @@ import {
   HelpOutline,
   Refresh,
 } from "@mui/icons-material";
-import { Handle } from "../../../components";
+import { Handle } from "@/lib/components";
 import { CompositeNode } from "../CompositeNode";
 import { getStores, NodeStore } from "../stores";
 
