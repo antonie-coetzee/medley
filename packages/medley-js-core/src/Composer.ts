@@ -1,5 +1,5 @@
 import { BaseContext, ExecutionContext, Input } from "./Context";
-import { Port, Unwrap } from "./core";
+import { Link, NonNullableType, Port, PortLink, Unwrap } from "./core";
 import { Medley } from "./Medley";
 import { MedleyTypes } from "./MedleyTypes";
 import {
@@ -14,14 +14,21 @@ export type InputProvider<MT extends MedleyTypes = MedleyTypes> = {
 export class Composer<MT extends MedleyTypes = MedleyTypes> {
   constructor(public medley: Medley<MT>) {}
 
+  public async runLink<T = unknown>(
+    link: PortLink<NonNullableType<MT>["link"]>,
+    ...args: T extends (...args: any) => any ? Parameters<T> : any[]
+  ): Promise<Unwrap<T>> {
+    return this.runNode(link.source, ...args);
+  }
+
   public async runNode<T = unknown>(
     nodeId: string,
     ...args: T extends (...args: any) => any ? Parameters<T> : any[]
   ): Promise<Unwrap<T>> {
-    return this.runNodeWithProvider(nodeId, null, ...args);
+    return this.runNodeWithInputProvider(nodeId, null, ...args);
   }
 
-  public async runNodeWithProvider<T = unknown>(
+  public async runNodeWithInputProvider<T = unknown>(
     nodeId: string,
     inputProvider: InputProvider<MT> | null,
     ...args: T extends (...args: any) => any ? Parameters<T> : any[]
@@ -50,7 +57,7 @@ export class Composer<MT extends MedleyTypes = MedleyTypes> {
         nodeId,
       }) as Input;
     } else {
-      context.input = this.inputProviderInput.bind({
+      context.input = this.inputProvider.bind({
         conductor: this,
         context,
         inputProvider,
@@ -60,7 +67,7 @@ export class Composer<MT extends MedleyTypes = MedleyTypes> {
     return nodeFunction(context, args);
   }
 
-  private async inputProviderInput(
+  private async inputProvider(
     this: {
       context: ExecutionContext<MT["node"], MT>;
       conductor: Composer<MT>;
@@ -87,16 +94,16 @@ export class Composer<MT extends MedleyTypes = MedleyTypes> {
       port.name,
       this.nodeId
     );
-    if ((links == null || links.length === 0) && !port.required) {
-      return;
-    }
-    if (links.length === 0 && port.required === true) {
-      throw new Error(`required port not linked: '${port.name}'`);
+    if (links == null || links.length === 0) {
+      if(port.required){
+        throw new Error(`required port not linked: '${port.name}'`);
+      }
+      return;    
     }
     if (links.length !== 1) {
       throw new Error(`multiple links detected for port: '${port.name}'`);
     }
     const link = links[0];
-    return this.conductor.runNode(link.source, args);
+    return this.conductor.runLink(link, args);
   }
 }

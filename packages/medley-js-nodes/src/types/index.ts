@@ -1,8 +1,8 @@
-import { CompositeType } from "./composite"
-import { IdentityType } from "./identity"
+import { CompositeType } from "./Structure/Composite"
+import { IdentityType } from "./Identity"
 
-export * from "./composite"
-export * from "./identity"
+export * from "./Structure/Composite"
+export * from "./Identity"
 
 export const NodeTypes = [
   CompositeType,

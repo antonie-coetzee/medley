@@ -1,1 +1,1 @@
-export * from "./types/exportsRuntime";
+export * from "./types/exportsMin";

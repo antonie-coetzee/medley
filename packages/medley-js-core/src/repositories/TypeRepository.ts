@@ -46,7 +46,7 @@ export class TypeRepository<MType extends Type = Type> {
     return this.typeMap.setNodeValue(type, typeScope, type.name);
   }
 
-  public async getExport(scopeId:string, typeName: string, exportName: string) {
+  public async getExport(scopeId:string, typeName: string, exportName: string) : Promise<unknown> {
     const type = this.typeMap.getNodeValue(scopeId, typeName);
     if (type == null) {
       return;

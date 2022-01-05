@@ -39,7 +39,7 @@ export interface CLink extends Link {
   position?: Coordinates;
 }
 
-export type CNodePart<TNode extends CNode = CNode> = NodePart<TNode>;
+export type CNodePart<TNode extends CNode = CNode> = NodePart<TNode, CNode>;
 
 export interface CType extends Type {
   version: string;
