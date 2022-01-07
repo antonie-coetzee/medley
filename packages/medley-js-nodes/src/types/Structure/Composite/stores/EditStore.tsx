@@ -4,9 +4,9 @@ import {
   CNodePart,
   constants,
   Coordinates,
-  CreateNode,
   CType,
   Host,
+  NodeConstructor,
   TCreateNodeComponent,
   TCreateNodeComponentProps,
   TEditNodeComponent,
@@ -142,9 +142,9 @@ export class EditStore {
     // first construct/initialize the nodepart with nodeCreate if
     // available
     try {
-      const ncf = await medley.types.getExport<CreateNode<CNode>>(
+      const ncf = await medley.types.getExport<NodeConstructor<CNode>>(
         type.name,
-        constants.createNode
+        constants.nodeConstructor
       );
       if (ncf) {
         const doCreate = await ncf(

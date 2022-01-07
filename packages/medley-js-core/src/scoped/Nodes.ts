@@ -8,11 +8,11 @@ export class Nodes<MNode extends Node = Node> {
   ) {}
 
   public getNode(nodeId: string): MNode | undefined {
-    return this.nodeRepository.getNode(this.scopeId, nodeId) as MNode;
+    return this.nodeRepository.getNode(this.scopeId, nodeId);
   }
 
   public getNodes(): MNode[] {
-    return this.nodeRepository.getNodes(this.scopeId) as MNode[];
+    return this.nodeRepository.getNodes(this.scopeId);
   }
 
   public upsertNode<TNode extends MNode>(node: TNode): void {

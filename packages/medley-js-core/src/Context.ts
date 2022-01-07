@@ -1,4 +1,4 @@
-import { Node, Port, NodePart, Unwrap, NonNullableType } from "./core";
+import { Node, NodePart, Port, Unwrap } from "./core";
 import { Medley } from "./Medley";
 import { MedleyTypes } from "./MedleyTypes";
 
@@ -16,9 +16,8 @@ export class BaseContext<MT extends MedleyTypes> {
 }
 
 export class NodePartContext<
-  TNodePart extends NodePart<M["node"], M["node"]>,
-  MT extends MedleyTypes = MedleyTypes,
-  M extends NonNullableType<MT> = NonNullableType<MT> 
+  TNodePart extends NodePart<NonNullable<MT["node"]>>,
+  MT extends MedleyTypes = MedleyTypes
 > extends BaseContext<MT> {
   constructor(medley: Medley<MT>, public nodePart: TNodePart) {
     super(medley);

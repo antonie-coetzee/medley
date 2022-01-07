@@ -1,9 +1,9 @@
-import { BaseContext, NodeContext, NodePartContext } from "@medley-js/core";
-import { CMedleyTypes, CNode, CNodePart, RType } from "../types";
+import { BaseContext, NodeContext } from "@medley-js/core";
+import { CMedleyTypes, CNode, CNodeData, RType } from "../types";
 
 export type NodeConstructor<TNode extends CNode = CNode> = (
   context: BaseContext<CMedleyTypes>
-) => Promise<CNodePart<TNode> | void>;
+) => Promise<CNodeData<TNode> | void>;
 
 export interface TargetType<TNode extends CNode = CNode> {
   (context: NodeContext<TNode, CMedleyTypes>, portName: string): RType;

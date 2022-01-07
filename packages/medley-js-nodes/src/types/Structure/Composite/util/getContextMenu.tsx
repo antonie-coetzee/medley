@@ -84,7 +84,7 @@ function getRunOption(
           return;
         }
         const compositeNode = nodes[0];
-        const res = await rootInstance.composer.runNodeWithProvider(
+        const res = await rootInstance.composer.runNodeWithInputProvider(
           compositeNode.id,
           {
             input: async () => "Test",

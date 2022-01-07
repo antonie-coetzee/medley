@@ -4,6 +4,7 @@ import {
   Link,
   Medley,
   MedleyTypes,
+  NF,
   Node,
   NodePart,
   Port,
@@ -31,6 +32,8 @@ export interface CNode extends Node {
   position?: Coordinates;
 }
 
+export type CNF<TNode extends CNode = CNode> = NF<TNode, CMedleyTypes>;
+
 export type CNodeWithValue<T> = CNode & {
   value: T;
 };
@@ -39,7 +42,11 @@ export interface CLink extends Link {
   position?: Coordinates;
 }
 
-export type CNodePart<TNode extends CNode = CNode> = NodePart<TNode, CNode>;
+export type CNodeData<TNode extends CNode = CNode> = {
+  [Property in keyof TNode as Exclude<Property, keyof CNode>]: TNode[Property];
+};
+
+export type CNodePart<TNode extends CNode = CNode> = NodePart<TNode>;
 
 export interface CType extends Type {
   version: string;

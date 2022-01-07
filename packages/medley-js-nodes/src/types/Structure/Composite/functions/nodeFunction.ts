@@ -1,10 +1,9 @@
-import { CMedley, CMedleyTypes } from "@medley-js/common";
-import { NF } from "@medley-js/core";
+import { CMedley, CNF } from "@medley-js/common";
 import { CompositeNode } from "../node";
 import { inputTypeName } from "../scopedTypes/input/typeName";
 import { outputTypeName } from "../scopedTypes/output/typeName";
 
-export const nodeFunction: NF<CompositeNode, CMedleyTypes> = async (cntx) => {
+export const nodeFunction: CNF<CompositeNode> = async (cntx) => {
   const compositeScope = cntx.compositeScope;
 
   // bridge child input nodes to composite node's input ports using node ids as port names
@@ -34,7 +33,7 @@ export const nodeFunction: NF<CompositeNode, CMedleyTypes> = async (cntx) => {
 function prepareType(
   compositeScope: CMedley,
   typeName: string,
-  nodeFunction: NF
+  nodeFunction: CNF
 ) {
   const type = compositeScope.types.getType(typeName);
   if (type?.scope === compositeScope.scope) {

@@ -1,1 +1,1 @@
-export * as composite from "./Composite/exports";
+export * as composite from "./Structure/Composite/exports";

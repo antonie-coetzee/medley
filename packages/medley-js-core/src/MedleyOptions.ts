@@ -4,17 +4,14 @@ import { Loader, NonNullableType } from "./core";
 import { MedleyTypes } from "./MedleyTypes";
 import { LinkRepository, NodeRepository, TypeRepository } from "./repositories";
 
-export interface MedleyOptions<
-  MT extends MedleyTypes = MedleyTypes,
-  M extends NonNullableType<MT> = NonNullableType<MT>
-> {
-  loader?: Loader<M["type"]>;
-  typeRepository?: TypeRepository<M["type"]>;
-  nodeRepository?: NodeRepository<M["node"]>;
-  linkRepository?: LinkRepository<M["link"]>;
-  nodes?: Nodes<M["node"]>;
-  types?: Types<M["type"]>;
-  links?: Links<M["link"]>;
-  composer?: Composer<M>;
+export interface MedleyOptions<MT extends MedleyTypes = MedleyTypes> {
+  loader?: Loader<NonNullable<MT["type"]>>;
+  typeRepository?: TypeRepository<NonNullable<MT["type"]>>;
+  nodeRepository?: NodeRepository<NonNullable<MT["node"]>>;
+  linkRepository?: LinkRepository<NonNullable<MT["link"]>>;
+  nodes?: Nodes<NonNullable<MT["node"]>>;
+  types?: Types<NonNullable<MT["type"]>>;
+  links?: Links<NonNullable<MT["link"]>>;
+  composer?: Composer<MT>;
   scope?: string;
 }
