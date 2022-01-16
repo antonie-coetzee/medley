@@ -73,6 +73,7 @@ export class ReactFlowStore {
   private registerMedleyEvents() {
     const debouncedUpdateState = debounce(async () => {
       this.updateReactFlow();
+      this.nodeStore.updatePorts();
     }, 50);
 
     const medley = this.nodeStore.compositeScope;
