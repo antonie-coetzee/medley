@@ -41,6 +41,7 @@ export const NodeComponent: TNodeComponent<InputNode> = ({
         setAnchorEl(e.currentTarget);
       }}
       onContextMenu={handleContextMenu}
+      style={{position:"relative"}}
     >
       <Chip
         label={node.name}
@@ -75,7 +76,7 @@ export const NodeComponent: TNodeComponent<InputNode> = ({
             : undefined
         }
       >
-        <EditNodeComponent context={context} host={host} close={handleClose} />
+        <EditNodeComponent context={context} host={host} />
       </Menu>
     </div>
   );

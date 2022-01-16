@@ -11,17 +11,25 @@ import {
   TLinkComponent,
   TLinkComponentProps,
   TNodeComponent,
-  TNodeComponentProps
+  TNodeComponentProps,
 } from "@medley-js/common";
-import { BaseContext, isPortLink, Medley, NodeContext, PortLink } from "@medley-js/core";
+import { isPortLink, NodeContext, PortLink } from "@medley-js/core";
 import { debounce } from "@mui/material";
 import { makeAutoObservable, observable, runInAction } from "mobx";
 import { observer } from "mobx-react";
 import React, { memo, ReactNode, VFC } from "react";
-import { Connection, Edge, Elements, Node as RFNode, OnLoadParams, Position, ReactFlowProps } from "react-flow-renderer";
+import {
+  Connection,
+  Edge,
+  Node as RFNode,
+  OnLoadParams,
+  Position,
+  ReactFlowProps,
+} from "react-flow-renderer";
 import { NodeStore } from ".";
-import { CompositeNode } from "../node";
+import { NodeContainer } from "../components";
 import { onLinksChange, onNodesChange } from "../extensions";
+import { CompositeNode } from "../node";
 import { EditStore } from "./EditStore";
 
 export class ReactFlowStore {
@@ -41,17 +49,9 @@ export class ReactFlowStore {
   }
 
   async initialize() {
-    const context = this.context;
-    const openNodeEdit = (_ctx: BaseContext<CMedleyTypes>, node: CNode) => {
-      this.editStore.editNode(node);
-    };
-    const host = {
-      ...this.host,
-      openNodeEdit: this.host.openNodeEdit || openNodeEdit,
-    };
+    this.registerMedleyEvents();
     this.updateReactFlow();
     this.nodeStore.updatePorts();
-    this.registerMedleyEvents();
   }
 
   updateReactFlowProps(reactFlowProps: ReactFlowProps) {
@@ -59,17 +59,18 @@ export class ReactFlowStore {
     this.reactFlowProps = props;
   }
 
-  async updateReactFlow(){
+  async updateReactFlow() {
     const context = this.context;
     const elements = await this.getReactFlowElements(context);
-    const { nodeTypes, edgeTypes } = await this.getReactFlowTypes(context, this.host);
+    const { nodeTypes, edgeTypes } = await this.getReactFlowTypes(
+      context,
+      this.host
+    );
     const events = this.getReactFlowEvents();
-    this.nodeStore.updatePorts();
     this.updateReactFlowProps({ elements, nodeTypes, edgeTypes, ...events });
   }
 
   private registerMedleyEvents() {
-    
     const debouncedUpdateState = debounce(async () => {
       this.updateReactFlow();
     }, 50);
@@ -96,14 +97,14 @@ export class ReactFlowStore {
         scope: this.compositeScope.scope,
       });
     };
-  
+
     const onLoad: (instance: OnLoadParams) => void = (instance) => {
       this.reactFlowInstance = instance;
       runInAction(() => {
         instance.fitView();
       });
     };
-  
+
     const onNodeDragStop: (
       event: React.MouseEvent<Element, MouseEvent>,
       node: RFNode<any>
@@ -111,47 +112,21 @@ export class ReactFlowStore {
       const mNode = this.compositeScope.nodes.getNode(rfNode.id);
       if (mNode) {
         const pos = rfNode.position;
-        this.editStore.moveNode(mNode, [pos.x, pos.y], ()=>this.updateReactFlow());
+        this.editStore.moveNode(mNode, [pos.x, pos.y], () =>
+          this.updateReactFlow()
+        );
       }
     };
-  
-    const onElementsRemove: (elements: Elements<any>) => void = (elements) => {
-      if (elements) {
-        elements.forEach(async (el) => {
-          const edge = el as Edge;
-          if (edge.source) {
-            const link = this.compositeScope.links.getLink(     
-              edge.source,
-              edge.target,
-              edge.targetHandle || undefined
-            );
-            if (link) {
-              this.editStore.removeLink(link)
-            }
-          } else {
-            const node = this.context.compositeScope.nodes.getNode(el.id);
-            if (node == null) {
-              return;
-            }
-            this.compositeScope.nodes.deleteNode(node.id);
-            const links = this.compositeScope.links.getLinks().filter(l=>l.source === node.id || l.target === node.id)
-            this.editStore.removeNode(node, links);
-          }
-        });
-      }
-    };
-  
-    return { onConnect, onNodeDragStop, onElementsRemove, onLoad };
+
+    return { onConnect, onNodeDragStop, onLoad };
   }
 
-  async getReactFlowElements(
-    contex: NodeContext<CompositeNode, CMedleyTypes>
-  ) {
+  async getReactFlowElements(contex: NodeContext<CompositeNode, CMedleyTypes>) {
     const reactFlowNodes = await this.getReactFlowNodes(contex);
     const reactFlowEdges = await this.getReactFlowEdges(contex);
     return [...reactFlowNodes, ...reactFlowEdges];
   }
-  
+
   getReactFlowNodes(
     context: NodeContext<CompositeNode, CMedleyTypes>
   ): Promise<RFNode[]> {
@@ -169,6 +144,7 @@ export class ReactFlowStore {
           connectable: true,
           sourcePosition: Position.Right,
           targetPosition: Position.Left,
+          dragHandle: ".drag-handle",
           ...nodeProps,
         };
         return {
@@ -187,35 +163,39 @@ export class ReactFlowStore {
     );
   }
 
-  async getReactFlowEdges(context: NodeContext<CompositeNode, CMedleyTypes>): Promise<Edge[]> {
+  async getReactFlowEdges(
+    context: NodeContext<CompositeNode, CMedleyTypes>
+  ): Promise<Edge[]> {
     const mLinks = context.compositeScope.links.getLinks();
     const edges = await Promise.all(
-      mLinks.filter(l=>isPortLink(l)).map(async (l) => {
-        const pLink = l as PortLink;
-        const node = context.compositeScope.nodes.getNode(pLink.source);
-        if (node == null) {
-          return;
-        }
-        const decorateLink = await context.compositeScope.types.getExport<DecorateLink>(
-          node.type,
-          constants.decorateLink
-        );
-        const linkComponent = await context.compositeScope.types.getExport<TLinkComponent>(
-          node.type,
-          constants.LinkComponent
-        );
-        const nodeContext = new NodeContext(context.compositeScope, node);
-        const linkProps = await decorateLink?.(nodeContext);
-        return {
-          data: { context: nodeContext, link:pLink },
-          id: `${pLink.scope}${pLink.source}${pLink.target}${pLink.port}`,
-          source: pLink.source,
-          target: pLink.target,
-          targetHandle: pLink.port,
-          type: linkComponent && node.type,
-          ...linkProps,
-        };
-      })
+      mLinks
+        .filter((l) => isPortLink(l))
+        .map(async (l) => {
+          const pLink = l as PortLink;
+          const node = context.compositeScope.nodes.getNode(pLink.source);
+          if (node == null) {
+            return;
+          }
+          const decorateLink = await context.compositeScope.types.getExport<DecorateLink>(
+            node.type,
+            constants.decorateLink
+          );
+          const linkComponent = await context.compositeScope.types.getExport<TLinkComponent>(
+            node.type,
+            constants.LinkComponent
+          );
+          const nodeContext = new NodeContext(context.compositeScope, node);
+          const linkProps = await decorateLink?.(nodeContext);
+          return {
+            data: { context: nodeContext, link: pLink },
+            id: `${pLink.scope}${pLink.source}${pLink.target}${pLink.port}`,
+            source: pLink.source,
+            target: pLink.target,
+            targetHandle: pLink.port,
+            type: linkComponent && node.type,
+            ...linkProps,
+          };
+        })
     );
     return edges.filter((n) => n !== undefined) as Edge[];
   }
@@ -265,20 +245,22 @@ export class ReactFlowStore {
         edgeTypes: { [index: string]: ReactNode };
       }
     );
-  
+
     return wrappedTypes;
   }
 }
 
 function getNodes(context: NodeContext<CompositeNode, CMedleyTypes>) {
   /* nodes linked to the current scope */
-  const linkedNodes = context.medley.links.getSourceLinks(context.node.id).map((sl) => {
-    const linkedNode = context.medley.nodes.getNode(sl.target);
-    if (linkedNode) {
-      /* use link's position on node */
-      return { ...linkedNode, ...sl.position };
-    }
-  });
+  const linkedNodes = context.medley.links
+    .getSourceLinks(context.node.id)
+    .map((sl) => {
+      const linkedNode = context.medley.nodes.getNode(sl.target);
+      if (linkedNode) {
+        /* use link's position on node */
+        return { ...linkedNode, ...sl.position };
+      }
+    });
   /* nodes belonging to the composite scope */
   const scopeNodes = context.compositeScope.nodes.getNodes();
   const mNodes = linkedNodes
@@ -301,10 +283,11 @@ function wrapNodeComponent(
     const nodeContext = props.data;
     if (nodeContext) {
       return (
-        <NodeComponent
+        <NodeContainer
           context={nodeContext}
           host={host}
           selected={props.selected}
+          NodeComponent={NodeComponent}
         />
       );
     } else {
@@ -330,11 +313,7 @@ function wrapLinkComponent(
     const linkProps = { ...props, data: props.data.link };
     if (context) {
       return (
-        <LinkComponent
-          context={context}
-          host={host}
-          linkProps={linkProps}
-        />
+        <LinkComponent context={context} host={host} linkProps={linkProps} />
       );
     } else {
       return null;

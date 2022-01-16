@@ -1,7 +1,9 @@
 import { DecorateLink } from "@medley-js/common";
 import { CompositeNode } from "../node";
 
-export const decorateLink: DecorateLink<CompositeNode> = async (node) => {
+export const decorateLink: DecorateLink<CompositeNode> = async (context) => {
+  const node = context.observableNode;
+  
   return {
       animated:true,
       style:{

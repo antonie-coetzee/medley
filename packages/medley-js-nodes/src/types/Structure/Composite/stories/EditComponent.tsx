@@ -11,10 +11,6 @@ import { CompositeType } from "..";
 import { componentStory } from "@/util/util.sb";
 import { addTypes, createBasicCompositeNode } from "./utils";
 
-export default {
-  title: "Nodes/Composite",
-} as Meta;
-
 export const Edit = componentStory(async () => {
   const medley = new Medley<CMedleyTypes>({ loader: new CLoader() });
   addTypes(medley);
@@ -31,7 +27,6 @@ export const Edit = componentStory(async () => {
     <EditNodeComponent
       context={bcnContext}
       host={{ executeCommand: (cmd) => cmd.execute() }}
-      close={() => {}}
     />
   );
 });

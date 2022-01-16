@@ -1,5 +1,5 @@
 import { BaseContext, ExecutionContext, Input } from "./Context";
-import { Link, NonNullableType, Port, PortLink, Unwrap } from "./core";
+import { NonNullableType, Port, PortLink, Unwrap } from "./core";
 import { Medley } from "./Medley";
 import { MedleyTypes } from "./MedleyTypes";
 import {
@@ -95,10 +95,10 @@ export class Composer<MT extends MedleyTypes = MedleyTypes> {
       this.nodeId
     );
     if (links == null || links.length === 0) {
-      if(port.required){
+      if (port.required) {
         throw new Error(`required port not linked: '${port.name}'`);
       }
-      return;    
+      return;
     }
     if (links.length !== 1) {
       throw new Error(`multiple links detected for port: '${port.name}'`);

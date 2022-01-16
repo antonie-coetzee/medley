@@ -1,1 +1,1 @@
-export * from "./decorateLink"
+export * from "./decorateLink";

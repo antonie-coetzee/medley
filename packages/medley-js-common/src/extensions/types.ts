@@ -22,5 +22,5 @@ Types.prototype.runExportFunction = async function <
   if (exportFunc == null) {
     return;
   }
-  return exportFunc(args);
+  return exportFunc(...args);
 };

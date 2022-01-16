@@ -47,7 +47,6 @@ export const NodeComponent: TNodeComponent<IdentityNode> = ({ context:{node}, se
           variant="outlined"
           sx={selected ? { boxShadow: 2 } : undefined}
         >
-          <DragIndicator className="drag-handle" style={{position:"absolute", right:0}} />
           <CardHeader
             style={{ backgroundColor: "#b7dbff" }}
             title={"Test"}

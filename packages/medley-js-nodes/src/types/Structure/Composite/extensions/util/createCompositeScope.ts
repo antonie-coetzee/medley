@@ -12,10 +12,7 @@ import {
   Medley,
   NodePart,
   Nodes,
-  NonNullableType,
-  PortLink,
   Types,
-  Unwrap,
 } from "@medley-js/core";
 import { onLinksChange } from "../links";
 import { onNodeInsert, onNodesChange } from "../nodes";
@@ -33,11 +30,6 @@ export function createCompositeScope(medley: CMedley, compositeNodeId: string) {
     typeRepository: parent.typeRepository,
     linkRepository: parent.linkRepository,
     loader: parent.loader,
-    composer: chainObjects(parent.composer, {
-      runLink: async (link, ...args): Promise<any> => {
-        return parent.composer.runLink(link, args);
-      },
-    }),
     types: chainObjects(scopedTypes, {
       getType: (typeName) => {
         const type = scopedTypes.getType(typeName);

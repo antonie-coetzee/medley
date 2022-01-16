@@ -1,8 +1,8 @@
-import { Links, Nodes, Types } from "./scoped";
 import { Composer } from "./Composer";
-import { Loader, NonNullableType } from "./core";
+import { Loader } from "./core";
 import { MedleyTypes } from "./MedleyTypes";
 import { LinkRepository, NodeRepository, TypeRepository } from "./repositories";
+import { Links, Nodes, Types } from "./scoped";
 
 export interface MedleyOptions<MT extends MedleyTypes = MedleyTypes> {
   loader?: Loader<NonNullable<MT["type"]>>;

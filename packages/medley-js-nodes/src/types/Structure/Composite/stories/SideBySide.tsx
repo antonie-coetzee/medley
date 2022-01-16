@@ -41,7 +41,6 @@ export const SideBySide = componentStory(async () => {
           <EditNodeComponent
             context={ecnContext}
             host={{executeCommand:(cmd)=>cmd.execute()}}
-            close={() => {}}
           />
         </Paper>
       </Grid>
@@ -51,7 +50,6 @@ export const SideBySide = componentStory(async () => {
           <EditNodeComponent
             context={bcnContext}
             host={{executeCommand:(cmd)=>cmd.execute()}}
-            close={() => {}}
           />
         </Paper>
       </Grid>

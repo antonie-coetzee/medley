@@ -37,7 +37,6 @@ export const Node = componentStory(async () => {
     <EditNodeComponent
       context={ecnContext}
       host={{executeCommand:(cmd)=>cmd.execute()}}
-      close={()=>{}}
     />
   );
 });

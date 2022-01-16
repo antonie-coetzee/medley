@@ -5,20 +5,13 @@ import {
   constants,
   Coordinates,
   CType,
+  EditNode,
   Host,
   NodeConstructor,
   TCreateNodeComponent,
   TCreateNodeComponentProps,
-  TEditNodeComponent,
-  TEditNodeComponentProps,
 } from "@medley-js/common";
-import {
-  AnyLink,
-  BaseContext,
-  NodeContext,
-  NodePartContext,
-  PortLink,
-} from "@medley-js/core";
+import { AnyLink, NodeContext, NodePartContext } from "@medley-js/core";
 import { makeAutoObservable, observable } from "mobx";
 import React, { ReactNode } from "react";
 import { NodeStore } from ".";
@@ -55,7 +48,7 @@ export class EditStore {
   async removeLink(link: AnyLink<CLink>) {
     return this.host.executeCommand({
       execute: async () => {
-        this.nodeStore.compositeScope.links.deleteLink(link);       
+        this.nodeStore.compositeScope.links.deleteLink(link);
       },
       undo: async () => {
         this.nodeStore.compositeScope.links.upsertLink(link);
@@ -63,35 +56,42 @@ export class EditStore {
     });
   }
 
-  async removeNode(node:CNode, links: AnyLink<CLink>[]){
+  async removeNode(node: CNode) {
+    const links = this.nodeStore.compositeScope.links
+      .getLinks()
+      .filter((l) => l.source === node.id || l.target === node.id);
     return this.host.executeCommand({
       execute: async () => {
         for (const l of links) {
           this.nodeStore.compositeScope.links.deleteLink(l);
-        } 
-        this.nodeStore.compositeScope.nodes.deleteNode(node.id);     
+        }
+        this.nodeStore.compositeScope.nodes.deleteNode(node.id);
       },
       undo: async () => {
         this.nodeStore.compositeScope.nodes.upsertNode(node);
         for (const l of links) {
           this.nodeStore.compositeScope.links.upsertLink(l);
-        } 
+        }
       },
-    });    
+    });
   }
 
-  async moveNode(node:CNode, coords: Coordinates, updateView:()=>Promise<void>){
+  async moveNode(
+    node: CNode,
+    coords: Coordinates,
+    updateView: () => Promise<void>
+  ) {
     const previousPosition = node.position;
     return this.host.executeCommand({
       execute: async () => {
         node.position = coords;
-        updateView();  
-      },
-      undo: async () => {
-        node.position = previousPosition; 
         updateView();
       },
-    });    
+      undo: async () => {
+        node.position = previousPosition;
+        updateView();
+      },
+    });
   }
 
   /**
@@ -101,18 +101,7 @@ export class EditStore {
    * into the current scope
    */
   async createNode(type: CType, position?: Coordinates) {
-    if (this.host.constructNode) {
-      const newNodePart = await this.host.constructNode(
-        new BaseContext(this.nodeStore.compositeScope),
-        type
-      );
-      if (newNodePart) {
-        newNodePart.position = position;
-        await this.hostInsertNodePart(newNodePart);
-      }
-    } else {
-      await this.createNodeFallback(type, position);
-    }
+    await this.createNodeFallback(type, position);
   }
 
   private async hostInsertNodePart(nodePart: CNodePart<CNode>) {
@@ -195,55 +184,13 @@ export class EditStore {
     this.dialogStore.openDialog(() => <CreateNodeComponent {...props} />);
   }
 
-  /**
-   * open EditNodeComponent for the provided node
-   */
-  async editNode(node: CNode) {
-    if (this.host.openNodeEdit) {
-      await this.host.openNodeEdit(
-        new BaseContext(this.nodeStore.compositeScope),
-        node
-      );
-    } else {
-      await this.openNodeEditFallback(node);
-    }
-  }
-
-  async openNodeEditFallback(node: CNode) {
+  async editNode(node: CNode, displayPopover?: (component: React.VFC) => void) {
     const medley = this.nodeStore.compositeScope;
-    try {
-      const nec = await medley.types.getExport<TEditNodeComponent>(
-        node.type,
-        constants.EditNodeComponent
-      );
-      if (nec) {
-        this.doEditNodeComponent(nec, node);
-      }
-    } catch (e) {
-      medley.logger.error(e);
-      return;
-    }
+    await medley.types.runExportFunction<EditNode>(
+      node.type,
+      constants.editNode,
+      new NodeContext(medley, node),
+      { ...this.host, displayPopover }
+    );
   }
-
-  private doEditNodeComponent(
-    EditNodeComponent: TEditNodeComponent,
-    node: CNode
-  ) {
-    const props: TEditNodeComponentProps = {
-      context: new NodeContext(this.nodeStore.compositeScope, node),
-      host: this.host,
-      close: () => {
-        this.dialogStore.closeDialog();
-      },
-    };
-    this.dialogStore.openDialog(() => <EditNodeComponent {...props} />);
-  }
-
-  /**
-   * removes the node from the current scope by either removing the link
-   * if it is externally referenced via a scope link or removing the node
-   * completely from the scope. Before it does so it passes the node to the
-   * NodeDeleteComponent and then to the nodeDelete function
-   */
-  deleteNode(node: CNode) {}
 }

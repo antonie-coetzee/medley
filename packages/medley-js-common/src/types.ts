@@ -1,11 +1,11 @@
 import {
-  BaseContext,
   Graph,
   Link,
   Medley,
   MedleyTypes,
   NF,
   Node,
+  NodeContext,
   NodePart,
   Port,
   Type,
@@ -33,6 +33,11 @@ export interface CNode extends Node {
 }
 
 export type CNF<TNode extends CNode = CNode> = NF<TNode, CMedleyTypes>;
+
+export type CNodeContext<TNode extends CNode = CNode> = NodeContext<
+  TNode,
+  CMedleyTypes
+>;
 
 export type CNodeWithValue<T> = CNode & {
   value: T;
@@ -75,16 +80,11 @@ export interface Command {
 }
 
 export type Host = {
-  openNodeEdit?: (context: BaseContext<CMedleyTypes>, node: CNode) => void;
+  displayPopover?: (component: React.VFC) => void;
+  openWindow?: (component: React.VFC) => void;
   doDialog?: <T>(
     dialog: React.VFC<{ close: (result?: T) => void }>
   ) => Promise<T | undefined>;
-  displayMessage?: () => void;
-  constructNode?: (
-    context: BaseContext<CMedleyTypes>,
-    type?: CType
-  ) => Promise<CNodePart | undefined>;
-  selectNode?: () => Promise<CNode>;
   executeCommand: (command: Command) => Promise<void>;
 };
 

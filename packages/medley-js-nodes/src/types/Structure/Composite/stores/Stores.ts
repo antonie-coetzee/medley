@@ -9,14 +9,18 @@ import { NodeStore } from "./NodeStore";
 import React from "react";
 import { MobXProviderContext } from "mobx-react";
 
-export const storesKey = Symbol();
+const storesKey = Symbol();
 
 export function useStores() {
   return React.useContext(MobXProviderContext) as Stores;
 }
 
-export function getStores(context: NodeContext<CompositeNode, CMedleyTypes>, host:Host) {
-  return context.getNodeMetaData(storesKey, ()=>new Stores(context, host));
+export function getStores(context: NodeContext<CompositeNode, CMedleyTypes>, host:Host) : Stores {
+  const node = context.node;
+  if(node[storesKey] == null){
+    node[storesKey] = new Stores(context, host);
+  }
+  return node[storesKey] as Stores;
 }
 
 export class Stores {

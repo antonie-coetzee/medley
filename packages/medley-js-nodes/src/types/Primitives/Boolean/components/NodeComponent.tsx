@@ -14,12 +14,10 @@ export const NodeComponent: TNodeComponent<BooleanNode> = ({
   };
 
   return (
-    <NodeContainer selected={selected} name={context.node.name}>
-      <Switch
-        defaultChecked={context.node.value}
-        onChange={handleChange}
-        inputProps={{ "aria-label": "controlled" }}
-      />   
-    </NodeContainer>
+    <Switch
+      defaultChecked={context.node.value}
+      onChange={handleChange}
+      inputProps={{ "aria-label": "controlled" }}
+    />   
   );
 };

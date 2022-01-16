@@ -1,10 +1,10 @@
 import {
-  Link,
+  AnyLink,
   DEFAULT_SCOPE,
   TreeMap,
   PortLink,
   isPortLink,
-  AnyLink,
+  Link,
 } from "../core";
 
 export class LinkRepository<MLink extends Link = Link> {

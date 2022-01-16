@@ -11,10 +11,12 @@ export class NodeStore {
   public inputNodes: InputNode[] = [];
   public outputNodes: OutputNode[] = [];
   public compositeScope: Medley<CMedleyTypes>;
+  public parentScope: Medley<CMedleyTypes>;
 
   constructor(context: NodeContext<CompositeNode, CMedleyTypes>) {
     makeAutoObservable(this, { compositeScope: false });
     this.compositeScope = context.compositeScope;
+    this.parentScope = context.medley;
   }
 
   updatePorts() {

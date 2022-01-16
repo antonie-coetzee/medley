@@ -9,7 +9,7 @@ export const NodeComponent: TNodeComponent<OutputNode> = ({
   selected,
 }) => {
   return (
-    <>
+    <div style={{position:"relative"}}>
       <Chip
         label={node.name}
         variant="outlined"
@@ -32,6 +32,6 @@ export const NodeComponent: TNodeComponent<OutputNode> = ({
         isConnectable={true}
         id={node.id}
       />
-    </>
+    </div>
   );
 };
