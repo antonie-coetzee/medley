@@ -1,10 +1,13 @@
-import { CMedleyTypes, CNode } from "@medley-js/common";
-import { NodeContext, Node, MedleyTypes } from "@medley-js/core";
+import { CBaseContext, CLink, CMedleyTypes, CNode } from "@medley-js/common";
+import { NodeContext, Node, MedleyTypes, BaseContext } from "@medley-js/core";
 import { isObservable, observable } from "mobx";
 
 declare module "@medley-js/core" {
   interface NodeContext<TNode extends MT["node"], MT extends MedleyTypes> {
     get observableNode():TNode;
+  }
+  interface LinkContext<TLink extends MT["link"], MT extends MedleyTypes> {
+    get observableLink():TLink;
   }
 }
 
@@ -13,18 +16,41 @@ Object.defineProperty(NodeContext.prototype, "observableNode", {
     if(isObservable(this.node)){
       return this.node;
     }
-    const node = this.medley.nodes.getNode(this.node.id) as CNode;
-    if(node == null){
-      this.node;
-    }
-    if(isObservable(node)){
-      this.node = node;
-      return this.node;
-    }else{
-      const observableNode = observable.object(node);
-      this.medley.nodes.upsertNode(observableNode);
-      this.node = observableNode;
-      return observableNode;
-    }    
+    this.node = getObservableNode(this, this.node);
+    return this.node;
   }
 })
+
+function getObservableNode(context: CBaseContext, node: CNode) : CNode{
+  if(isObservable(node)){
+    return node;
+  }
+  const mNode = context.medley.nodes.getNode(node.id) as CNode;
+  if(mNode == null){
+    node;
+  }
+  if(isObservable(mNode)){
+    return mNode;
+  }else{
+    const observableNode = observable.object(mNode);
+    context.medley.nodes.upsertNode(observableNode);
+    return observableNode;
+  }    
+}
+
+function getObservableLink(context: CBaseContext, link: CLink) : CLink{
+  if(isObservable(link)){
+    return link;
+  }
+  const mLink = context.medley.links.getLink(link.source, link.target, link.) as CLink;
+  if(mNode == null){
+    node;
+  }
+  if(isObservable(mNode)){
+    return mNode;
+  }else{
+    const observableNode = observable.object(mNode);
+    context.medley.nodes.upsertNode(observableNode);
+    return observableNode;
+  }    
+}

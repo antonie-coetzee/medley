@@ -19,7 +19,9 @@ export const addTypes = (medley: Medley<CMedleyTypes>) => {
 };
 
 export const createEmptyCompositeNode = (medley: Medley<CMedleyTypes>) => {
-
+  medley.types.upsertType(InputType);
+  medley.types.upsertType(OutputType);
+  
   const compositeNode = medley.nodes.insertNodePart<CompositeNode>({
     name: "empty_composite",
     type: CompositeType.name,

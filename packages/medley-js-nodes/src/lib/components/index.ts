@@ -1,1 +1,2 @@
-export * from "./Handle"
+export * from "./Handle";
+export * from "./Terminal";

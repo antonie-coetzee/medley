@@ -1,10 +1,11 @@
+import { Box, SxProps } from "@mui/system";
 import React from "react";
 import { Handle as RfHandle, Position } from "react-flow-renderer";
-import { Box } from "@mui/system";
 
-const Label: React.FC<{ justifyRight: boolean }> = ({
+const Label: React.FC<{ justifyRight: boolean; labelStyle?: SxProps }> = ({
   children,
   justifyRight,
+  labelStyle,
 }) => {
   return (
     <Box
@@ -17,7 +18,8 @@ const Label: React.FC<{ justifyRight: boolean }> = ({
         paddingRight: "4px",
         flex: !justifyRight ? 1 : undefined,
         width: "unset",
-        marginLeft: justifyRight ? "auto" : undefined
+        marginLeft: justifyRight ? "auto" : undefined,
+        ...labelStyle,
       }}
     >
       {children}
@@ -25,10 +27,14 @@ const Label: React.FC<{ justifyRight: boolean }> = ({
   );
 };
 
-const HandleWrapper: React.FC<{ output: boolean }> = ({ children, output }) => {
+const HandleWrapper: React.FC<{ output: boolean; handleStyle?: SxProps }> = ({
+  children,
+  output,
+  handleStyle,
+}) => {
   return (
-    <div className={"handle"} >
-      <Box     
+    <div className={"handle"}>
+      <Box
         sx={{
           display: "flex",
           flexWrap: "wrap",
@@ -38,6 +44,7 @@ const HandleWrapper: React.FC<{ output: boolean }> = ({ children, output }) => {
           paddingLeft: !output ? "3px" : undefined,
           transform: `translate(${output ? "10px" : "-10px"})`,
           width: "calc(100%) + 10px",
+          ...handleStyle,
         }}
       >
         {children}
@@ -46,12 +53,14 @@ const HandleWrapper: React.FC<{ output: boolean }> = ({ children, output }) => {
   );
 };
 
-export const Handle: React.VFC<{ id: string; output?: boolean; label?: string, color?: string }> = ({
-  id,
-  output,
-  label,
-  color
-}) => {
+export const Handle: React.VFC<{
+  id: string;
+  output?: boolean;
+  label?: string;
+  color?: string;
+  handleStyle?: SxProps;
+  labelStyle?: SxProps;
+}> = ({ id, output, label, color, handleStyle, labelStyle }) => {
   const handle = (
     <RfHandle
       key={id}
@@ -74,10 +83,14 @@ export const Handle: React.VFC<{ id: string; output?: boolean; label?: string, c
     ></RfHandle>
   );
   const isOutput = output || false;
-  const hLabel = label && <Label justifyRight={isOutput} key={id + "label"}>{label}</Label>;
+  const hLabel = label && (
+    <Label justifyRight={isOutput} key={id + "label"} labelStyle={labelStyle}>
+      {label}
+    </Label>
+  );
   return (
-      <HandleWrapper output={isOutput}>
-        {isOutput ?  [hLabel, handle] : [handle, hLabel] }
-      </HandleWrapper>
-    );
+    <HandleWrapper output={isOutput} handleStyle={handleStyle}>
+      {isOutput ? [hLabel, handle] : [handle, hLabel]}
+    </HandleWrapper>
+  );
 };

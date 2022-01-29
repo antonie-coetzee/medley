@@ -1,4 +1,5 @@
 import {
+  BaseContext,
   Graph,
   Link,
   Medley,
@@ -38,6 +39,8 @@ export type CNodeContext<TNode extends CNode = CNode> = NodeContext<
   TNode,
   CMedleyTypes
 >;
+
+export type CBaseContext = BaseContext<CMedleyTypes>;
 
 export type CNodeWithValue<T> = CNode & {
   value: T;
