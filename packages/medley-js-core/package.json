@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "main": "dist/medley.cjs.js",
-  "types": "dist/medley.esm.d.ts",
+  "types": "dist/medley.cjs.d.ts",
   "module": "dist/medley.esm.js",
   "license": "MIT",
   "author": "Antonie Coetzee",

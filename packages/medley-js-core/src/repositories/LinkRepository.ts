@@ -49,7 +49,7 @@ export class LinkRepository<MLink extends Link = Link> {
     }
   }
 
-  public async upsertLink(scopeId: string, link: MLink): Promise<boolean> {
+  public async upsertLink(scopeId: string, link: MLink) {
     const linkScope = link.scope || DEFAULT_SCOPE;
     if (linkScope !== scopeId) {
       throw new Error(
@@ -86,14 +86,11 @@ export class LinkRepository<MLink extends Link = Link> {
     return this.sourceToPortMap.getFromPath(true, scopeId, source);
   }
 
-  public async getSourceLinks(
-    scopeId: string,
-    target: string
-  ): Promise<MLink[]> {
+  public async getSourceLinks(scopeId: string, target: string): Promise<MLink[]> {
     return this.targetToSourceMap.getFromPath(true, scopeId, target);
   }
 
-  public async getLinks(scopeId?: string): Promise<MLink[]> {
+  public getLinks(scopeId?: string): MLink[] {
     if (scopeId) {
       return [
         ...this.portToSourceMap.getFromPath(true, scopeId),
@@ -107,7 +104,7 @@ export class LinkRepository<MLink extends Link = Link> {
     }
   }
 
-  public async deleteLink(scopeId: string, link: MLink): Promise<boolean> {
+  public deleteLink(scopeId: string, link: MLink): boolean {
     const linkScope = link.scope || DEFAULT_SCOPE;
     if (linkScope !== scopeId) {
       throw new Error(

@@ -33,7 +33,7 @@ export class Composer<MT extends MedleyTypes = MedleyTypes> {
     inputProvider: InputProvider<MT> | null,
     ...args: T extends (...args: any) => any ? Parameters<T> : any[]
   ): Promise<Unwrap<T>> {
-    const node = await this.medley.nodes.getNode(nodeId);
+    const node = this.medley.nodes.getNode(nodeId);
     if (node == null) {
       throw new Error(`node with id: '${nodeId}', not found`);
     }
@@ -90,7 +90,7 @@ export class Composer<MT extends MedleyTypes = MedleyTypes> {
     port: Port,
     ...args: any[]
   ): Promise<unknown | undefined> {
-    let links = await this.conductor.medley.links.getPortLinks(
+    let links = this.conductor.medley.links.getPortLinks(
       port.name,
       this.nodeId
     );

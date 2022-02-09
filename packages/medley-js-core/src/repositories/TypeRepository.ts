@@ -6,14 +6,14 @@ export class TypeRepository<MType extends Type = Type> {
 
   constructor(public loader: Loader<MType>) {}
 
-  public async setTypes(types: MType[]): Promise<void> {
+  public setTypes(types: MType[]): void {
     this.typeMap.clearNodes();
     for (const type of types) {
       this.upsertType(type.scope || DEFAULT_SCOPE, type);
     }
   }
 
-  public async getTypes(scopeId?: string): Promise<MType[]> {
+  public getTypes(scopeId?: string): MType[] {
     if(scopeId){
       return this.typeMap.getFromPath(false, scopeId);
     }else{
@@ -21,11 +21,11 @@ export class TypeRepository<MType extends Type = Type> {
     }
   }
 
-  public async getType(scopeId: string, typeName: string): Promise<MType | undefined> {
+  public getType(scopeId: string, typeName: string): MType | undefined {
     return this.typeMap.getNodeValue(scopeId, typeName);
   }
 
-  public async hasType(scopeId: string, typeName: string): Promise<boolean> {
+  public hasType(scopeId: string, typeName: string): boolean {
     const type = this.typeMap.getNodeValue(scopeId, typeName);
     if (type == null) {
       return false;
@@ -34,11 +34,11 @@ export class TypeRepository<MType extends Type = Type> {
     }
   }
 
-  public async deleteType(scopeId: string, typeName: string): Promise<boolean> {
+  public deleteType(scopeId: string, typeName: string): boolean {
     return this.typeMap.deleteNode(scopeId, typeName);
   }
 
-  public async upsertType(scopeId: string, type: MType): Promise<boolean> {
+  public upsertType(scopeId: string, type: MType): boolean {
     const typeScope = type.scope || DEFAULT_SCOPE;
     if(typeScope !== scopeId){
       throw new Error(`type: '${type.name}' with scope: '${type.scope}' not equal to '${scopeId}'`);

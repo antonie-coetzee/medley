@@ -62,7 +62,7 @@ describe("treemap", function () {
     treemap.setNodeValue("bb", "1", "2", "3");
     treemap.setNodeValue("cc", "1", "2", "3", "c");
     treemap.setNodeValue("dd", "1", "2", "3", "d");
-    const all = treemap.getNodes();
+    const all = treemap.getAllNodes();
     expect(all?.length).toBe(4);
   });
   it("can get values from path recursive", function () {
