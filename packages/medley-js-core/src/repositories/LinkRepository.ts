@@ -16,7 +16,7 @@ export class LinkRepository<MLink extends Link = Link> {
     this.targetToSourceMap = new TreeMap();
   }
 
-  public async setLinks(links: MLink[]): Promise<void> {
+  public setLinks(links: MLink[]): void {
     this.portToSourceMap.clearNodes();
     this.sourceToPortMap.clearNodes();
     this.targetToSourceMap.clearNodes();
@@ -25,12 +25,12 @@ export class LinkRepository<MLink extends Link = Link> {
     }
   }
 
-  public async getLink(
+  public getLink(
     scopeId: string,
     source: string,
     target: string,
     port?: string
-  ): Promise<MLink | undefined> {
+  ): MLink | undefined {
     if (port) {
       return this.portToSourceMap.getFromPath(
         false,
@@ -49,7 +49,7 @@ export class LinkRepository<MLink extends Link = Link> {
     }
   }
 
-  public async upsertLink(scopeId: string, link: MLink) {
+  public upsertLink(scopeId: string, link: MLink): boolean {
     const linkScope = link.scope || DEFAULT_SCOPE;
     if (linkScope !== scopeId) {
       throw new Error(
@@ -64,18 +64,18 @@ export class LinkRepository<MLink extends Link = Link> {
     }
   }
 
-  public async getPortLinks(
+  public getPortLinks(
     scopeId: string,
     port: string,
     target: string
-  ): Promise<PortLink<MLink>[]> {
+  ): PortLink<MLink>[] {
     return this.portToSourceMap.getFromPath(false, scopeId, port, target);
   }
 
-  public async getSourceToPortLinks(
+  public getSourceToPortLinks(
     scopeId: string,
     source: string
-  ): Promise<PortLink<MLink>[]> {
+  ): PortLink<MLink>[] {
     if (this.updateSourceToPortMap) {
       this.sourceToPortMap.clearNodes();
       const allLinks = this.portToSourceMap.getNodes();
@@ -86,7 +86,7 @@ export class LinkRepository<MLink extends Link = Link> {
     return this.sourceToPortMap.getFromPath(true, scopeId, source);
   }
 
-  public async getSourceLinks(scopeId: string, target: string): Promise<MLink[]> {
+  public getSourceLinks(scopeId: string, target: string): MLink[] {
     return this.targetToSourceMap.getFromPath(true, scopeId, target);
   }
 
