@@ -1,11 +1,4 @@
-import {
-  AnyLink,
-  DEFAULT_SCOPE,
-  TreeMap,
-  PortLink,
-  isPortLink,
-  Link,
-} from "../core";
+import { DEFAULT_SCOPE, isPortLink, Link, PortLink, TreeMap } from "../core";
 
 export class LinkRepository<MLink extends Link = Link> {
   private updateSourceToPortMap: boolean = false;
@@ -23,7 +16,7 @@ export class LinkRepository<MLink extends Link = Link> {
     this.targetToSourceMap = new TreeMap();
   }
 
-  public setLinks(links: MLink[]): void {
+  public async setLinks(links: MLink[]): Promise<void> {
     this.portToSourceMap.clearNodes();
     this.sourceToPortMap.clearNodes();
     this.targetToSourceMap.clearNodes();
@@ -32,19 +25,20 @@ export class LinkRepository<MLink extends Link = Link> {
     }
   }
 
-  public getLink(
+  public async getLink(
     scopeId: string,
     source: string,
     target: string,
     port?: string
-  ) : MLink | undefined {
+  ): Promise<MLink | undefined> {
     if (port) {
       return this.portToSourceMap.getFromPath(
         false,
         scopeId,
         port,
         target,
-        source)?.[0];
+        source
+      )?.[0];
     } else {
       return this.targetToSourceMap.getFromPath(
         false,
@@ -55,13 +49,13 @@ export class LinkRepository<MLink extends Link = Link> {
     }
   }
 
-  public upsertLink(scopeId: string, link: AnyLink<MLink>) {
+  public async upsertLink(scopeId: string, link: MLink) {
     const linkScope = link.scope || DEFAULT_SCOPE;
     if (linkScope !== scopeId) {
       throw new Error(
         `link with scope: '${link.scope}' not equal to '${linkScope}'`
       );
-    }    
+    }
     if (isPortLink(link)) {
       this.updateSourceToPortMap = true;
       return this.setPortToSourceMap(link);
@@ -70,11 +64,18 @@ export class LinkRepository<MLink extends Link = Link> {
     }
   }
 
-  public getPortLinks(scopeId: string, port: string, target: string): PortLink<MLink>[] {
+  public async getPortLinks(
+    scopeId: string,
+    port: string,
+    target: string
+  ): Promise<PortLink<MLink>[]> {
     return this.portToSourceMap.getFromPath(false, scopeId, port, target);
   }
 
-  public getSourceToPortLinks(scopeId: string, source: string): PortLink<MLink>[] {
+  public async getSourceToPortLinks(
+    scopeId: string,
+    source: string
+  ): Promise<PortLink<MLink>[]> {
     if (this.updateSourceToPortMap) {
       this.sourceToPortMap.clearNodes();
       const allLinks = this.portToSourceMap.getNodes();
@@ -85,32 +86,31 @@ export class LinkRepository<MLink extends Link = Link> {
     return this.sourceToPortMap.getFromPath(true, scopeId, source);
   }
 
-  public getSourceLinks(scopeId: string, target: string): MLink[] {
+  public async getSourceLinks(scopeId: string, target: string): Promise<MLink[]> {
     return this.targetToSourceMap.getFromPath(true, scopeId, target);
   }
 
-  public getLinks(scopeId?: string): AnyLink<MLink>[] {
-    if(scopeId){
+  public getLinks(scopeId?: string): MLink[] {
+    if (scopeId) {
       return [
         ...this.portToSourceMap.getFromPath(true, scopeId),
         ...this.targetToSourceMap.getFromPath(true, scopeId),
       ];
-    }else{
+    } else {
       return [
         ...this.portToSourceMap.getNodes(),
         ...this.targetToSourceMap.getNodes(),
       ];
     }
-
   }
 
-  public deleteLink(scopeId: string, link: AnyLink<MLink>):boolean {
+  public deleteLink(scopeId: string, link: MLink): boolean {
     const linkScope = link.scope || DEFAULT_SCOPE;
     if (linkScope !== scopeId) {
       throw new Error(
         `link with scope: '${link.scope}' not equal to '${linkScope}'`
       );
-    }   
+    }
     if (isPortLink(link)) {
       this.updateSourceToPortMap = true;
       return this.portToSourceMap.deleteNode(

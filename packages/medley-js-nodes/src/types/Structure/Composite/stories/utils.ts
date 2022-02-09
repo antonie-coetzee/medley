@@ -10,6 +10,8 @@ import { CompositeType } from "..";
 import { CompositeNode } from "../node";
 import { IdentityType } from "@/types/Identity";
 import { IdentityNode } from "@/types/Identity/node";
+import { BooleanType } from "@/types/Primitives/Boolean";
+import { BooleanNode } from "@/types/Primitives/Boolean/node";
 
 export const addTypes = (medley: Medley<CMedleyTypes>) => {
   medley.types.upsertType(CompositeType);
@@ -95,6 +97,13 @@ export const createBasicCompositeNode = (
     position: [1400, 50],
     type: OutputType.name,
   });
+
+  // const b_1 = cs.nodes.insertNodePart<BooleanNode>({
+  //   name: "Test_2",
+  //   position: [300, 300],
+  //   type: BooleanType.name,
+  //   value: false
+  // });
 
   cs.links.upsertLink({
     source: id_0.id,

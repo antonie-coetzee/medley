@@ -1,2 +1,2 @@
-//export * from "./LinkComponent";
+export * from "./LinkComponent";
 export * from "./NodeComponent";

@@ -1,4 +1,4 @@
-import { AnyLink, Link, PortLink } from "../core";
+import { Link, PortLink } from "../core";
 import { LinkRepository } from "../repositories";
 
 export class Links<MLink extends Link = Link> {
@@ -19,7 +19,7 @@ export class Links<MLink extends Link = Link> {
     return this.linkRepo.getSourceLinks(this.scopeId, target);
   }
 
-  public upsertLink(newLink: AnyLink<MLink>): boolean {
+  public upsertLink(newLink: MLink): boolean {
     return this.linkRepo.upsertLink(this.scopeId, newLink);
   }
 
@@ -31,7 +31,7 @@ export class Links<MLink extends Link = Link> {
     return this.linkRepo.getLink(this.scopeId, source, target, port);
   }
 
-  public getLinks(): AnyLink<MLink>[] {
+  public getLinks(): MLink[] {
     return this.linkRepo.getLinks(this.scopeId);
   }
 

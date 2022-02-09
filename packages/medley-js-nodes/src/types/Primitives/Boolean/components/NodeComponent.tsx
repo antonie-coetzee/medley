@@ -4,6 +4,7 @@ import { Box, Chip, Switch } from "@mui/material";
 import React from "react";
 import { BooleanNode } from "../node";
 import { Terminal } from "@/lib/components";
+import { runInAction } from "mobx";
 
 export const NodeComponent: TNodeComponent<BooleanNode> = ({
   context,
@@ -12,7 +13,7 @@ export const NodeComponent: TNodeComponent<BooleanNode> = ({
 
   const node = context.observableNode;
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    node.value = event.target.checked;
+    runInAction(()=>{node.value = event.target.checked});
   };
 
   return (
@@ -26,7 +27,6 @@ export const NodeComponent: TNodeComponent<BooleanNode> = ({
             inputProps={{ "aria-label": "controlled" }}
           />
         }
-        //color={"#0288d1"}
         variant="outlined"
         style={{ borderWidth: "2px", padding: "20px", borderRadius: "100px", borderColor: node.value ? "green" : "grey" }}
         size="small"

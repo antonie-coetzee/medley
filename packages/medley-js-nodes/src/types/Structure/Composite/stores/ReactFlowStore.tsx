@@ -4,7 +4,6 @@ import {
   CMedleyTypes,
   CNode,
   constants,
-  DecorateLink,
   DecorateNode,
   Host,
   LinkProps,
@@ -13,14 +12,22 @@ import {
   TNodeComponent,
   TNodeComponentProps,
 } from "@medley-js/common";
-import { isPortLink, NodeContext, PortLink } from "@medley-js/core";
+import {
+  generateId,
+  isPortLink,
+  LinkContext,
+  NodeContext,
+  PortLink,
+} from "@medley-js/core";
 import { debounce } from "@mui/material";
 import { makeAutoObservable, observable, runInAction } from "mobx";
 import { observer } from "mobx-react";
-import React, { memo, ReactNode, VFC } from "react";
+import React, { ComponentType, memo, ReactNode, VFC } from "react";
 import {
+  BezierEdge,
   Connection,
   Edge,
+  EdgeProps,
   Node as RFNode,
   OnLoadParams,
   Position,
@@ -28,7 +35,7 @@ import {
 } from "react-flow-renderer";
 import { NodeStore } from ".";
 import { NodeContainer } from "../components";
-import { onLinksChange, onNodesChange } from "../extensions";
+import { onLinksChange, onNodesChange, onTypeUpsert } from "../extensions";
 import { CompositeNode } from "../node";
 import { EditStore } from "./EditStore";
 
@@ -36,6 +43,8 @@ export class ReactFlowStore {
   public reactFlowInstance: OnLoadParams | null = null;
   public reactFlowProps: ReactFlowProps | null = null;
   private compositeScope: CMedley;
+  private nodeTypesId: string = "";
+  private edgeTypesId: string = "";
 
   constructor(
     private context: NodeContext<CompositeNode, CMedleyTypes>,
@@ -51,11 +60,16 @@ export class ReactFlowStore {
   async initialize() {
     this.registerMedleyEvents();
     this.updateReactFlow();
-    this.nodeStore.updatePorts();
+    -this.nodeStore.updatePorts();
   }
 
   updateReactFlowProps(reactFlowProps: ReactFlowProps) {
-    const props = { ...this.reactFlowProps, ...reactFlowProps };
+    const props = {
+      ...this.reactFlowProps,
+      ...reactFlowProps,
+      nodeTypesId: this.nodeTypesId,
+      edgeTypesId: this.edgeTypesId,
+    };
     this.reactFlowProps = props;
   }
 
@@ -85,6 +99,13 @@ export class ReactFlowStore {
     if (medley.links[onLinksChange] == null) {
       medley.links[onLinksChange] = () => {
         debouncedUpdateState();
+      };
+    }
+    if (medley.types[onTypeUpsert] == null) {
+      medley.types[onTypeUpsert] = (type) => {
+        this.nodeTypesId = generateId();
+        this.edgeTypesId = generateId();
+        return type;
       };
     }
   }
@@ -177,24 +198,18 @@ export class ReactFlowStore {
           if (node == null) {
             return;
           }
-          const decorateLink = await context.compositeScope.types.getExport<DecorateLink>(
-            node.type,
-            constants.decorateLink
-          );
           const linkComponent = await context.compositeScope.types.getExport<TLinkComponent>(
             node.type,
             constants.LinkComponent
           );
-          const nodeContext = new NodeContext(context.compositeScope, node);
-          const linkProps = await decorateLink?.(nodeContext);
+          const linkContext = new LinkContext(context.compositeScope, pLink);
           return {
-            data: { context: nodeContext, link: pLink },
+            data: { context: linkContext, link: pLink },
             id: `${pLink.scope}${pLink.source}${pLink.target}${pLink.port}`,
             source: pLink.source,
             target: pLink.target,
             targetHandle: pLink.port,
             type: linkComponent && node.type,
-            ...linkProps,
           };
         })
     );
@@ -216,11 +231,11 @@ export class ReactFlowStore {
     ];
     const types = await Promise.all(
       typeNames.map(async (typeName) => {
-        const nodeComponent = await context.medley.types.getExport<
+        const nodeComponent = await context.compositeScope.types.getExport<
           TNodeComponent<CNode>
         >(typeName, constants.NodeComponent);
-        const linkComponent = await context.medley.types.getExport<
-          TLinkComponent<CNode>
+        const linkComponent = await context.compositeScope.types.getExport<
+          TLinkComponent<CLink>
         >(typeName, constants.LinkComponent);
         return { typeName, nodeComponent, linkComponent };
       })
@@ -236,7 +251,8 @@ export class ReactFlowStore {
         if (crnt.linkComponent) {
           acc.edgeTypes[crnt.typeName] = wrapLinkComponent(
             host,
-            memo(observer(crnt.linkComponent))
+            memo(observer(crnt.linkComponent)),
+            BezierEdge
           );
         }
         return acc;
@@ -300,24 +316,28 @@ function wrapNodeComponent(
 
 function wrapLinkComponent(
   host: Host,
-  LinkComponent: React.VFC<TLinkComponentProps>
+  LinkComponent: React.VFC<TLinkComponentProps>,
+  DefaultLinkComponent: ComponentType<LinkProps>
 ) {
   const linkWrapper: VFC<
-    Omit<LinkProps, "data"> & {
+    EdgeProps & {
       data: {
-        context: NodeContext<CNode, CMedleyTypes>;
-        link: CLink;
+        context: LinkContext<CLink, CMedleyTypes>;
       };
     }
   > = (props) => {
     const context = props.data.context;
-    const linkProps = { ...props, data: props.data.link };
     if (context) {
       return (
-        <LinkComponent context={context} host={host} linkProps={linkProps} />
+        <LinkComponent
+          context={context}
+          host={host}
+          linkProps={props}
+          DefaultLinkComponent={DefaultLinkComponent}
+        />
       );
     } else {
-      return null;
+      return <DefaultLinkComponent {...props} />;
     }
   };
   return linkWrapper;

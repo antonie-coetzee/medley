@@ -1,6 +1,6 @@
 import { CMedleyTypes } from "@medley-js/common";
 import { Medley, NodeContext } from "@medley-js/core";
-import { makeAutoObservable } from "mobx";
+import { isObservable, makeAutoObservable, observable } from "mobx";
 import { CompositeNode } from "../node";
 import { InputType } from "../scopedTypes/input";
 import { InputNode } from "../scopedTypes/input/InputNode";
@@ -20,9 +20,19 @@ export class NodeStore {
   }
 
   updatePorts() {
+    console.log("update ports");
     this.inputNodes = this.compositeScope.nodes
       .getNodes()
-      .filter((n) => n.type === InputType.name) as InputNode[];
+      .filter((n) => n.type === InputType.name)
+      .map(n=>{
+        if(isObservable(n)){
+          return n;
+        }else{
+          const observableNode = observable.object(n);
+          this.compositeScope.nodes.upsertNode(observableNode);
+          return observableNode;
+        }
+      }) as InputNode[];
     this.outputNodes = this.compositeScope.nodes
       .getNodes()
       .filter((n) => n.type === OutputType.name) as OutputNode[];

@@ -1,5 +1,6 @@
 import { Box, SxProps } from "@mui/system";
 import React from "react";
+import { observer } from "mobx-react";
 import { Handle as RfHandle, Position } from "react-flow-renderer";
 
 const Label: React.FC<{ justifyRight: boolean; labelStyle?: SxProps }> = ({
@@ -60,7 +61,7 @@ export const Handle: React.VFC<{
   color?: string;
   handleStyle?: SxProps;
   labelStyle?: SxProps;
-}> = ({ id, output, label, color, handleStyle, labelStyle }) => {
+}> = observer(({ id, output, label, color, handleStyle, labelStyle }) => {
   const handle = (
     <RfHandle
       key={id}
@@ -93,4 +94,4 @@ export const Handle: React.VFC<{
       {isOutput ? [hLabel, handle] : [handle, hLabel]}
     </HandleWrapper>
   );
-};
+});

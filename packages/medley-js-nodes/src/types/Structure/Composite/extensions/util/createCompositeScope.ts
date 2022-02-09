@@ -7,13 +7,13 @@ import {
   CType,
 } from "@medley-js/common";
 import {
-  AnyLink,
   Links,
   Medley,
   NodePart,
   Nodes,
   Types,
 } from "@medley-js/core";
+import { onTypeUpsert } from "..";
 import { onLinksChange } from "../links";
 import { onNodeInsert, onNodesChange } from "../nodes";
 
@@ -39,14 +39,21 @@ export function createCompositeScope(medley: CMedley, compositeNodeId: string) {
           return parent.types.getType(typeName);
         }
       },
-      getExport: async (typeName, exportName) => {
+      getExport: async <T>(typeName:string, exportName:string) => {
         const exportValue = await scopedTypes.getExport(typeName, exportName);
         if (exportValue) {
-          return exportValue;
+          return exportValue as T;
         } else {
-          return parent.types.getExport(typeName, exportName);
+          return await parent.types.getExport<T>(typeName, exportName);
         }
       },
+      upsertType: function(this: Types<CType>, type:CType){
+        if (this[onTypeUpsert]) {
+          return scopedTypes.upsertType(this[onTypeUpsert]!(type));
+        } else {
+          return scopedTypes.upsertType(type);
+        }
+      },      
     }),
     nodes: chainObjects<Nodes<CNode>>(scopedNodes, {
       insertNodePart: function <TNode extends CNode>(
@@ -76,7 +83,7 @@ export function createCompositeScope(medley: CMedley, compositeNodeId: string) {
       },
     }),
     links: chainObjects<Links<CLink>>(scopedLinks, {
-      upsertLink: function (this: Links<CLink>, newLink: AnyLink<CLink>) {
+      upsertLink: function (this: Links<CLink>, newLink: CLink) {
         this[onLinksChange]?.call(scopedLinks);
         return scopedLinks.upsertLink(newLink);
       },

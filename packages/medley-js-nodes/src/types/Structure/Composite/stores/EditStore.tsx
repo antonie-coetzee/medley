@@ -11,7 +11,7 @@ import {
   TCreateNodeComponent,
   TCreateNodeComponentProps,
 } from "@medley-js/common";
-import { AnyLink, NodeContext, NodePartContext } from "@medley-js/core";
+import { NodeContext, NodePartContext } from "@medley-js/core";
 import { makeAutoObservable, observable } from "mobx";
 import React, { ReactNode } from "react";
 import { NodeStore } from ".";
@@ -34,7 +34,7 @@ export class EditStore {
    */
   addNode(node: CNode, position?: Coordinates) {}
 
-  async addLink(newLink: AnyLink<CLink>) {
+  async addLink(newLink: CLink) {
     return this.host.executeCommand({
       execute: async () => {
         this.nodeStore.compositeScope.links.upsertLink(newLink);
@@ -45,7 +45,7 @@ export class EditStore {
     });
   }
 
-  async removeLink(link: AnyLink<CLink>) {
+  async removeLink(link: CLink) {
     return this.host.executeCommand({
       execute: async () => {
         this.nodeStore.compositeScope.links.deleteLink(link);
@@ -130,6 +130,10 @@ export class EditStore {
     const nodePart: CNodePart = { type: type.name, name: "", position };
     // first construct/initialize the nodepart with nodeCreate if
     // available
+    const mType = medley.types.getType(type.name);
+    if(mType == null){
+      medley.types.upsertType({...type, scope: medley.scope});
+    }
     try {
       const ncf = await medley.types.getExport<NodeConstructor<CNode>>(
         type.name,

@@ -1,6 +1,6 @@
-import { LinkContext, NodeContext } from "@medley-js/core";
-import { ComponentType, CSSProperties, ReactNode, VFC } from "react";
-import { CLink, CMedleyTypes, CNode, Host, Location } from "../../types";
+import { LinkContext } from "@medley-js/core";
+import { ComponentType, CSSProperties, ReactElement, ReactNode, VFC } from "react";
+import { ArrowHeadType, CLink, CMedleyTypes, Host, Position } from "../../types";
 
 export type LinkProps = {
   id: string;
@@ -12,16 +12,17 @@ export type LinkProps = {
   targetY: number;
   selected?: boolean;
   animated?: boolean;
-  sourcePosition: Location;
-  targetPosition: Location;
+  sourcePosition: Position;
+  targetPosition: Position;
   label?: string | ReactNode;
   labelStyle?: CSSProperties;
   labelShowBg?: boolean;
   labelBgStyle?: CSSProperties;
   labelBgPadding?: [number, number];
   labelBgBorderRadius?: number;
+  data?: unknown;
   style?: CSSProperties;
-  arrowHeadType?: "arrow" | "arrowclosed";
+  arrowHeadType?: ArrowHeadType;
   markerEndId?: string;
   sourceHandleId?: string | null;
   targetHandleId?: string | null;

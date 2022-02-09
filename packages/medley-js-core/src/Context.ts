@@ -1,4 +1,4 @@
-import { AnyLink, Link, Node, NodePart, Port, PortLink, Unwrap } from "./core";
+import {Link, Node, NodePart, Port, Unwrap } from "./core";
 import { Medley } from "./Medley";
 import { MedleyTypes } from "./MedleyTypes";
 
@@ -34,7 +34,7 @@ export class NodeContext<
 }
 
 export class LinkContext<
-  TLink extends PortLink<NonNullable<MT["link"]>> = PortLink<NonNullable<MT["link"]>>,
+  TLink extends MT["link"] = Link,
   MT extends MedleyTypes = MedleyTypes
 > extends BaseContext<MT> {
   constructor(medley: Medley<MT>, public link: TLink) {

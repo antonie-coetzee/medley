@@ -12,7 +12,17 @@ import {
   Type,
 } from "@medley-js/core";
 
-export type Location = "left" | "top" | "right" | "bottom";
+export declare enum Position {
+  Left = "left",
+  Top = "top",
+  Right = "right",
+  Bottom = "bottom"
+}
+
+export declare enum ArrowHeadType {
+  Arrow = "arrow",
+  ArrowClosed = "arrowclosed"
+}
 
 export type Coordinates = [x: number, y: number];
 
@@ -30,6 +40,8 @@ export interface CMedleyTypes extends MedleyTypes {
 
 export interface CNode extends Node {
   name: string;
+  label?: string;
+  note?: string;
   position?: Coordinates;
 }
 

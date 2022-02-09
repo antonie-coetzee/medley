@@ -1,3 +1,4 @@
+import { BooleanType } from "@/types/Primitives/Boolean";
 import { NodeContext } from "@medley-js/core";
 import { ExitToApp } from "@mui/icons-material";
 import { Chip, MenuItem } from "@mui/material";
@@ -74,16 +75,31 @@ export class ContextMenuStore {
         await editStore.createNode(InputType, [mouseX || 0, mouseY || 0]);
         close();
       };
+      const addBoolean = async () => {
+        await editStore.createNode(BooleanType, [mouseX || 0, mouseY || 0]);
+        close();
+      };
       return (
-        <MenuItem onClick={addInput}>
-          <Chip
-            icon={<ExitToApp />}
-            label="INPUT"
-            color={"primary"}
-            variant="outlined"
-            style={{ borderWidth: "2px" }}
-          />
-        </MenuItem>
+        <>
+          <MenuItem onClick={addInput}>
+            <Chip
+              icon={<ExitToApp />}
+              label="Input"
+              color={"primary"}
+              variant="outlined"
+              style={{ borderWidth: "2px" }}
+            />
+          </MenuItem>
+          <MenuItem onClick={addBoolean}>
+            <Chip
+              icon={<ExitToApp />}
+              label="Boolean"
+              color={"success"}
+              variant="outlined"
+              style={{ borderWidth: "2px" }}
+            />
+          </MenuItem>
+        </>
       );
     };
   }

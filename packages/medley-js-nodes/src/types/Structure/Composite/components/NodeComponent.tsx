@@ -2,6 +2,7 @@ import { Handle } from "@/lib/components";
 import { TNodeComponent } from "@medley-js/common";
 import { Card, CardContent, CardHeader } from "@mui/material";
 import { Box } from "@mui/system";
+import { Observer } from "mobx-react";
 import React, { useEffect } from "react";
 import { useUpdateNodeInternals } from "react-flow-renderer";
 import { CompositeNode } from "../node";
@@ -13,7 +14,9 @@ function getHandles(nodeStore: NodeStore) {
     .sort((a, b) => a.name.localeCompare(b.name))
     .map((n) => {
       return (
-        <Handle id={n.id} key={n.id} label={n.name} color={n.value.color} />
+        <Observer key={n.id}>
+         {()=><Handle id={n.id} key={n.id} label={n.name} color={n.value.color} />}
+        </Observer>
       );
     });
   let outputHandles: JSX.Element[] = [];

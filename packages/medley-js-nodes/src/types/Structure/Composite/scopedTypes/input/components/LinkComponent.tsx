@@ -1,30 +1,25 @@
-import React from "react";
-import { ArrowHeadType, getBezierPath, getMarkerEnd, Position } from "react-flow-renderer";
 import { TLinkComponent } from "@medley-js/common";
+import React from "react";
 import { InputNode } from "../InputNode";
 
-
-export const LinkComponent: TLinkComponent<InputNode> = ({ context, linkProps:{
-    id,
-    sourceX,
-    sourceY,
-    targetX,
-    targetY,
-    sourcePosition ,
-    targetPosition,
-    style,
-    data,
-    arrowHeadType,
-    markerEndId,
-  } }) => {
-    const node = context.observableNode;
-    const edgePath = getBezierPath({ sourceX, sourceY, sourcePosition:sourcePosition as Position  , targetX, targetY, targetPosition: targetPosition as  Position});
-    const markerEnd = getMarkerEnd(arrowHeadType as ArrowHeadType, markerEndId);
-    console.log("updated")
-    return (
-      <>
-        <path id={id} style={{...style, ...{ stroke: node.value?.color ? node.value.color : "#0288d1", strokeWidth: "2px"}}} className="react-flow__edge-path" d={edgePath} markerEnd={markerEnd} />
-      </>
-    );
-  };
-
+export const LinkComponent: TLinkComponent = ({
+  context,
+  DefaultLinkComponent,
+  linkProps,
+}) => {
+  const node = context.getObservableNode<InputNode>();
+  return (
+    <DefaultLinkComponent
+      {...linkProps}
+      style={{
+        ...linkProps.style,
+        ...{
+          stroke: node.value?.color ? node.value.color : "#0288d1",
+          strokeWidth: "2px",
+          animation: node.value ? "dashdraw .5s linear infinite" : "unset",
+          strokeDasharray: node.value ? 5 : 0,
+        },
+      }}
+    />
+  );
+};

@@ -14,20 +14,3 @@ export type DecorateNode<TNode extends CNode = CNode> = (
     dragHandle: string;
   }>
 >;
-
-export type DecorateLink<TNode extends CNode = CNode> = (
-  context: NodeContext<TNode, CMedleyTypes>
-) => Promise<
-  Partial<{
-    label: string | ReactNode;
-    labelStyle: CSSProperties;
-    labelShowBg: boolean;
-    labelBgStyle: CSSProperties;
-    labelBgPadding: [number, number];
-    labelBgBorderRadius: number;
-    style: CSSProperties;
-    animated: boolean;
-    isHidden: boolean;
-    className: string;
-  }>
->;
