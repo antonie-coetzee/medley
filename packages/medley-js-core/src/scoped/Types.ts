@@ -7,23 +7,30 @@ export class Types<MType extends Type = Type> {
     private typeRepository: TypeRepository<MType>
   ) {}
 
-  public async getExport<T>(typeName: string, exportName: string): Promise<T | undefined> {
-    return await this.typeRepository.getExport(this.scopeId, typeName, exportName) as T;
+  public async getExport<T>(
+    typeName: string,
+    exportName: string
+  ): Promise<T | undefined> {
+    return (await this.typeRepository.getExport(
+      this.scopeId,
+      typeName,
+      exportName
+    )) as T;
   }
 
-  public getTypes(): MType[] {
+  public async getTypes(): Promise<MType[]> {
     return this.typeRepository.getTypes(this.scopeId);
   }
 
-  public getType(typeName: string): MType | undefined {
+  public async getType(typeName: string): Promise<MType | undefined> {
     return this.typeRepository.getType(this.scopeId, typeName);
   }
 
-  public hasType(typeName: string): boolean {
+  public async hasType(typeName: string): Promise<boolean> {
     return this.typeRepository.hasType(this.scopeId, typeName);
   }
 
-  public upsertType(type: MType) {
+  public async upsertType(type: MType): Promise<boolean> {
     return this.typeRepository.upsertType(this.scopeId, type);
   }
 }

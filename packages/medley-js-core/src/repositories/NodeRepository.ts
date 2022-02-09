@@ -1,14 +1,10 @@
-import {
-  DEFAULT_SCOPE, generateId,
-  Node,
-  NodePart, TreeMap
-} from "../core";
+import { DEFAULT_SCOPE, generateId, Node, NodePart, TreeMap } from "../core";
 
 export class NodeRepository<MNode extends Node> {
   public nodeIndex: Map<string, MNode> = new Map();
   public nodeTreeMap: TreeMap<MNode> = new TreeMap();
 
-  public setNodes(nodes: MNode[]): void {
+  public async setNodes(nodes: MNode[]): Promise<void> {
     this.nodeTreeMap.clearNodes();
     this.nodeIndex.clear();
     for (const node of nodes) {
@@ -16,19 +12,25 @@ export class NodeRepository<MNode extends Node> {
     }
   }
 
-  public getNodes(scopeId?: string): MNode[] {
-    if(scopeId){
+  public async getNodes(scopeId?: string): Promise<MNode[]> {
+    if (scopeId) {
       return this.nodeTreeMap.getFromPath(false, scopeId);
-    }else{
+    } else {
       return this.nodeTreeMap.getNodes();
     }
   }
 
-  public getNode(scopeId: string, nodeId: string): MNode | undefined {
+  public async getNode(
+    scopeId: string,
+    nodeId: string
+  ): Promise<MNode | undefined> {
     return this.nodeIndex.get(`${scopeId}${nodeId}`);
   }
 
-  public insertNodePart(scopeId: string, nodePart: NodePart<MNode>): MNode {
+  public async insertNodePart<TNode extends MNode>(
+    scopeId: string,
+    nodePart: NodePart<MNode>
+  ): Promise<TNode> {
     let newId: string;
     do {
       newId = generateId();
@@ -37,13 +39,13 @@ export class NodeRepository<MNode extends Node> {
       ...nodePart,
       id: newId,
       scope: scopeId,
-    } as MNode;
+    } as TNode;
 
     this.upsertNode(scopeId, newNode);
     return newNode;
   }
 
-  public upsertNode(scopeId: string, node: MNode): boolean {
+  public async upsertNode(scopeId: string, node: MNode): Promise<boolean> {
     const nodeScope = node.scope || DEFAULT_SCOPE;
     if (nodeScope !== scopeId) {
       throw new Error(
@@ -54,7 +56,7 @@ export class NodeRepository<MNode extends Node> {
     return this.nodeTreeMap.setNodeValue(node, nodeScope, node.id);
   }
 
-  public deleteNode(scopeId: string, nodeId: string): boolean {
+  public async deleteNode(scopeId: string, nodeId: string): Promise<boolean> {
     const storedNode = this.nodeIndex.get(`${scopeId}${nodeId}`);
     if (storedNode == null) {
       return false;

@@ -7,24 +7,23 @@ export class Nodes<MNode extends Node = Node> {
     private nodeRepository: NodeRepository<MNode>
   ) {}
 
-  public getNode(nodeId: string): MNode | undefined {
+  public async getNode(nodeId: string): Promise<MNode | undefined> {
     return this.nodeRepository.getNode(this.scopeId, nodeId);
   }
 
-  public getNodes(): MNode[] {
+  public async getNodes(): Promise<MNode[]> {
     return this.nodeRepository.getNodes(this.scopeId);
   }
 
-  public upsertNode<TNode extends MNode>(node: TNode): void {
+  public async upsertNode<TNode extends MNode>(node: TNode): Promise<void> {
     this.nodeRepository.upsertNode(this.scopeId, node);
   }
 
-  public insertNodePart<TNode extends MNode>(nodePart: NodePart<TNode>): TNode {
-    return this.nodeRepository.insertNodePart(this.scopeId, nodePart) as TNode;
+  public async insertNodePart<TNode extends MNode>(nodePart: NodePart<TNode>): Promise<TNode> {
+    return this.nodeRepository.insertNodePart(this.scopeId, nodePart);
   }
 
-  public deleteNode(nodeId: string): boolean {
-    const deletedNode = this.nodeRepository.deleteNode(this.scopeId, nodeId);
-    return deletedNode ? true : false;
+  public async deleteNode(nodeId: string): Promise<boolean> {
+    return this.nodeRepository.deleteNode(this.scopeId, nodeId);
   }
 }

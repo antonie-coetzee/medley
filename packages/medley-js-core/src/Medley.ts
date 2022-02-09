@@ -46,23 +46,25 @@ export class Medley<MT extends MedleyTypes = MedleyTypes> {
     this.composer = options?.composer || new Composer<MT>(this);
   }
 
-  public setGraph<TGraph extends Graph<MT> = Graph<MT>>(graph: TGraph) {
-    this.typeRepository.setTypes(graph.types);
-    this.nodeRepository.setNodes(graph.nodes);
-    this.linkRepository.setLinks(graph.links);
+  public async setGraph<TGraph extends Graph<MT> = Graph<MT>>(graph: TGraph) {
+    await Promise.all([
+      this.typeRepository.setTypes(graph.types),
+      this.nodeRepository.setNodes(graph.nodes),
+      this.linkRepository.setLinks(graph.links),
+    ]);
     this.graph = graph;
   }
 
-  public getGraph<TGraph extends Graph<MT> = Graph<MT>>() {
-    const types = this.typeRepository
-      .getTypes()
-      .filter((t) => t.volatile == null || t.volatile === false);
-    const nodes = this.nodeRepository
-      .getNodes()
-      .filter((n) => n.volatile == null || n.volatile === false);
-    const links = this.linkRepository
-      .getLinks()
-      .filter((l) => l.volatile == null || l.volatile === false);
+  public async getGraph<TGraph extends Graph<MT> = Graph<MT>>() {
+    const types = (await this.typeRepository.getTypes()).filter(
+      (t) => t.volatile == null || t.volatile === false
+    );
+    const nodes = (await this.nodeRepository.getNodes()).filter(
+      (n) => n.volatile == null || n.volatile === false
+    );
+    const links = (await this.linkRepository.getLinks()).filter(
+      (l) => l.volatile == null || l.volatile === false
+    );
     return {
       ...this.graph,
       types,

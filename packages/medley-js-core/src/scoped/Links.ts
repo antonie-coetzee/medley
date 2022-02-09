@@ -7,35 +7,40 @@ export class Links<MLink extends Link = Link> {
     private linkRepo: LinkRepository<MLink>
   ) {}
 
-  public getPortLinks(port: string, target: string): PortLink<MLink>[] {
+  public async getPortLinks(
+    port: string,
+    target: string
+  ): Promise<PortLink<MLink>[]> {
     return this.linkRepo.getPortLinks(this.scopeId, port, target);
   }
 
-  public getSourceToPortLinks(source: string): PortLink<MLink>[] {
+  public async getSourceToPortLinks(
+    source: string
+  ): Promise<PortLink<MLink>[]> {
     return this.linkRepo.getSourceToPortLinks(this.scopeId, source);
   }
 
-  public getSourceLinks(target: string): MLink[] {
+  public async getSourceLinks(target: string): Promise<MLink[]> {
     return this.linkRepo.getSourceLinks(this.scopeId, target);
   }
 
-  public upsertLink(newLink: MLink): boolean {
+  public async upsertLink(newLink: MLink): Promise<boolean> {
     return this.linkRepo.upsertLink(this.scopeId, newLink);
   }
 
-  public getLink(  
+  public async getLink(
     source: string,
     target: string,
     port?: string
-  ): MLink | undefined {
+  ): Promise<MLink | undefined> {
     return this.linkRepo.getLink(this.scopeId, source, target, port);
   }
 
-  public getLinks(): MLink[] {
+  public async getLinks(): Promise<MLink[]> {
     return this.linkRepo.getLinks(this.scopeId);
   }
 
-  public deleteLink(link: MLink): boolean {
+  public async deleteLink(link: MLink): Promise<boolean> {
     return this.linkRepo.deleteLink(this.scopeId, link);
   }
 }
