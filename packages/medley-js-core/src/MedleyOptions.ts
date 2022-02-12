@@ -1,11 +1,12 @@
 import { Composer } from "./Composer";
-import { Loader } from "./core";
+import { IdGenerator, Loader } from "./core";
 import { MedleyTypes } from "./MedleyTypes";
 import { LinkRepository, NodeRepository, TypeRepository } from "./repositories";
 import { Links, Nodes, Types } from "./scoped";
 
 export interface MedleyOptions<MT extends MedleyTypes = MedleyTypes> {
   loader?: Loader<NonNullable<MT["type"]>>;
+  idGenerator?: IdGenerator;
   typeRepository?: TypeRepository<NonNullable<MT["type"]>>;
   nodeRepository?: NodeRepository<NonNullable<MT["node"]>>;
   linkRepository?: LinkRepository<NonNullable<MT["link"]>>;

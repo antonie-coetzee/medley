@@ -1,5 +1,5 @@
 import { Composer } from "./Composer";
-import { DEFAULT_SCOPE, Loader } from "./core";
+import { defaultIdGenerator, DEFAULT_SCOPE, IdGenerator, Loader } from "./core";
 import { Graph } from "./Graph";
 import { MedleyOptions } from "./MedleyOptions";
 import { MedleyTypes } from "./MedleyTypes";
@@ -7,14 +7,13 @@ import { LinkRepository, NodeRepository, TypeRepository } from "./repositories";
 import { Links, Nodes, Types } from "./scoped";
 
 export class Medley<MT extends MedleyTypes = MedleyTypes> {
+  public readonly idGenerator: IdGenerator;
   public readonly loader: Loader<NonNullable<MT["type"]>>;
   public readonly nodeRepository: NodeRepository<NonNullable<MT["node"]>>;
   public readonly typeRepository: TypeRepository<NonNullable<MT["type"]>>;
   public readonly linkRepository: LinkRepository<NonNullable<MT["link"]>>;
   public readonly composer: Composer<MT>;
-
   public readonly scope: string;
-
   public readonly nodes: Nodes<NonNullable<MT["node"]>>;
   public readonly types: Types<NonNullable<MT["type"]>>;
   public readonly links: Links<NonNullable<MT["link"]>>;
@@ -23,8 +22,10 @@ export class Medley<MT extends MedleyTypes = MedleyTypes> {
 
   public constructor(options?: MedleyOptions<MT>) {
     this.loader = options?.loader || { import: async () => undefined };
+    this.idGenerator = options?.idGenerator || defaultIdGenerator;
     this.nodeRepository =
-      options?.nodeRepository || new NodeRepository<NonNullable<MT["node"]>>();
+      options?.nodeRepository ||
+      new NodeRepository<NonNullable<MT["node"]>>(this.idGenerator);
     this.typeRepository =
       options?.typeRepository ||
       new TypeRepository<NonNullable<MT["type"]>>(this.loader);

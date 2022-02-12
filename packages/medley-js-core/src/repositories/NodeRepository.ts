@@ -1,12 +1,10 @@
-import {
-  DEFAULT_SCOPE, generateId,
-  Node,
-  NodePart, TreeMap
-} from "../core";
+import { DEFAULT_SCOPE, IdGenerator, Node, NodePart, TreeMap } from "../core";
 
 export class NodeRepository<MNode extends Node> {
   public nodeIndex: Map<string, MNode> = new Map();
   public nodeTreeMap: TreeMap<MNode> = new TreeMap();
+
+  constructor(private idGenerator: IdGenerator) {}
 
   public setNodes(nodes: MNode[]): void {
     this.nodeTreeMap.clearNodes();
@@ -17,9 +15,9 @@ export class NodeRepository<MNode extends Node> {
   }
 
   public getNodes(scopeId?: string): MNode[] {
-    if(scopeId){
+    if (scopeId) {
       return this.nodeTreeMap.getFromPath(false, scopeId);
-    }else{
+    } else {
       return this.nodeTreeMap.getNodes();
     }
   }
@@ -29,10 +27,9 @@ export class NodeRepository<MNode extends Node> {
   }
 
   public insertNodePart(scopeId: string, nodePart: NodePart<MNode>): MNode {
-    let newId: string;
-    do {
-      newId = generateId();
-    } while (this.nodeIndex.get(`${scopeId}${newId}`));
+    let newId = this.idGenerator(
+      (id) => this.nodeIndex.get(`${scopeId}${id}`) != null
+    );
     let newNode = {
       ...nodePart,
       id: newId,
