@@ -1,4 +1,4 @@
-import { BooleanType } from "@/types/Primitives/Boolean";
+import { BooleanType } from "@/types/DataTypes/Boolean";
 import { NodeContext } from "@medley-js/core";
 import { ExitToApp } from "@mui/icons-material";
 import { Chip, MenuItem } from "@mui/material";

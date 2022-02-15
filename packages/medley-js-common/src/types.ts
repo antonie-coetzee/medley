@@ -70,6 +70,7 @@ export type CNodePart<TNode extends CNode = CNode> = NodePart<TNode>;
 
 export interface CType extends Type {
   version: string;
+  primitive?: boolean;
   label?: string;
   description?: string;
   category?: string[];

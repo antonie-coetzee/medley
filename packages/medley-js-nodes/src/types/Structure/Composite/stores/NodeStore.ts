@@ -20,7 +20,6 @@ export class NodeStore {
   }
 
   updatePorts() {
-    console.log("update ports");
     this.inputNodes = this.compositeScope.nodes
       .getNodes()
       .filter((n) => n.type === InputType.name)

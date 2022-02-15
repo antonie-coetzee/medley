@@ -14,6 +14,8 @@ import {
   Types,
 } from "@medley-js/core";
 import { onTypeUpsert } from "..";
+import { InputType } from "../../scopedTypes/input";
+import { OutputType } from "../../scopedTypes/output";
 import { onLinksChange } from "../links";
 import { onNodeInsert, onNodesChange } from "../nodes";
 
@@ -93,5 +95,7 @@ export function createCompositeScope(medley: CMedley, compositeNodeId: string) {
       },
     }),
   });
+  compositeScope.types.upsertType({...InputType, scope: compositeScope.scope});
+  compositeScope.types.upsertType({...OutputType, scope: compositeScope.scope});
   return compositeScope;
 }

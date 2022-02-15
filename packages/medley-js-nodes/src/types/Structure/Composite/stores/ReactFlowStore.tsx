@@ -122,7 +122,6 @@ export class ReactFlowStore {
       node: RFNode<any>
     ) => void = (_, rfNode) => {
       const mNode = this.compositeScope.nodes.getNode(rfNode.id);
-      console.log(rfNode);
       if (mNode) {
         const pos = rfNode.position;
         this.editStore.moveNode(mNode, [pos.x, pos.y], async () => {} );
