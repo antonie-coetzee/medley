@@ -1,16 +1,18 @@
+import "@/lib/extensions";
 import { TEditNodeComponent } from "@medley-js/common";
 import { observer, Provider } from "mobx-react";
 import React from "react";
 import ReactFlow, {
   Controls,
   MiniMap,
-  ReactFlowProvider
+  ReactFlowProvider,
+  useEdgesState,
+  useNodesState,
 } from "react-flow-renderer";
 import { CompositeNode } from "../node";
-import { getStores, Stores, useStores } from "../stores";
+import { getStores, useStores } from "../stores";
 import { ContextMenu } from "./ContextMenu";
 import { DialogManager } from "./DialogManager";
-import "@/lib/extensions";
 
 export const EditComponent: React.VFC = observer(() => {
   const { reactFlowStore: rFS, contextMenuStore: cMS } = useStores();
@@ -21,6 +23,7 @@ export const EditComponent: React.VFC = observer(() => {
           <ReactFlow
             {...rFS.reactFlowProps}
             onPaneContextMenu={cMS.handleContextMenu}
+            fitView
           >
             <MiniMap />
             <Controls />

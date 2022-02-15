@@ -25,10 +25,10 @@ export class Composer<MT extends MedleyTypes = MedleyTypes> {
     nodeId: string,
     ...args: T extends (...args: any) => any ? Parameters<T> : any[]
   ): Promise<Unwrap<T>> {
-    return this.runNodeWithInputProvider(nodeId, null, ...args);
+    return this.runNodeExtended(nodeId, null, ...args);
   }
 
-  public async runNodeWithInputProvider<T = unknown>(
+  public async runNodeExtended<T = unknown>(
     nodeId: string,
     inputProvider: InputProvider<MT> | null,
     ...args: T extends (...args: any) => any ? Parameters<T> : any[]
@@ -53,11 +53,11 @@ export class Composer<MT extends MedleyTypes = MedleyTypes> {
 
     if (inputProvider == null) {
       context.input = this.portInput.bind({
-        conductor: this,
+        composer: this,
         nodeId,
       }) as Input;
     } else {
-      context.input = this.inputProvider.bind({
+      context.input = this.providerInput.bind({
         conductor: this,
         context,
         inputProvider,
@@ -67,7 +67,7 @@ export class Composer<MT extends MedleyTypes = MedleyTypes> {
     return nodeFunction(context, args);
   }
 
-  private async inputProvider(
+  private async providerInput(
     this: {
       context: ExecutionContext<MT["node"], MT>;
       conductor: Composer<MT>;
@@ -85,12 +85,12 @@ export class Composer<MT extends MedleyTypes = MedleyTypes> {
   private async portInput(
     this: {
       nodeId: string;
-      conductor: Composer<MT>;
+      composer: Composer<MT>;
     },
     port: Port,
     ...args: any[]
   ): Promise<unknown | undefined> {
-    let links = this.conductor.medley.links.getPortLinks(
+    let links = this.composer.medley.links.getPortLinks(
       port.name,
       this.nodeId
     );
@@ -104,6 +104,6 @@ export class Composer<MT extends MedleyTypes = MedleyTypes> {
       throw new Error(`multiple links detected for port: '${port.name}'`);
     }
     const link = links[0];
-    return this.conductor.runLink(link, args);
+    return this.composer.runLink(link, args);
   }
 }

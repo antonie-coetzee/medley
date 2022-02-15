@@ -13,7 +13,6 @@ import {
   TNodeComponentProps,
 } from "@medley-js/common";
 import {
-  generateId,
   isPortLink,
   LinkContext,
   NodeContext,
@@ -22,14 +21,15 @@ import {
 import { debounce } from "@mui/material";
 import { makeAutoObservable, observable, runInAction } from "mobx";
 import { observer } from "mobx-react";
-import React, { ComponentType, memo, ReactNode, VFC } from "react";
+import React, { ComponentType, memo, ReactNode, useCallback, VFC } from "react";
 import {
+  applyNodeChanges,
   BezierEdge,
   Connection,
   Edge,
   EdgeProps,
   Node as RFNode,
-  OnLoadParams,
+  NodeChange,
   Position,
   ReactFlowProps,
 } from "react-flow-renderer";
@@ -40,7 +40,6 @@ import { CompositeNode } from "../node";
 import { EditStore } from "./EditStore";
 
 export class ReactFlowStore {
-  public reactFlowInstance: OnLoadParams | null = null;
   public reactFlowProps: ReactFlowProps | null = null;
   private compositeScope: CMedley;
   private nodeTypesId: string = "";
@@ -66,9 +65,7 @@ export class ReactFlowStore {
   updateReactFlowProps(reactFlowProps: ReactFlowProps) {
     const props = {
       ...this.reactFlowProps,
-      ...reactFlowProps,
-      nodeTypesId: this.nodeTypesId,
-      edgeTypesId: this.edgeTypesId,
+      ...reactFlowProps
     };
     this.reactFlowProps = props;
   }
@@ -81,7 +78,7 @@ export class ReactFlowStore {
       this.host
     );
     const events = this.getReactFlowEvents();
-    this.updateReactFlowProps({ elements, nodeTypes, edgeTypes, ...events });
+    this.updateReactFlowProps({ ...elements, nodeTypes, edgeTypes, ...events });
   }
 
   private registerMedleyEvents() {
@@ -103,8 +100,8 @@ export class ReactFlowStore {
     }
     if (medley.types[onTypeUpsert] == null) {
       medley.types[onTypeUpsert] = (type) => {
-        this.nodeTypesId = generateId();
-        this.edgeTypesId = generateId();
+        this.nodeTypesId = medley.idGenerator(()=>false);
+        this.edgeTypesId = medley.idGenerator(()=>false);
         return type;
       };
     }
@@ -120,33 +117,25 @@ export class ReactFlowStore {
       });
     };
 
-    const onLoad: (instance: OnLoadParams) => void = (instance) => {
-      this.reactFlowInstance = instance;
-      runInAction(() => {
-        instance.fitView();
-      });
-    };
-
     const onNodeDragStop: (
       event: React.MouseEvent<Element, MouseEvent>,
       node: RFNode<any>
     ) => void = (_, rfNode) => {
       const mNode = this.compositeScope.nodes.getNode(rfNode.id);
+      console.log(rfNode);
       if (mNode) {
         const pos = rfNode.position;
-        this.editStore.moveNode(mNode, [pos.x, pos.y], () =>
-          this.updateReactFlow()
-        );
+        this.editStore.moveNode(mNode, [pos.x, pos.y], async () => {} );
       }
     };
 
-    return { onConnect, onNodeDragStop, onLoad };
+    return { onConnect, onNodeDragStop};
   }
 
   async getReactFlowElements(contex: NodeContext<CompositeNode, CMedleyTypes>) {
     const reactFlowNodes = await this.getReactFlowNodes(contex);
     const reactFlowEdges = await this.getReactFlowEdges(contex);
-    return [...reactFlowNodes, ...reactFlowEdges];
+    return {defaultNodes: reactFlowNodes, defaultEdges : reactFlowEdges};
   }
 
   getReactFlowNodes(
