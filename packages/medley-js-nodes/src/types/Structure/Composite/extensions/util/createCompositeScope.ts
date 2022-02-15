@@ -33,6 +33,9 @@ export function createCompositeScope(medley: CMedley, compositeNodeId: string) {
     linkRepository: parent.linkRepository,
     loader: parent.loader,
     types: chainObjects(scopedTypes, {
+      getTypes: () => {
+          return [...parent.types.getTypes().filter(t=>t.volatile !== true), ...scopedTypes.getTypes()];
+      },
       getType: (typeName) => {
         const type = scopedTypes.getType(typeName);
         if (type) {
@@ -95,7 +98,5 @@ export function createCompositeScope(medley: CMedley, compositeNodeId: string) {
       },
     }),
   });
-  compositeScope.types.upsertType({...InputType, scope: compositeScope.scope});
-  compositeScope.types.upsertType({...OutputType, scope: compositeScope.scope});
   return compositeScope;
 }

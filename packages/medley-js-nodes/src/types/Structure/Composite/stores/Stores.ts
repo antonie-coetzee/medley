@@ -8,6 +8,8 @@ import { NodeContext } from "@medley-js/core";
 import { NodeStore } from "./NodeStore";
 import React from "react";
 import { MobXProviderContext } from "mobx-react";
+import { InputType } from "../scopedTypes/input";
+import { OutputType } from "../scopedTypes/output";
 
 const storesKey = Symbol();
 
@@ -31,6 +33,9 @@ export class Stores {
   nodeStore:NodeStore;
 
   constructor(context: NodeContext<CompositeNode, CMedleyTypes>, host:Host) {
+    context.compositeScope.types.upsertType({...InputType, scope: context.compositeScope.scope});
+    context.compositeScope.types.upsertType({...OutputType, scope: context.compositeScope.scope});
+    
     this.nodeStore = new NodeStore(context);
     this.dialogStore = new DialogStore();
     this.editStore = new EditStore(host, this.dialogStore, this.nodeStore);

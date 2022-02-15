@@ -1,5 +1,5 @@
 import { BooleanType } from "@/types/DataTypes/Boolean";
-import { NodeContext } from "@medley-js/core";
+import { CNodeContext } from "@medley-js/common"
 import { ExitToApp } from "@mui/icons-material";
 import { Chip, MenuItem } from "@mui/material";
 import { makeAutoObservable, observable, toJS } from "mobx";
@@ -21,7 +21,7 @@ export class ContextMenuStore {
   }>[] = [];
 
   constructor(
-    private context: NodeContext<CompositeNode>,
+    private context: CNodeContext<CompositeNode>,
     private editStore: EditStore
   ) {
     this.menuItems.push(this.menuAddInputNode());
@@ -69,36 +69,32 @@ export class ContextMenuStore {
     mouseX?: number;
     mouseY?: number;
   }> {
+
     const editStore = this.editStore;
     return ({ close, mouseX, mouseY }) => {
-      const addInput = async () => {
-        await editStore.createNode(InputType, [mouseX || 0, mouseY || 0]);
-        close();
-      };
-      const addBoolean = async () => {
-        await editStore.createNode(BooleanType, [mouseX || 0, mouseY || 0]);
-        close();
-      };
+      const allTypes = this.context.compositeScope.types.getTypes();
+      const types = allTypes.filter(t=>t.primitive === true && t.volatile !== true);
+      const inputType = this.context.compositeScope.types.getType(InputType.name);
+      if(inputType){
+        types.push(inputType);
+      } 
       return (
         <>
-          <MenuItem onClick={addInput}>
-            <Chip
-              icon={<ExitToApp />}
-              label="Input"
-              color={"primary"}
-              variant="outlined"
-              style={{ borderWidth: "2px" }}
-            />
-          </MenuItem>
-          <MenuItem onClick={addBoolean}>
-            <Chip
-              icon={<ExitToApp />}
-              label="Boolean"
-              color={"success"}
-              variant="outlined"
-              style={{ borderWidth: "2px" }}
-            />
-          </MenuItem>
+          {
+            types.map(type => {
+              return <MenuItem onClick={async () => {
+                await editStore.createNode(type, [mouseX || 0, mouseY || 0]);
+                close();
+              }}>
+                <Chip
+                  label={type.name}
+                  color={"primary"}
+                  variant="outlined"
+                  style={{ borderWidth: "2px" }}
+                />
+              </MenuItem>             
+            })
+          }
         </>
       );
     };

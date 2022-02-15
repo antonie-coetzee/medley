@@ -5,5 +5,6 @@ export const OutputType: CType = {
   name: exports.outputTypeName,
   version: "1.0.0",
   volatile: true,
+  primitive: true,
   import: () => Promise.resolve(exports),
 };

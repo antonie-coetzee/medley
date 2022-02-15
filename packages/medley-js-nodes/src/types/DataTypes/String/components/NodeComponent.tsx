@@ -25,7 +25,8 @@ export const NodeComponent: TNodeComponent<StringNode> = ({ context }) => {
         id={context.node.id}
         output={true}
         style={{
-          backgroundColor: "pink",
+          backgroundColor: "Magenta",
+          right: "-6px",
         }}
       />
     </Box>
