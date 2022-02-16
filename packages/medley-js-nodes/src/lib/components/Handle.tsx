@@ -1,6 +1,6 @@
 import { Box, SxProps } from "@mui/system";
-import React from "react";
 import { observer } from "mobx-react";
+import React from "react";
 import { Handle as RfHandle, Position } from "react-flow-renderer";
 
 const Label: React.FC<{ justifyRight: boolean; labelStyle?: SxProps }> = ({
@@ -28,10 +28,10 @@ const Label: React.FC<{ justifyRight: boolean; labelStyle?: SxProps }> = ({
   );
 };
 
-const HandleWrapper: React.FC<{ output: boolean; handleStyle?: SxProps }> = ({
+const HandleWrapper: React.FC<{ output: boolean; containerStyle?: SxProps; }> = ({
   children,
   output,
-  handleStyle,
+  containerStyle,
 }) => {
   return (
     <div className={"handle"}>
@@ -45,7 +45,7 @@ const HandleWrapper: React.FC<{ output: boolean; handleStyle?: SxProps }> = ({
           paddingLeft: !output ? "3px" : undefined,
           transform: `translate(${output ? "10px" : "-10px"})`,
           width: "calc(100%) + 10px",
-          ...handleStyle,
+          ...containerStyle,
         }}
       >
         {children}
@@ -59,9 +59,10 @@ export const Handle: React.VFC<{
   output?: boolean;
   label?: string;
   color?: string;
-  handleStyle?: SxProps;
+  containerStyle?: SxProps;
+  handleStyle?: React.CSSProperties;
   labelStyle?: SxProps;
-}> = observer(({ id, output, label, color, handleStyle, labelStyle }) => {
+}> = observer(({ id, output, label, color, containerStyle, handleStyle, labelStyle }) => {
   const handle = (
     <RfHandle
       key={id}
@@ -78,6 +79,7 @@ export const Handle: React.VFC<{
         backgroundColor: color ?? "#0288d1",
         position: "unset",
         transform: "none",
+        ...handleStyle
       }}
       isConnectable
       id={id}
@@ -90,8 +92,14 @@ export const Handle: React.VFC<{
     </Label>
   );
   return (
-    <HandleWrapper output={isOutput} handleStyle={handleStyle}>
-      {isOutput ? [hLabel, handle] : [handle, hLabel]}
-    </HandleWrapper>
+    <>
+      {label == null ? (
+        handle
+      ) : (
+        <HandleWrapper output={isOutput} containerStyle={containerStyle}>
+          {isOutput ? [hLabel, handle] : [handle, hLabel]}
+        </HandleWrapper>
+      )}
+    </>
   );
 });

@@ -14,9 +14,7 @@ function getHandles(nodeStore: NodeStore) {
     .sort((a, b) => a.name.localeCompare(b.name))
     .map((n) => {
       return (
-        <Observer key={n.id}>
-         {()=><Handle id={n.id} key={n.id} label={n.name} color={n.value.color} />}
-        </Observer>
+         <Handle id={n.id} key={n.id} label={n.name} color={n.value.color} />
       );
     });
   let outputHandles: JSX.Element[] = [];
@@ -87,8 +85,6 @@ export const NodeComponent: TNodeComponent<CompositeNode> = ({
             {getHandles(nodeStore)}
           </Box>
         </CardContent>
-        {/* <CardContent>
-        </CardContent> */}
       </Card>
     </>
   );

@@ -12,7 +12,6 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  SelectChangeEvent,
   Slider,
   Typography,
 } from "@mui/material";
@@ -21,11 +20,6 @@ import { IdentityNode } from "./node";
 export const NodeComponent: TNodeComponent<IdentityNode> = ({ context:{node}, selected }) => {
     const [age, setAge] = React.useState('');
     const [slider, setSlider] = React.useState(node.value?.slider || 0);
-    const handleChange = (event: SelectChangeEvent) => {
-      const newAge = event.target.value as string;
-      setAge(newAge);
-      node.value = {...node.value, age:newAge}
-    };
     return (
       <>
         <Handle
@@ -64,11 +58,6 @@ export const NodeComponent: TNodeComponent<IdentityNode> = ({ context:{node}, se
               aria-label="Small"
               valueLabelDisplay="auto"
               value={slider}
-              onChange={(_,v)=>{
-                const n = v as number;
-                setSlider(n) ;
-                node.value = {...node.value, slider:n}
-              }}
             />
             <FormControl fullWidth>
               <InputLabel id="demo-simple-select-label">Age</InputLabel>
@@ -77,7 +66,6 @@ export const NodeComponent: TNodeComponent<IdentityNode> = ({ context:{node}, se
                 id="demo-simple-select"
                 value={age}
                 label="Age"
-                onChange={handleChange}
               >
                 <MenuItem value={10}>Ten</MenuItem>
                 <MenuItem value={20}>Twenty</MenuItem>

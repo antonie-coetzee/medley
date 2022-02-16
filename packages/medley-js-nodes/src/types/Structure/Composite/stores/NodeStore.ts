@@ -15,6 +15,10 @@ export class NodeStore {
 
   constructor(context: NodeContext<CompositeNode, CMedleyTypes>) {
     makeAutoObservable(this, { compositeScope: false });
+    
+    context.compositeScope.types.upsertType({...InputType, scope: context.compositeScope.scope});
+    context.compositeScope.types.upsertType({...OutputType, scope: context.compositeScope.scope});
+
     this.compositeScope = context.compositeScope;
     this.parentScope = context.medley;
   }

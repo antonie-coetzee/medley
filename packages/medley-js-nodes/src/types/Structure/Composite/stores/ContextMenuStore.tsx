@@ -82,7 +82,7 @@ export class ContextMenuStore {
         <>
           {
             types.map(type => {
-              return <MenuItem onClick={async () => {
+              return <MenuItem key={type.name} onClick={async () => {
                 await editStore.createNode(type, [mouseX || 0, mouseY || 0]);
                 close();
               }}>
