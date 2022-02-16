@@ -57,7 +57,7 @@ export const NodeComponent: TNodeComponent<CompositeNode> = ({
         variant="outlined"
         sx={
           selected
-            ? { boxShadow: 2, borderWidth: "2px" }
+            ? { boxShadow: 2, borderWidth: "2px"}
             : { borderWidth: "2px" }
         }
       >

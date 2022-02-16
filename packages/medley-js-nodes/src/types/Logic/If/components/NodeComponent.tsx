@@ -11,7 +11,7 @@ export const NodeComponent: TNodeComponent<IfNode> = (props) => {
     <Paper
       variant="outlined"
       sx={{
-        backgroundColor: "lightyellow",
+        backgroundColor: "ivory",
       }}
     >
       <Box

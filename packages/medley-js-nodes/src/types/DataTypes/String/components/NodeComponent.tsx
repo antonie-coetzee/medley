@@ -20,6 +20,9 @@ export const NodeComponent: TNodeComponent<StringNode> = ({ context }) => {
         rows={4}
         value={node.value}
         onChange={handleChange}
+        sx={{
+          backgroundColor:"lavenderblush"
+        }}
       />
       <Terminal
         id={context.node.id}

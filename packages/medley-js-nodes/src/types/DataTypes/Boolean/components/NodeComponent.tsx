@@ -18,7 +18,12 @@ export const NodeComponent: TNodeComponent<BooleanNode> = ({
 
   return (
     <Box>
-      <Paper variant="outlined">
+      <Paper
+        variant="outlined"
+        sx={{
+          backgroundColor: "honeydew",
+        }}
+      >
         <Switch
           checked={context.node.value || false}
           onChange={handleChange}
