@@ -1,4 +1,4 @@
 export interface Port<T = unknown> {
-  name: string;
+  id: string;
   required?:boolean;
 }

@@ -10,9 +10,9 @@ export const nodeFunction: NF = async ({ input }, testArg: string) => {
 };
 
 const portOne: Port<string> = {
-  name: "typeOnePortOne",
+  id: "typeOnePortOne",
 };
 
 const portTwo: Port<string> = {
-  name: "typeOnePortTwo",
+  id: "typeOnePortTwo",
 };

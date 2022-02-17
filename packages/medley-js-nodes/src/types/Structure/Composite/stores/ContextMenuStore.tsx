@@ -1,6 +1,4 @@
-import { BooleanType } from "@/types/DataTypes/Boolean";
-import { CNodeContext } from "@medley-js/common"
-import { ExitToApp } from "@mui/icons-material";
+import { CNodeContext } from "@medley-js/common";
 import { Chip, MenuItem } from "@mui/material";
 import { makeAutoObservable, observable, toJS } from "mobx";
 import React from "react";
@@ -69,32 +67,52 @@ export class ContextMenuStore {
     mouseX?: number;
     mouseY?: number;
   }> {
-
     const editStore = this.editStore;
     return ({ close, mouseX, mouseY }) => {
       const allTypes = this.context.compositeScope.types.getTypes();
-      const types = allTypes.filter(t=>t.primitive === true && t.volatile !== true);
-      const inputType = this.context.compositeScope.types.getType(InputType.name);
-      if(inputType){
+      const types = allTypes.filter(
+        (t) => t.primitive === true && t.volatile !== true
+      );
+      const inputType = this.context.compositeScope.types.getType(
+        InputType.name
+      );
+      if (inputType) {
         types.push(inputType);
-      } 
+      }
       return (
         <>
-          {
-            types.map(type => {
-              return <MenuItem key={type.name} onClick={async () => {
-                await editStore.createNode(type, [mouseX || 0, mouseY || 0]);
-                close();
-              }}>
+          <MenuItem
+            key={"run"}
+            onClick={async () => {
+              await editStore.runNode();
+              close();
+            }}
+          >
+            <Chip
+              label={"Run"}
+              color={"primary"}
+              variant="outlined"
+              style={{ borderWidth: "2px" }}
+            />
+          </MenuItem>
+          {types.map((type) => {
+            return (
+              <MenuItem
+                key={type.name}
+                onClick={async () => {
+                  await editStore.createNode(type, [mouseX || 0, mouseY || 0]);
+                  close();
+                }}
+              >
                 <Chip
                   label={type.name}
                   color={"primary"}
                   variant="outlined"
                   style={{ borderWidth: "2px" }}
                 />
-              </MenuItem>             
-            })
-          }
+              </MenuItem>
+            );
+          })}
         </>
       );
     };

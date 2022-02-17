@@ -1,33 +1,33 @@
-import { Terminal } from "@/lib/components";
-import { TNodeComponent } from "@medley-js/common";
-import { Box, TextField } from "@mui/material";
-import { runInAction } from "mobx";
 import React from "react";
-import { StringNode } from "../node";
+import { TNodeComponent } from "@medley-js/common";
+import { NumberNode } from "../node";
+import { runInAction } from "mobx";
+import { Box, TextField } from "@mui/material";
+import { Terminal } from "@/lib/components";
 
-export const NodeComponent: TNodeComponent<StringNode> = ({ context }) => {
+export const NodeComponent: TNodeComponent<NumberNode> = ({ context }) => {
   const node = context.observableNode;
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     runInAction(() => {
-      node.value = event.target.value;
+        node.value = event.target.value;
     });
   };
 
   return (
     <Box>
       <TextField
-        multiline
         value={node.value}
         onChange={handleChange}
+        inputProps={{ type: 'number'}}
         sx={{
-          backgroundColor:"lavenderblush"
+          backgroundColor:"cornsilk"
         }}
       />
       <Terminal
         id={context.node.id}
         output={true}
         style={{
-          backgroundColor: "Magenta",
+          backgroundColor: "orange",
           right: "-6px",
         }}
       />

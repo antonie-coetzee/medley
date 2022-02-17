@@ -55,17 +55,17 @@ const HandleWrapper: React.FC<{ output: boolean; containerStyle?: SxProps; }> = 
 };
 
 export const Handle: React.VFC<{
-  id: string;
+  portId: string;
   output?: boolean;
   label?: string;
   color?: string;
   containerStyle?: SxProps;
   handleStyle?: React.CSSProperties;
   labelStyle?: SxProps;
-}> = observer(({ id, output, label, color, containerStyle, handleStyle, labelStyle }) => {
+}> = observer(({ portId, output, label, color, containerStyle, handleStyle, labelStyle }) => {
   const handle = (
     <RfHandle
-      key={id}
+      key={portId}
       type={output ? "source" : "target"}
       position={output ? Position.Right : Position.Left}
       style={{
@@ -82,12 +82,12 @@ export const Handle: React.VFC<{
         ...handleStyle
       }}
       isConnectable
-      id={id}
+      id={portId}
     ></RfHandle>
   );
   const isOutput = output || false;
   const hLabel = label && (
-    <Label justifyRight={isOutput} key={id + "label"} labelStyle={labelStyle}>
+    <Label justifyRight={isOutput} key={portId + "label"} labelStyle={labelStyle}>
       {label}
     </Label>
   );

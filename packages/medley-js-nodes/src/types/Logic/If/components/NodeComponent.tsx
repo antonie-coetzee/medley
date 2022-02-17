@@ -4,9 +4,9 @@ import { QuestionMark } from "@mui/icons-material";
 import { Box, Paper } from "@mui/material";
 import React from "react";
 import { IfNode } from "../node";
+import { falsePort, selectPort, truePort } from "../ports";
 
 export const NodeComponent: TNodeComponent<IfNode> = (props) => {
-  const id = props.context.node.id;
   return (
     <Paper
       variant="outlined"
@@ -25,16 +25,16 @@ export const NodeComponent: TNodeComponent<IfNode> = (props) => {
       </Box>
       <Handle
         output
-        id={"output"}
+        portId={props.context.node.id}
         color={"black"}
         handleStyle={{
           position: "absolute",
           top: "57%",
         }}
       />
-      <Handle id={"true"} color={"green"} label={"true"} />
-      <Handle id={"select"} label={"select"} />
-      <Handle id={"false"} color={"grey"} label={"false"} />
+      <Handle portId={truePort.id} color={"green"} label={"true"} />
+      <Handle portId={selectPort.id} label={"select"} />
+      <Handle portId={falsePort.id} color={"grey"} label={"false"} />
     </Paper>
   );
 };

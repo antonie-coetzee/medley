@@ -19,17 +19,15 @@ import {
   PortLink,
 } from "@medley-js/core";
 import { debounce } from "@mui/material";
-import { makeAutoObservable, observable, runInAction } from "mobx";
+import { makeAutoObservable, observable } from "mobx";
 import { observer } from "mobx-react";
-import React, { ComponentType, memo, ReactNode, useCallback, VFC } from "react";
+import React, { ComponentType, memo, ReactNode, VFC } from "react";
 import {
-  applyNodeChanges,
   BezierEdge,
   Connection,
   Edge,
   EdgeProps,
   Node as RFNode,
-  NodeChange,
   Position,
   ReactFlowProps,
 } from "react-flow-renderer";
@@ -65,7 +63,7 @@ export class ReactFlowStore {
   updateReactFlowProps(reactFlowProps: ReactFlowProps) {
     const props = {
       ...this.reactFlowProps,
-      ...reactFlowProps
+      ...reactFlowProps,
     };
     this.reactFlowProps = props;
   }
@@ -100,8 +98,8 @@ export class ReactFlowStore {
     }
     if (medley.types[onTypeUpsert] == null) {
       medley.types[onTypeUpsert] = (type) => {
-        this.nodeTypesId = medley.idGenerator(()=>false);
-        this.edgeTypesId = medley.idGenerator(()=>false);
+        this.nodeTypesId = medley.idGenerator(() => false);
+        this.edgeTypesId = medley.idGenerator(() => false);
         return type;
       };
     }
@@ -124,17 +122,17 @@ export class ReactFlowStore {
       const mNode = this.compositeScope.nodes.getNode(rfNode.id);
       if (mNode) {
         const pos = rfNode.position;
-        this.editStore.moveNode(mNode, [pos.x, pos.y], async () => {} );
+        this.editStore.moveNode(mNode, [pos.x, pos.y], async () => {});
       }
     };
 
-    return { onConnect, onNodeDragStop};
+    return { onConnect, onNodeDragStop };
   }
 
   async getReactFlowElements(contex: NodeContext<CompositeNode, CMedleyTypes>) {
     const reactFlowNodes = await this.getReactFlowNodes(contex);
     const reactFlowEdges = await this.getReactFlowEdges(contex);
-    return {defaultNodes: reactFlowNodes, defaultEdges : reactFlowEdges};
+    return { defaultNodes: reactFlowNodes, defaultEdges: reactFlowEdges };
   }
 
   getReactFlowNodes(

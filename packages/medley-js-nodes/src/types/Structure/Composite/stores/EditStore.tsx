@@ -94,6 +94,18 @@ export class EditStore {
     });
   }
 
+  async runNode() {
+    try {
+      const result = await this.nodeStore.parentScope.composer.runNode(this.nodeStore.compositeScope.scope);
+      if(result){
+        console.log(result);
+      }   
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+
   /**
    * create a new node, by first executing its
    * CreateNode function, then passing in the NodePart from there into the

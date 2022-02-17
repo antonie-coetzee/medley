@@ -6,7 +6,7 @@ export const typeTwoNodeFunction: NF = async ({ input}) => {
 };
 
 const typeTwoPortOne: Port<string> = {
-  name: "typeTwoPortOne",
+  id: "typeTwoPortOne",
 };
 
 export const typeFiveNodeFunction: NF = async ({ input }) => {
@@ -15,6 +15,6 @@ export const typeFiveNodeFunction: NF = async ({ input }) => {
 };
 
 const typeFivePortOne: Port<string> = {
-  name: "typeFivePortOne",
+  id: "typeFivePortOne",
 };
 

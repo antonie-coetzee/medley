@@ -14,7 +14,7 @@ function getHandles(nodeStore: NodeStore) {
     .sort((a, b) => a.name.localeCompare(b.name))
     .map((n) => {
       return (
-         <Handle id={n.id} key={n.id} label={n.name} color={n.value.color} />
+         <Handle portId={n.id} key={n.id} label={n.name} color={n.value.color} />
       );
     });
   let outputHandles: JSX.Element[] = [];
@@ -23,7 +23,7 @@ function getHandles(nodeStore: NodeStore) {
     outputHandles = [
       <Handle
         output
-        id={outputNode.id}
+        portId={outputNode.id}
         key={outputNode.id}
         label={outputNode.name}
       />,

@@ -39,7 +39,8 @@ export const NodeContainer: React.FC<NodeContainerProps> = (props) => {
   const node = props.context.node;
 
   useEffect(() => {
-    (async () => {
+    let isMounted = true; 
+    (async () => { 
       const editNodeFunc = await compositeScope.types.getExport(
         node.type,
         constants.editNode
@@ -48,11 +49,14 @@ export const NodeContainer: React.FC<NodeContainerProps> = (props) => {
         node.type,
         constants.HelpNodeComponent
       );
-      setSupportedActions({
-        canEdit: editNodeFunc != null,
-        canHelp: helpFunc != null,
-      });
-    })();
+      if(isMounted){
+        setSupportedActions({
+          canEdit: editNodeFunc != null,
+          canHelp: helpFunc != null,
+        });
+      }
+    })()
+    return () => { isMounted = false };
   }, []);
 
   return (

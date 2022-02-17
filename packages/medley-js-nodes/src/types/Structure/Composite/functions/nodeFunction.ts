@@ -1,4 +1,5 @@
 import { CMedley, CNF } from "@medley-js/common";
+import { nodeFunction as nodeFunctionExportName} from "@medley-js/core";
 import { CompositeNode } from "../node";
 import { inputTypeName } from "../scopedTypes/input/typeName";
 import { outputTypeName } from "../scopedTypes/output/typeName";
@@ -9,13 +10,13 @@ export const nodeFunction: CNF<CompositeNode> = async (cntx) => {
   // bridge child input nodes to composite node's input ports using node ids as port names
   prepareType(compositeScope, inputTypeName, ({ node }) => {
     return cntx.input({
-      name: node.id,
+      id: node.id,
     });
   });
   // output nodes returns port input, ensure type is present on scope
   prepareType(compositeScope, outputTypeName, ({ node, input }) => {
     return input({
-      name: node.id,
+      id: node.id,
     });
   });
 
@@ -40,7 +41,7 @@ function prepareType(
     // type exists on the current scope - update nodefunction
     type.exportMap = {
       ...type.exportMap,
-      nodeFunctionName: async () => nodeFunction,
+      [nodeFunctionExportName]: async () => nodeFunction,
     };
   } else {
     // type doesn't exist on the current scope - create
@@ -49,7 +50,7 @@ function prepareType(
       name: typeName,
       version: "1.0.0",
       exportMap: {
-        nodeFunctionName: async () => nodeFunction,
+        [nodeFunctionExportName]: async () => nodeFunction,
       },
     });
   }

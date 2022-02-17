@@ -75,9 +75,9 @@ export class Composer<MT extends MedleyTypes = MedleyTypes> {
     },
     port: Port
   ): Promise<unknown | undefined> {
-    const inputFunction = this.inputProvider[port.name];
+    const inputFunction = this.inputProvider[port.id];
     if (inputFunction == null && port.required) {
-      throw new Error(`port: '${port.name}' requires input`);
+      throw new Error(`port: '${port.id}' requires input`);
     }
     return inputFunction == null ? null : inputFunction(this.context);
   }
@@ -91,17 +91,17 @@ export class Composer<MT extends MedleyTypes = MedleyTypes> {
     ...args: any[]
   ): Promise<unknown | undefined> {
     let links = this.composer.medley.links.getPortLinks(
-      port.name,
+      port.id,
       this.nodeId
     );
     if (links == null || links.length === 0) {
       if (port.required) {
-        throw new Error(`required port not linked: '${port.name}'`);
+        throw new Error(`required port not linked: '${port.id}'`);
       }
       return;
     }
     if (links.length !== 1) {
-      throw new Error(`multiple links detected for port: '${port.name}'`);
+      throw new Error(`multiple links detected for port: '${port.id}'`);
     }
     const link = links[0];
     return this.composer.runLink(link, args);
