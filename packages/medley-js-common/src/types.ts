@@ -70,7 +70,6 @@ export type CNodePart<TNode extends CNode = CNode> = NodePart<TNode>;
 
 export interface CType extends Type {
   version: string;
-  primitive?: boolean;
   label?: string;
   description?: string;
   category?: string[];
@@ -78,7 +77,6 @@ export interface CType extends Type {
   repository?: string;
   system?: string;
   esm?: string;
-  nameSpace?: string;
   import?: () => Promise<{ [key: string]: unknown }>;
   exportMap?: {
     [key: string]: () => Promise<unknown>;

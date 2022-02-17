@@ -37,10 +37,15 @@ export class Composer<MT extends MedleyTypes = MedleyTypes> {
     if (node == null) {
       throw new Error(`node with id: '${nodeId}', not found`);
     }
+
+    const type = this.medley.types.getType(node.type);
+    if (type == null) {
+      throw new Error(`type with name: '${node.type}', not found`);
+    }
+
     const nodeFunction = await this.medley.types.getExport<
       NodeFunction<MT["node"], MT>
-    >(node.type, nodeFunctionExportName);
-
+    >(type.name, nodeFunctionExportName);
     if (nodeFunction == null) {
       throw new Error(`node function for type: '${node.type}', not valid`);
     }
@@ -48,22 +53,24 @@ export class Composer<MT extends MedleyTypes = MedleyTypes> {
     const context = new ExecutionContext<MT["node"], MT>(
       this.medley,
       node,
-      {} as Input
+      (async () => {}) as Input
     );
 
-    if (inputProvider == null) {
-      context.input = this.portInput.bind({
-        composer: this,
-        nodeId,
-      }) as Input;
-    } else {
-      context.input = this.providerInput.bind({
-        conductor: this,
-        context,
-        inputProvider,
-      }) as Input;
+    if (type.primitive === undefined || type.primitive === false) {
+      if (inputProvider == null) {
+        context.input = this.portInput.bind({
+          composer: this,
+          nodeId,
+        }) as Input;
+      } else {
+        context.input = this.providerInput.bind({
+          conductor: this,
+          context,
+          inputProvider,
+        }) as Input;
+      }
     }
-
+    
     return nodeFunction(context, args);
   }
 
@@ -90,10 +97,7 @@ export class Composer<MT extends MedleyTypes = MedleyTypes> {
     port: Port,
     ...args: any[]
   ): Promise<unknown | undefined> {
-    let links = this.composer.medley.links.getPortLinks(
-      port.id,
-      this.nodeId
-    );
+    let links = this.composer.medley.links.getPortLinks(port.id, this.nodeId);
     if (links == null || links.length === 0) {
       if (port.required) {
         throw new Error(`required port not linked: '${port.id}'`);
