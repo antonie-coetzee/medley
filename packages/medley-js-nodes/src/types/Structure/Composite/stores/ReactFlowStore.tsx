@@ -23,16 +23,17 @@ import { makeAutoObservable, observable } from "mobx";
 import { observer } from "mobx-react";
 import React, { ComponentType, memo, ReactNode, VFC } from "react";
 import {
-  BezierEdge,
   Connection,
   Edge,
+  EdgeChange,
   EdgeProps,
   Node as RFNode,
+  NodeChange,
   Position,
   ReactFlowProps,
 } from "react-flow-renderer";
 import { NodeStore } from ".";
-import { NodeContainer } from "../components";
+import { DefaultLinkComponent, NodeContainer } from "../components";
 import { onLinksChange, onNodesChange, onTypeUpsert } from "../extensions";
 import { CompositeNode } from "../node";
 import { EditStore } from "./EditStore";
@@ -114,6 +115,27 @@ export class ReactFlowStore {
         scope: this.compositeScope.scope,
       });
     };
+    const onEdgesChange = (edgeChanges: EdgeChange[]) => {
+      edgeChanges.forEach(ec=>{
+        if(ec.type === "remove"){
+          const edge = this.reactFlowProps?.defaultEdges?.find(e=>e.id === ec.id);
+          const link = (edge?.data as LinkContext)?.link;
+          if(link){
+            this.editStore.removeLink(link);
+          }
+        }
+      })
+    };
+    const onNodesChange = (nodesChange:NodeChange[]) => {
+      nodesChange.forEach(nc=>{
+        if(nc.type === "remove"){
+          const mNode = this.compositeScope.nodes.getNode(nc.id);
+          if(mNode){
+            this.editStore.removeNode(mNode);
+          }
+        }
+      })
+    };    
 
     const onNodeDragStop: (
       event: React.MouseEvent<Element, MouseEvent>,
@@ -126,7 +148,7 @@ export class ReactFlowStore {
       }
     };
 
-    return { onConnect, onNodeDragStop };
+    return { onConnect, onNodeDragStop, onEdgesChange, onNodesChange };
   }
 
   async getReactFlowElements(contex: NodeContext<CompositeNode, CMedleyTypes>) {
@@ -147,7 +169,7 @@ export class ReactFlowStore {
           DecorateNode<CNode>
         >(node.type, constants.decorateNode, nodeContext);
         const props = {
-          selectable: true,
+          selectable: false,
           draggable: true,
           connectable: true,
           sourcePosition: Position.Right,
@@ -195,7 +217,7 @@ export class ReactFlowStore {
             source: pLink.source,
             target: pLink.target,
             targetHandle: pLink.port,
-            type: linkComponent && node.type,
+            type: node.type,
           };
         })
     );
@@ -237,8 +259,13 @@ export class ReactFlowStore {
         if (crnt.linkComponent) {
           acc.edgeTypes[crnt.typeName] = wrapLinkComponent(
             host,
-            memo(observer(crnt.linkComponent)),
-            BezierEdge
+            memo(DefaultLinkComponent),
+            memo(observer(crnt.linkComponent))
+          );
+        }else{
+          acc.edgeTypes[crnt.typeName] = wrapLinkComponent(
+            host,
+            memo(DefaultLinkComponent)
           );
         }
         return acc;
@@ -301,9 +328,9 @@ function wrapNodeComponent(
 }
 
 function wrapLinkComponent(
-  host: Host,
-  LinkComponent: React.VFC<TLinkComponentProps>,
-  DefaultLinkComponent: ComponentType<LinkProps>
+  host: Host, 
+  DefaultLinkComponent: ComponentType<LinkProps>,
+  LinkComponent?: React.VFC<TLinkComponentProps>
 ) {
   const linkWrapper: VFC<
     EdgeProps & {
@@ -313,7 +340,7 @@ function wrapLinkComponent(
     }
   > = (props) => {
     const context = props.data.context;
-    if (context) {
+    if (LinkComponent && context) {
       return (
         <LinkComponent
           context={context}

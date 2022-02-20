@@ -1,6 +1,4 @@
 import * as types from "@/types";
-import { IdentityType } from "@/types/Identity";
-import { IdentityNode } from "@/types/Identity/node";
 import { CMedleyTypes, Coordinates, CType } from "@medley-js/common";
 import { Medley, NodeContext } from "@medley-js/core";
 import { CompositeType } from "..";
@@ -30,7 +28,7 @@ export const createEmptyCompositeNode = (medley: Medley<CMedleyTypes>) => {
   );
   const cs = cNodeContext.compositeScope;
 
-  const id_4 = cs.nodes.insertNodePart<OutputNode>({
+  cs.nodes.insertNodePart<OutputNode>({
     name: "OUTPUT",
     position: [600, 200],
     type: OutputType.name,
@@ -54,74 +52,24 @@ export const createBasicCompositeNode = (
   );
   const cs = cNodeContext.compositeScope;
 
-  const id_0 = cs.nodes.insertNodePart<InputNode>({
-    name: "INPUT1",
+  const id_1 = cs.nodes.insertNodePart<InputNode>({
+    name: "input 1",
     position: [0, 50],
     type: InputType.name,
     value: { color: "green" },
   });
 
-  const id_00 = cs.nodes.insertNodePart<InputNode>({
-    name: "abc",
+  const id_2 = cs.nodes.insertNodePart<InputNode>({
+    name: "input 2",
     position: [0, 100],
     type: InputType.name,
     value: { color: "red" },
   });
 
-  const id_01 = cs.nodes.insertNodePart<InputNode>({
-    name: "INPUT3",
-    position: [0, 150],
-    type: InputType.name,
-    value: { color: "blue" },
-  });
-
-  const id_1 = cs.nodes.insertNodePart<IdentityNode>({
-    name: "Test_1",
-    position: [200, 50],
-    type: IdentityType.name,
-    value: {},
-  });
-  const id_2 = cs.nodes.insertNodePart<IdentityNode>({
-    name: "Test_2",
-    position: [600, 50],
-    type: IdentityType.name,
-    value: {},
-  });
-  const id_3 = cs.nodes.insertNodePart<IdentityNode>({
-    name: "Test_3",
-    position: [1000, 300],
-    type: IdentityType.name,
-    value: {},
-  });
-  const id_4 = cs.nodes.insertNodePart<OutputNode>({
+  const id_3 = cs.nodes.insertNodePart<OutputNode>({
     name: "OUTPUT",
-    position: [1400, 50],
+    position: [500, 50],
     type: OutputType.name,
-  });
-
-  cs.links.upsertLink({
-    source: id_0.id,
-    target: id_1.id,
-    port: "input1",
-    scope: compositeNode.id,
-  });
-  cs.links.upsertLink({
-    source: id_1.id,
-    target: id_2.id,
-    port: "input1",
-    scope: compositeNode.id,
-  });
-  cs.links.upsertLink({
-    source: id_2.id,
-    target: id_3.id,
-    port: "input1",
-    scope: compositeNode.id,
-  });
-  cs.links.upsertLink({
-    source: id_3.id,
-    target: id_4.id,
-    port: id_4.id,
-    scope: compositeNode.id,
   });
 
   return cNodeContext;

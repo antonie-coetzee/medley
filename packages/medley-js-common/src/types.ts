@@ -74,6 +74,7 @@ export interface CType extends Type {
   description?: string;
   category?: string[];
   icon?: URL;
+  primitive?: boolean;
   repository?: string;
   system?: string;
   esm?: string;

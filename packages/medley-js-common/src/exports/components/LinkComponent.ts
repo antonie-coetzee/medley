@@ -22,6 +22,8 @@ export type LinkProps = {
   labelBgBorderRadius?: number;
   data?: unknown;
   style?: CSSProperties;
+  className?: string;
+  color?: string;
   arrowHeadType?: ArrowHeadType;
   markerEndId?: string;
   sourceHandleId?: string | null;

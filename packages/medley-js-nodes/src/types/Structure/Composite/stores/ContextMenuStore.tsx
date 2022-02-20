@@ -81,20 +81,6 @@ export class ContextMenuStore {
       }
       return (
         <>
-          <MenuItem
-            key={"run"}
-            onClick={async () => {
-              await editStore.runNode();
-              close();
-            }}
-          >
-            <Chip
-              label={"Run"}
-              color={"primary"}
-              variant="outlined"
-              style={{ borderWidth: "2px" }}
-            />
-          </MenuItem>
           {types.map((type) => {
             return (
               <MenuItem

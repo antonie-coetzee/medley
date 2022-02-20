@@ -56,19 +56,17 @@ export class Composer<MT extends MedleyTypes = MedleyTypes> {
       (async () => {}) as Input
     );
 
-    if (type.primitive === undefined || type.primitive === false) {
-      if (inputProvider == null) {
-        context.input = this.portInput.bind({
-          composer: this,
-          nodeId,
-        }) as Input;
-      } else {
-        context.input = this.providerInput.bind({
-          conductor: this,
-          context,
-          inputProvider,
-        }) as Input;
-      }
+    if (inputProvider == null) {
+      context.input = this.portInput.bind({
+        composer: this,
+        nodeId,
+      }) as Input;
+    } else {
+      context.input = this.providerInput.bind({
+        conductor: this,
+        context,
+        inputProvider,
+      }) as Input;
     }
     
     return nodeFunction(context, args);

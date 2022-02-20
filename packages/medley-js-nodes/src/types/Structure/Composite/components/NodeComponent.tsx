@@ -55,11 +55,6 @@ export const NodeComponent: TNodeComponent<CompositeNode> = ({
           paddingBottom: "0px",
         }}
         variant="outlined"
-        sx={
-          selected
-            ? { boxShadow: 2, borderWidth: "2px"}
-            : { borderWidth: "2px" }
-        }
       >
         <CardHeader
           sx={{

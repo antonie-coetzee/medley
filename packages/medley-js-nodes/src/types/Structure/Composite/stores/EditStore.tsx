@@ -105,7 +105,6 @@ export class EditStore {
     }
   }
 
-
   /**
    * create a new node, by first executing its
    * CreateNode function, then passing in the NodePart from there into the

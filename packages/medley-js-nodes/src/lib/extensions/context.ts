@@ -8,7 +8,7 @@ declare module "@medley-js/core" {
   }
   interface LinkContext<TLink extends MT["link"], MT extends MedleyTypes> {
     get observableLink():TLink;
-    getObservableNode: <TNode extends CNode = CNode>() => TNode;
+    getObservableNode: <TNode extends CNode = CNode>() => TNode | undefined;
   }
 }
 
@@ -47,9 +47,10 @@ LinkContext.prototype.getObservableNode = function <TNode extends CNode = CNode>
     const node = this.medley.nodes.getNode(this.link.source);
     if(node){
       return getObservableNode(this, node) as TNode;
-    }else{
-      throw new Error("source node not found for link");
     }
+    // }else{
+    //   throw new Error("source node not found for link");
+    // }
   }
 
 
