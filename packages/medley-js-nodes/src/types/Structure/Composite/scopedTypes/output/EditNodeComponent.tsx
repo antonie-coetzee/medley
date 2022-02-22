@@ -10,6 +10,11 @@ import { runInAction } from "mobx";
 
 export const EditNodeComponent: TEditNodeComponent<OutputNode> = (props) => {
   const node = props.context.observableNode;
+  if(node.value == null){
+    node.value = {
+      color: "black",
+    }
+  }
   return (
     <>
       <DialogContent>

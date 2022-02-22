@@ -5,22 +5,23 @@ import Chip from "@mui/material/Chip";
 import { OutputNode } from "./node";
 
 export const NodeComponent: TNodeComponent<OutputNode> = ({
-  context: { node },
+  context,
   selected,
 }) => {
+  const node = context.observableNode;
   return (
     <div style={{position:"relative"}}>
       <Chip
         label={node.name}
         variant="outlined"
-        style={{ borderWidth: "2px", paddingLeft: "8px" }}
+        style={{ borderWidth: "2px", paddingLeft: "8px", borderColor: node.value?.color ? node.value?.color : "#bdbdbd" }}
         size="small"
       />
       <Handle
         type="target"
         position={Position.Left}
         style={{
-          background: "#bdbdbd",
+          background: node.value?.color ? node.value.color : "#bdbdbd" ,
           left: "0px",
           height: "23px",
           border: "none",
