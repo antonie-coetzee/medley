@@ -1,10 +1,17 @@
-import { CNodeContext } from "@medley-js/common";
+import { CNodeContext, CType } from "@medley-js/common";
 import { Chip, MenuItem } from "@mui/material";
 import { makeAutoObservable, observable, toJS } from "mobx";
 import React from "react";
 import { CompositeNode } from "../node";
 import { InputType } from "../scopedTypes/input";
 import { EditStore } from "./EditStore";
+
+export type TypeTree = {
+  category:(string | URL),
+  label?: string,
+  order?:number,
+  types: (CType | TypeTree)[]
+}
 
 export class ContextMenuStore {
   public contextMenu: {
@@ -60,6 +67,13 @@ export class ContextMenuStore {
     }>[]
   ): void {
     this.menuItems = menuItems;
+  }
+
+  getTabs(){
+    return [{
+      category: "",
+      types: []
+    }]
   }
 
   menuAddInputNode(): React.VFC<{

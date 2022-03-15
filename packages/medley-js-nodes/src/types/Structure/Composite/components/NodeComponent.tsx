@@ -26,6 +26,7 @@ function getHandles(nodeStore: NodeStore) {
         portId={outputNode.id}
         key={outputNode.id}
         label={outputNode.name}
+        color={outputNode.value?.color}
       />,
     ];
   }

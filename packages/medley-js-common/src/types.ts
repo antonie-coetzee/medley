@@ -73,6 +73,7 @@ export interface CType extends Type {
   label?: string;
   description?: string;
   category?: string[];
+  categoryIcon?: URL;
   icon?: URL;
   primitive?: boolean;
   repository?: string;
